@@ -1,3 +1,4 @@
+以太智元的官网源代码，后面大家各种做产品做好了可以往这个总站接入。暂时托管域名：     https://angsheng.luluyun.xyz/
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

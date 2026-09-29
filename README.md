@@ -1,4 +1,15 @@
 以太智元的官网源代码，后面大家各种做产品做好了可以往这个总站接入。暂时托管域名：     https://angsheng.luluyun.xyz/
+
+# AethericAI · 以太智元官网
+
+## 项目治理
+
+本仓库使用 [project-to-act](https://github.com/redmaplewww/project-to-act)
+维护唯一的项目状态、版本和验收入口。先看
+[项目治理总览](.project-to-act/PROJECT_OVERVIEW.md)，文档入口见
+[项目文档索引](.project-to-act/docs/README.md)。生产部署在乌兰察布
+`https://8.130.144.193/official/`，不在仓库中保存服务器密钥或证书私钥。
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

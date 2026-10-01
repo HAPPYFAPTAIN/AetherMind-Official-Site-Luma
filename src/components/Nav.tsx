@@ -93,7 +93,8 @@ export function Nav() {
           </span>
         </a>
 
-        <div className="hidden items-center gap-1 xl:flex">
+        {/* Text spacing: (8px + 4px + 8px) × 1.18 = 23.6px. */}
+        <div className="hidden items-center gap-[7.6px] xl:flex">
           {NAV_LINKS.map((l) => (
             <a
               key={l.href}

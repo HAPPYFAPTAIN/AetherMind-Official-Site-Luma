@@ -1,0 +1,109 @@
+.legal-page {
+  min-height: 100dvh;
+  background: var(--bg-0);
+  color: #e7edf4;
+  padding: 28px 24px 80px;
+}
+.legal-page nav {
+  max-width: 850px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #a7b2bd;
+  font-size: 13px;
+}
+.legal-page nav button {
+  padding: 8px 14px;
+  border: 1px solid #28323d;
+  border-radius: 20px;
+}
+.legal-page article {
+  max-width: 850px;
+  margin: 44px auto 0;
+  padding: 48px;
+  border: 1px solid #222c36;
+  border-radius: 16px;
+  background: #0d1116;
+}
+.legal-brand {
+  color: var(--accent);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.legal-page h1 {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 18px;
+  text-wrap: balance;
+}
+.legal-meta {
+  font-size: 12px;
+  color: #a7b2bd;
+  margin-top: 12px;
+}
+.legal-intro {
+  text-wrap: balance;
+  margin: 26px 0;
+  font-size: 14px;
+  color: #c4ced7;
+  line-height: 1.9;
+}
+.legal-contents {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 24px;
+  background: #101821;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--accent);
+}
+.legal-page section {
+  margin-top: 36px;
+  scroll-margin-top: 24px;
+}
+.legal-page h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.legal-page section p {
+  font-size: 14px;
+  line-height: 2;
+  color: #b8c2cd;
+  text-wrap: pretty;
+}
+.legal-page footer {
+  border-top: 1px solid #222c36;
+  margin-top: 36px;
+  padding-top: 24px;
+  display: grid;
+  gap: 10px;
+  font-size: 13px;
+}
+.legal-page footer a {
+  color: var(--accent);
+}
+.legal-page :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .legal-page {
+    padding: 20px 16px 48px;
+  }
+  .legal-page article {
+    padding: 28px 22px;
+    margin-top: 28px;
+  }
+  .legal-page h1 {
+    font-size: 25px;
+  }
+  .legal-contents {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+}

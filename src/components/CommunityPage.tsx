@@ -226,7 +226,15 @@ export function CommunityPage() {
   const [moderationBusy, setModerationBusy] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [selected, setSelected] = useState<Post | null>(null);
-  const [loginOpen, setLoginOpen] = useState(false);
+  const goLogin = (compose = false) => {
+    const next = new URL(window.location.href);
+    if (compose) next.searchParams.set("compose", "1");
+    window.location.assign(
+      assetUrl("/login/") +
+        "?returnTo=" +
+        encodeURIComponent(next.pathname + next.search),
+    );
+  };
   const [composeOpen, setComposeOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [moderation, setModeration] = useState<Queue | null>(null);
@@ -298,6 +306,12 @@ export function CommunityPage() {
     }
     try {
       setProfile(await api<Profile>("/api/v1/community/me"));
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("compose") === "1") {
+        setComposeOpen(true);
+        url.searchParams.delete("compose");
+        window.history.replaceState({}, "", url);
+      }
     } catch {
       setProfile(null);
     }
@@ -538,7 +552,7 @@ export function CommunityPage() {
               </>
             ) : (
               <button
-                onClick={() => setLoginOpen(true)}
+                onClick={() => goLogin()}
                 className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-bg-0"
               >
                 {labels.signIn}
@@ -727,7 +741,7 @@ export function CommunityPage() {
                       throw error;
                     }
                   }}
-                  onNeedLogin={() => setLoginOpen(true)}
+                  onNeedLogin={() => goLogin()}
                   loggedIn={Boolean(profile)}
                 />
               )}
@@ -848,7 +862,7 @@ export function CommunityPage() {
                   <button
                     className="forum-primary"
                     onClick={() =>
-                      profile ? setComposeOpen(true) : setLoginOpen(true)
+                      profile ? setComposeOpen(true) : goLogin(true)
                     }
                   >
                     {labels.write}
@@ -946,9 +960,7 @@ export function CommunityPage() {
           <div className="forum-panel forum-compose-card">
             <button
               className="forum-primary"
-              onClick={() =>
-                profile ? setComposeOpen(true) : setLoginOpen(true)
-              }
+              onClick={() => (profile ? setComposeOpen(true) : goLogin(true))}
             >
               {zh ? "发布新话题" : "New discussion"}
             </button>
@@ -1036,25 +1048,6 @@ export function CommunityPage() {
               } catch (error) {
                 throw error;
               }
-            }}
-          />
-        </Dialog>
-      )}
-      {loginOpen && (
-        <Dialog onClose={() => setLoginOpen(false)}>
-          <LoginForm
-            labels={labels}
-            onSuccess={async (data) => {
-              window.localStorage.setItem(ACCESS_KEY, data.accessToken);
-              window.localStorage.setItem(REFRESH_KEY, data.refreshToken);
-              window.localStorage.setItem(
-                EXPIRES_KEY,
-                String(data.accessTokenExpiresAtEpochMs),
-              );
-              await loadProfile();
-              setLoginOpen(false);
-              setNotice(zh ? "登录成功" : "Signed in");
-              await loadPosts();
             }}
           />
         </Dialog>
@@ -1259,156 +1252,6 @@ function Avatar({ profile }: { profile: Author }) {
         profile.displayName.slice(0, 1)
       )}
     </span>
-  );
-}
-
-function LoginForm({
-  labels,
-  onSuccess,
-}: {
-  labels: Record<string, string>;
-  onSuccess: (data: AuthResponse) => Promise<void>;
-}) {
-  const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const [stage, setStage] = useState<"phone" | "code">("phone");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [cooldown, setCooldown] = useState(0);
-  const zh = labels === copy.zh;
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const timer = window.setTimeout(
-      () => setCooldown((value) => Math.max(0, value - 1)),
-      1000,
-    );
-    return () => window.clearTimeout(timer);
-  }, [cooldown]);
-  const sendCode = async () => {
-    if (!/^1[3-9][0-9]{9}$/.test(phone.trim()))
-      throw new Error(labels.phoneError);
-    const response = await fetch(`${API_BASE}/api/v1/auth/sms/request`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone: phone.trim() }),
-    });
-    if (!response.ok) {
-      const payload = await response.json().catch(() => null);
-      if (response.status === 429)
-        setCooldown(Number(payload?.error?.retryAfterSeconds || 60));
-      throw new Error(payload?.error?.message || labels.accountError);
-    }
-    setCooldown(60);
-    setStage("code");
-  };
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
-    setBusy(true);
-    setError("");
-    try {
-      if (stage === "phone") {
-        await sendCode();
-      } else {
-        const response = await fetch(`${API_BASE}/api/v1/auth/sms/verify`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, code }),
-        });
-        const data = await response.json();
-        if (!response.ok)
-          throw new Error(data.error?.message || labels.codeError);
-        await onSuccess(data);
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : labels.accountError);
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <form onSubmit={submit}>
-      <h2 className="text-xl font-semibold text-white">{labels.loginTitle}</h2>
-      <p className="mt-2 text-sm leading-6 text-text-tertiary">
-        {stage === "phone"
-          ? zh
-            ? "首次验证后自动创建账户；已有 LLMer 账户可直接登录。手机号不会公开。"
-            : "Your first verification creates an account. Existing LLMer accounts work here. Your phone number stays private."
-          : labels.sent}
-      </p>
-      <label className="mt-6 block text-xs text-text-tertiary">
-        {stage === "phone" ? labels.phone : labels.code}
-        <input
-          key={stage}
-          value={stage === "phone" ? phone : code}
-          onChange={(event) =>
-            stage === "phone"
-              ? setPhone(event.target.value)
-              : setCode(event.target.value)
-          }
-          inputMode={stage === "phone" ? "tel" : "numeric"}
-          autoComplete={stage === "phone" ? "tel-national" : "one-time-code"}
-          maxLength={stage === "phone" ? 11 : 8}
-          pattern={stage === "phone" ? "1[3-9][0-9]{9}" : "[0-9]{4,8}"}
-          autoFocus
-          required
-          className="mt-2 w-full rounded-xl border border-line bg-bg-0 p-3 text-sm text-white outline-none focus:border-accent"
-        />
-      </label>
-      {error && (
-        <p className="mt-3 text-sm text-accent" role="alert">
-          {error}
-        </p>
-      )}
-      <button
-        disabled={busy || (stage === "phone" && cooldown > 0)}
-        className="mt-5 w-full rounded-full bg-white px-5 py-3 text-sm font-semibold text-bg-0"
-      >
-        {busy
-          ? "…"
-          : stage === "phone"
-            ? cooldown > 0
-              ? `${cooldown}s`
-              : labels.send
-            : labels.verify}
-      </button>
-      {stage === "code" && (
-        <>
-          <button
-            disabled={busy || cooldown > 0}
-            type="button"
-            onClick={async () => {
-              setBusy(true);
-              setError("");
-              try {
-                await sendCode();
-              } catch (error) {
-                setError(
-                  error instanceof Error ? error.message : labels.accountError,
-                );
-              } finally {
-                setBusy(false);
-              }
-            }}
-            className="mt-4 w-full text-sm text-accent"
-          >
-            {cooldown > 0
-              ? zh
-                ? `${cooldown} 秒后可重发`
-                : `Resend in ${cooldown}s`
-              : zh
-                ? "重新发送验证码"
-                : "Resend code"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setStage("phone")}
-            className="mt-3 w-full text-xs text-text-faint"
-          >
-            {zh ? "更换手机号" : "Change phone number"}
-          </button>
-        </>
-      )}
-    </form>
   );
 }
 

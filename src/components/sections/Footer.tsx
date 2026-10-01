@@ -3,6 +3,7 @@
 import { BRAND, BRAND_DESC, BRAND_NAME } from "@/lib/site";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
+import { assetUrl } from "@/lib/asset-url";
 
 const COLUMNS = [
   {
@@ -98,10 +99,10 @@ export function Footer() {
             © {new Date().getFullYear()} {tr(language, BRAND_NAME.en, BRAND_NAME.zh)}. {tr(language, "All rights reserved.", "版权所有。")}
           </span>
           <div className="flex gap-6 font-mono text-[12px] tracking-[0.08em] text-text-faint">
-            <a href="#" className="whitespace-nowrap hover:text-text-secondary">
+            <a href={assetUrl("/legal/#section-3")} className="whitespace-nowrap hover:text-text-secondary">
               {tr(language, "Privacy", "隐私")}
             </a>
-            <a href="#" className="whitespace-nowrap hover:text-text-secondary">
+            <a href={assetUrl("/legal/")} className="whitespace-nowrap hover:text-text-secondary">
               {tr(language, "Terms", "条款")}
             </a>
             <a href="#" className="whitespace-nowrap hover:text-text-secondary">

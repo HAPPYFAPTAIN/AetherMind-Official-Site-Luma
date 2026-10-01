@@ -3,35 +3,31 @@
 import { Section } from "@/components/primitives/Section";
 import { Reveal } from "@/components/primitives/Reveal";
 import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
+import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { useLanguage } from "@/components/LanguageProvider";
+import { BRAND } from "@/lib/site";
 import { tr } from "@/lib/i18n";
+import { assetUrl } from "@/lib/asset-url";
 
 export function FinalCTA() {
   const { language } = useLanguage();
 
   return (
-    <Section id="console" className="flex min-h-[88vh] items-center py-32">
+    <Section id="console" className="science-finale flex items-center py-32" background={
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <EdgeFadeVisual variant="cta" className="absolute inset-0">
-          <div className="absolute bottom-[-6%] right-[-4%] h-[72vh] w-[52vw] opacity-60 mix-blend-screen">
-            <img
-              src="/images/g02/g02-10-emerging-scientific-core.full.webp"
-              alt=""
-              loading="lazy"
-              className="h-full w-full object-contain"
-            />
-          </div>
           <div className="absolute inset-[-6%] opacity-[0.16]">
             <img
-              src="/images/g01/g01-10-discovery-final.md.webp"
+              src={assetUrl("/images/g01/g01-10-discovery-final.md.webp")}
               alt=""
               loading="lazy"
               className="h-full w-full object-cover"
             />
           </div>
         </EdgeFadeVisual>
+        <ScienceScene mode="discovery" className="science-finale__object absolute inset-0" />
       </div>
-
+    }>
       <div className="relative w-full">
         <Reveal>
           <div className="mono-label mb-8 flex items-center gap-3">
@@ -57,11 +53,9 @@ export function FinalCTA() {
         </Reveal>
         <Reveal delay={0.14}>
           <p className="zh-copy mt-8 max-w-md text-base leading-relaxed text-text-tertiary sm:text-lg">
-            {tr(
-              language,
-              "Join the labs already accelerating materials, chemistry and molecular science with ANGSHENG.",
-              "越来越多实验室正在借助 ANGSHENG，加快材料、化学和分子科学研究。",
-            )}
+            {language === "zh" ? (
+              <>越来越多实验室正在借助{BRAND.zh}，加快<span className="zh-term">材料</span>、<span className="zh-term">化学</span>和<span className="zh-term">分子科学</span>研究。</>
+            ) : `Join the labs already accelerating materials, chemistry and molecular science with ${BRAND.en}.`}
           </p>
         </Reveal>
         <Reveal delay={0.2}>

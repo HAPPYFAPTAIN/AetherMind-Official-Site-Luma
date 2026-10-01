@@ -5,6 +5,7 @@ import { Reveal } from "@/components/primitives/Reveal";
 import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
+import { assetUrl } from "@/lib/asset-url";
 
 const TAGS = [
   { en: "Molecular Dynamics", zh: "分子动力学" },
@@ -31,7 +32,7 @@ export function PlatformDefinition() {
         <EdgeFadeVisual variant="section" className="absolute inset-0">
           <div className="absolute left-1/2 top-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 opacity-[0.14]">
             <img
-              src="/images/g01/g01-09-multiscale-science.md.webp"
+              src={assetUrl("/images/g01/g01-09-multiscale-science.md.webp")}
               alt=""
               className="h-full w-full object-cover"
               loading="lazy"

@@ -6,6 +6,7 @@ import { Reveal, prefersReducedMotion } from "@/components/primitives/Reveal";
 import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
+import { assetUrl } from "@/lib/asset-url";
 
 const METRICS = [
   { value: "128", label: { en: "GPUs orchestrated per job", zh: "单个任务可调度的 GPU" } },
@@ -48,24 +49,53 @@ function Sparkline() {
 
 export function ComputationalEngine() {
   const { language } = useLanguage();
+  const contentRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(1248212);
   const [temp, setTemp] = useState(300.02);
   const [util, setUtil] = useState(78.4);
 
   useEffect(() => {
-    if (prefersReducedMotion()) return;
-    let raf = 0;
+    const section = contentRef.current?.closest("section");
+    if (!section || typeof IntersectionObserver === "undefined") return;
+
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let inView = false;
+    let timer: number | undefined;
     let last = performance.now();
-    const tick = (now: number) => {
-      const dt = Math.min(0.1, (now - last) / 1000);
+
+    const tick = () => {
+      const now = performance.now();
+      const dt = Math.min(0.5, (now - last) / 1000);
       last = now;
       setStep((s) => s + Math.floor(dt * 4000 + Math.random() * 60));
       setTemp(300.02 + Math.sin(now / 900) * 0.6 + (Math.random() - 0.5) * 0.1);
       setUtil(78 + Math.sin(now / 1400) * 6 + (Math.random() - 0.5) * 2);
-      raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+
+    const syncTimer = () => {
+      if (!inView || document.hidden || motion.matches) {
+        window.clearInterval(timer);
+        timer = undefined;
+      } else if (timer === undefined) {
+        last = performance.now();
+        timer = window.setInterval(tick, 250);
+      }
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      syncTimer();
+    });
+    observer.observe(section);
+    document.addEventListener("visibilitychange", syncTimer);
+    motion.addEventListener("change", syncTimer);
+
+    return () => {
+      window.clearInterval(timer);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", syncTimer);
+      motion.removeEventListener("change", syncTimer);
+    };
   }, []);
 
   return (
@@ -74,7 +104,7 @@ export function ComputationalEngine() {
         <EdgeFadeVisual variant="section" className="absolute inset-0">
           <div className="absolute inset-[-6%] opacity-[0.35]">
             <img
-              src="/images/g01/g01-08-computational-engine.md.webp"
+              src={assetUrl("/images/g01/g01-08-computational-engine.md.webp")}
               alt=""
               className="h-full w-full object-cover"
               loading="lazy"
@@ -83,7 +113,7 @@ export function ComputationalEngine() {
         </EdgeFadeVisual>
       </div>
 
-      <div className="relative grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
+      <div ref={contentRef} className="relative grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
         <div>
           <Reveal>
             <div className="mono-label mb-8 flex items-center gap-3">

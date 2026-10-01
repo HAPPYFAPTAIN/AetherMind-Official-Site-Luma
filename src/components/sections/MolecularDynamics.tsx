@@ -1,76 +1,12 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
 import { Section } from "@/components/primitives/Section";
-import { Reveal, prefersReducedMotion } from "@/components/primitives/Reveal";
+import { Reveal } from "@/components/primitives/Reveal";
 import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
+import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
-
-function Trajectory() {
-  const ref = useRef<SVGSVGElement>(null);
-
-  useLayoutEffect(() => {
-    const svg = ref.current;
-    if (!svg) return;
-    const path = svg.querySelector("path");
-    if (!path) return;
-
-    // brownian-like random walk path
-    let x = 6;
-    let y = 50;
-    const pts = [`${x},${y}`];
-    for (let i = 0; i < 90; i++) {
-      x += 0.4 + Math.random() * 1.1;
-      y += (Math.random() - 0.5) * 22;
-      y = Math.max(8, Math.min(92, y));
-      pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
-    }
-    const d = `M ${pts.join(" L ")}`;
-    path.setAttribute("d", d);
-    const len = path.getTotalLength();
-
-    if (prefersReducedMotion() || typeof IntersectionObserver === "undefined") {
-      path.style.strokeDasharray = `${len}`;
-      return;
-    }
-
-    path.style.strokeDasharray = `${len}`;
-    path.style.strokeDashoffset = `${len}`;
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          path.style.transition = "stroke-dashoffset 2.2s linear";
-          path.style.strokeDashoffset = "0";
-          io.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-    io.observe(svg);
-    return () => io.disconnect();
-  }, []);
-
-  return (
-    <svg
-      ref={ref}
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      className="h-full w-full"
-    >
-      <path
-        fill="none"
-        stroke="var(--accent)"
-        strokeWidth="0.5"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-        opacity="0.85"
-      />
-      <circle cx="6" cy="50" r="1" fill="var(--accent)" opacity="0.4" />
-    </svg>
-  );
-}
+import { assetUrl } from "@/lib/asset-url";
 
 const PARAMS = [
   { label: { en: "Timestep", zh: "时间步长" }, value: { en: "2.0 fs", zh: "2.0 fs" } },
@@ -88,7 +24,7 @@ export function MolecularDynamics() {
         <EdgeFadeVisual variant="section" className="absolute inset-0">
           <div className="absolute inset-[-6%] opacity-40">
             <img
-              src="/images/g01/g01-03-lammps-millions-atoms.full.webp"
+              src={assetUrl("/images/g01/g01-03-lammps-millions-atoms.full.webp")}
               alt=""
               className="h-full w-full object-cover"
               loading="lazy"
@@ -150,20 +86,13 @@ export function MolecularDynamics() {
         <div className="lg:col-span-6">
           <Reveal delay={0.1} y={40}>
             <div className="glass relative aspect-[16/10] overflow-hidden rounded-2xl">
-              <div className="absolute inset-0 opacity-90">
-                <SceneImageLazy language={language} />
-              </div>
-              <div className="absolute inset-0 grid-overlay opacity-20" />
-              {/* trajectory overlay */}
-              <div className="absolute inset-x-6 bottom-4 h-1/3 opacity-80">
-                <Trajectory />
-              </div>
-              <div className="absolute left-5 top-5 flex items-center gap-2">
+              <ScienceScene mode="simulation" className="absolute inset-0" />
+              <div className="pointer-events-none absolute left-5 top-5 z-10 flex items-center gap-2">
                 <span className="mono-label whitespace-nowrap">
-                  {tr(language, "trajectory · 400 ns", "轨迹 · 400 ns")}
+                  {tr(language, "Structural evolution", "结构演化示意")}
                 </span>
               </div>
-              <div className="absolute right-5 top-5 font-mono text-[11px] tracking-[0.12em] text-accent">
+              <div className="pointer-events-none absolute right-5 top-5 z-10 font-mono text-[11px] tracking-[0.12em] text-accent">
                 ⟨Δr²⟩ = 6Dt
               </div>
             </div>
@@ -171,16 +100,5 @@ export function MolecularDynamics() {
         </div>
       </div>
     </Section>
-  );
-}
-
-function SceneImageLazy({ language }: { language: "en" | "zh" }) {
-  return (
-    <img
-      src="/images/g01/g01-02-molecular-dynamics.md.webp"
-      alt={tr(language, "Molecular dynamics trajectory visualization", "分子动力学轨迹可视化")}
-      className="h-full w-full object-cover"
-      loading="lazy"
-    />
   );
 }

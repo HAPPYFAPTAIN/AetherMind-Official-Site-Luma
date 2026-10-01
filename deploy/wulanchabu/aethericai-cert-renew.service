@@ -1,0 +1,10 @@
+[Unit]
+Description=Renew the AethericAI public IP certificate
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/aethericai-official/tools/certbot/bin/certbot renew --cert-name aethericai-official-ip --quiet --no-random-sleep-on-renew --deploy-hook "/usr/sbin/nginx -t && /usr/bin/systemctl reload nginx"
+TimeoutStartSec=600
+UMask=0077

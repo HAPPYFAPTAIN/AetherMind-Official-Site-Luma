@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Inter_Tight, Geist_Mono } from "next/font/google";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import { BRAND } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,7 +23,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ANGSHENG — AI for Science",
+  title: `${BRAND.en} — AI for Science`,
   description:
     "AI-native scientific computing for molecular dynamics, materials research, LAMMPS workflows and AI for Science.",
   keywords: [
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
     "HPC",
   ],
   openGraph: {
-    title: "ANGSHENG — AI for Science",
+    title: `${BRAND.en} — AI for Science`,
     description:
       "AI-native scientific computing for molecular simulation, materials research and scientific discovery.",
     type: "website",

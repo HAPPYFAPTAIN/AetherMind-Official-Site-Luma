@@ -6,6 +6,7 @@ import { Reveal } from "@/components/primitives/Reveal";
 import { ASSETS, type AssetKey } from "@/lib/assets";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
+import { assetUrl } from "@/lib/asset-url";
 
 const SCENARIOS: { title: { en: string; zh: string }; tag: { en: string; zh: string }; id: AssetKey }[] = [
   { title: { en: "Materials Science", zh: "材料科学" }, tag: { en: "alloys · defects · interfaces", zh: "合金 · 缺陷 · 界面" }, id: "g01-04-materials-science" },
@@ -88,14 +89,12 @@ export function Scenarios() {
               {SCENARIOS.map((s, i) => (
                 <img
                   key={s.id}
-                  src={ASSETS[s.id].src.md}
+                  src={assetUrl(ASSETS[s.id].src.md)}
                   alt={tr(language, s.title.en, s.title.zh)}
                   loading={i === 0 ? "eager" : "lazy"}
-                  className="absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out"
+                  className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-out"
                   style={{
                     opacity: active === i ? 1 : 0,
-                    transform: active === i ? "scale(1)" : "scale(1.06)",
-                    filter: active === i ? "blur(0px)" : "blur(6px)",
                   }}
                 />
               ))}

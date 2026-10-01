@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { BRAND, NAV_LINKS } from "@/lib/site";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
+import { assetUrl } from "@/lib/asset-url";
 
 function Mark() {
   return (
@@ -61,7 +62,9 @@ export function Nav() {
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      const a = (e.target as HTMLElement).closest('a[href^="#"]') as HTMLAnchorElement | null;
+      const a = (e.target as HTMLElement).closest(
+        'a[href^="#"]',
+      ) as HTMLAnchorElement | null;
       if (!a) return;
       const id = a.getAttribute("href");
       if (!id || id === "#") return;
@@ -86,7 +89,7 @@ export function Nav() {
         <a href="#top" className="flex items-center gap-3 text-white">
           <Mark />
           <span className="font-display text-[15px] font-semibold tracking-[0.22em]">
-            {BRAND}
+            {tr(language, BRAND.en, BRAND.zh)}
           </span>
         </a>
 
@@ -94,8 +97,12 @@ export function Nav() {
           {NAV_LINKS.map((l) => (
             <a
               key={l.href}
-              href={l.href}
-              className="link-quiet whitespace-nowrap rounded-full px-4 py-2 text-[13.5px] font-medium"
+              href={
+                "externalPath" in l && l.externalPath
+                  ? assetUrl(l.href)
+                  : l.href
+              }
+              className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[13px] font-medium"
             >
               {tr(language, l.label.en, l.label.zh)}
             </a>
@@ -122,7 +129,9 @@ export function Nav() {
               aria-pressed={language === "en"}
               title="English"
               className={`h-8 min-w-8 rounded-full px-2 font-mono text-[10px] font-medium tracking-[0.08em] transition-colors ${
-                language === "en" ? "bg-white text-bg-0" : "text-text-tertiary hover:text-white"
+                language === "en"
+                  ? "bg-white text-bg-0"
+                  : "text-text-tertiary hover:text-white"
               }`}
             >
               EN
@@ -133,7 +142,9 @@ export function Nav() {
               aria-pressed={language === "zh"}
               title="中文"
               className={`h-8 min-w-8 rounded-full px-2 font-mono text-[10px] font-medium tracking-[0.08em] transition-colors ${
-                language === "zh" ? "bg-white text-bg-0" : "text-text-tertiary hover:text-white"
+                language === "zh"
+                  ? "bg-white text-bg-0"
+                  : "text-text-tertiary hover:text-white"
               }`}
             >
               中
@@ -171,14 +182,20 @@ export function Nav() {
       {/* mobile menu */}
       <div
         className={`overflow-hidden border-b border-line bg-bg-0/95 backdrop-blur-xl transition-[max-height,opacity] duration-500 xl:hidden ${
-          open ? "max-h-[420px] opacity-100" : "max-h-0 opacity-0"
+          open
+            ? "max-h-[calc(100dvh-72px)] overflow-y-auto opacity-100"
+            : "max-h-0 opacity-0"
         }`}
       >
         <div className="space-y-1 px-6 py-6">
           {NAV_LINKS.map((l) => (
             <a
               key={l.href}
-              href={l.href}
+              href={
+                "externalPath" in l && l.externalPath
+                  ? assetUrl(l.href)
+                  : l.href
+              }
               onClick={() => setOpen(false)}
               className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary hover:text-white"
             >

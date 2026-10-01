@@ -57,7 +57,7 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-3">
               <span className="font-display text-lg font-semibold tracking-[0.22em] text-white">
-                {BRAND}
+                {tr(language, BRAND.en, BRAND.zh)}
               </span>
             </div>
             <p className="zh-copy mt-4 max-w-xs text-[14px] leading-relaxed text-text-tertiary">
@@ -95,7 +95,7 @@ export function Footer() {
 
         <div className="mt-16 flex flex-col items-start justify-between gap-4 border-t border-line pt-8 sm:flex-row sm:items-center">
           <span className="font-mono text-[12px] tracking-[0.08em] text-text-faint">
-            © {new Date().getFullYear()} {BRAND_NAME}. {tr(language, "All rights reserved.", "版权所有。")}
+            © {new Date().getFullYear()} {tr(language, BRAND_NAME.en, BRAND_NAME.zh)}. {tr(language, "All rights reserved.", "版权所有。")}
           </span>
           <div className="flex gap-6 font-mono text-[12px] tracking-[0.08em] text-text-faint">
             <a href="#" className="whitespace-nowrap hover:text-text-secondary">

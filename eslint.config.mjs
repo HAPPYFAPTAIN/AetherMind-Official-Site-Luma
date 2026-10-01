@@ -11,6 +11,9 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    // Bundled Three.js and generated visual verification artifacts.
+    "public/science/scene-worker-*.js",
+    "output/**",
     "next-env.d.ts",
   ]),
 ]);

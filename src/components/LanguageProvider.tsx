@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { LANGUAGE_STORAGE_KEY, type Language } from "@/lib/i18n";
+import { BRAND } from "@/lib/site";
 
 type LanguageContextValue = {
   language: Language;
@@ -69,7 +70,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
     const updateMetadata = () => {
       document.title =
-        language === "zh" ? "ANGSHENG — 科学智能计算平台" : "ANGSHENG — AI for Science";
+        language === "zh" ? `${BRAND.zh} — 科学智能计算平台` : `${BRAND.en} — AI for Science`;
 
       const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
       if (description) {

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ASSETS, type AssetKey } from "@/lib/assets";
+import { assetUrl } from "@/lib/asset-url";
 
 type Props = {
   id: AssetKey;
@@ -52,15 +53,15 @@ export function SceneImage({
   return (
     <div className={`relative h-full w-full overflow-hidden ${className}`} style={style}>
       <img
-        src={asset.src.lqip}
+        src={assetUrl(asset.src.lqip)}
         alt=""
         aria-hidden
         className={`absolute inset-0 h-full w-full scale-110 ${fitClass} blur-xl`}
       />
       <img
         ref={imgRef}
-        src={asset.src[variant]}
-        srcSet={`${asset.src.sm} 640w, ${asset.src.md} 960w, ${asset.src.full} 1600w`}
+        src={assetUrl(asset.src[variant])}
+        srcSet={`${assetUrl(asset.src.sm)} 640w, ${assetUrl(asset.src.md)} 960w, ${assetUrl(asset.src.full)} 1600w`}
         sizes={sizes}
         alt={alt}
         loading={priority ? "eager" : "lazy"}

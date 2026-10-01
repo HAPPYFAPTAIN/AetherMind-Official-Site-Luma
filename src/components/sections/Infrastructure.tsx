@@ -4,6 +4,7 @@ import { Section } from "@/components/primitives/Section";
 import { Reveal } from "@/components/primitives/Reveal";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
+import { assetUrl } from "@/lib/asset-url";
 
 const MODES = [
   {
@@ -141,7 +142,7 @@ export function Infrastructure() {
         <Reveal delay={0.1} y={40}>
           <div className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-bg-1">
             <img
-              src="/images/g03/g03-09-dark-scientific-material.md.webp"
+              src={assetUrl("/images/g03/g03-09-dark-scientific-material.md.webp")}
               alt=""
               loading="lazy"
               className="absolute inset-0 h-full w-full object-cover opacity-70"

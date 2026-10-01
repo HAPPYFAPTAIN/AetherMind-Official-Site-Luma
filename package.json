@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "bun scripts/build-science-worker.ts && next dev",
+    "build": "bun scripts/build-science-worker.ts && next build",
+    "build:ip": "NEXT_PUBLIC_BASE_PATH=/official bun run build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -12,13 +13,15 @@
     "gsap": "^3.15.0",
     "next": "16.3.2",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "three": "0.185.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "0.185.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
     "sharp": "^0.35.3",

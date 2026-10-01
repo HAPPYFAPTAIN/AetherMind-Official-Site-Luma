@@ -3,28 +3,29 @@
 import { Section } from "@/components/primitives/Section";
 import { Reveal } from "@/components/primitives/Reveal";
 import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
-import { ASSETS } from "@/lib/assets";
+import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
+import { assetUrl } from "@/lib/asset-url";
 
 const STAGES = [
   {
     n: "01",
     title: { en: "Structure", zh: "结构" },
     desc: { en: "Matter as it is — coordinates, bonds, symmetry, defects.", zh: "用坐标、化学键、对称性和缺陷，忠实描述物质本身。" },
-    id: "g02-02-crystal-lattice-block" as const,
+    mode: "structure" as const,
   },
   {
     n: "02",
     title: { en: "Representation", zh: "表征" },
     desc: { en: "Learned embeddings that respect the underlying physics.", zh: "学习符合底层物理规律的有效表征。" },
-    id: "g02-09-computational-representation" as const,
+    mode: "representation" as const,
   },
   {
     n: "03",
     title: { en: "Prediction", zh: "预测" },
     desc: { en: "New candidates, ranked and validated against simulation.", zh: "对新候选结果排序，再通过模拟完成验证。" },
-    id: "g02-10-emerging-scientific-core" as const,
+    mode: "prediction" as const,
   },
 ];
 
@@ -37,7 +38,7 @@ export function AIScience() {
         <EdgeFadeVisual variant="section" className="absolute inset-0">
           <div className="absolute inset-[-6%] opacity-[0.22]">
             <img
-              src="/images/g01/g01-06-ai-science-transformation.md.webp"
+              src={assetUrl("/images/g01/g01-06-ai-science-transformation.md.webp")}
               alt=""
               className="h-full w-full object-cover"
               loading="lazy"
@@ -116,13 +117,7 @@ export function AIScience() {
                       {tr(language, s.desc.en, s.desc.zh)}
                     </p>
                     <div className="relative mt-5 aspect-[16/9] overflow-hidden rounded-xl border border-line">
-                      <img
-                        src={ASSETS[s.id].src.md}
-                        alt={tr(language, s.title.en, s.title.zh)}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-bg-0/60 to-transparent" />
+                      <ScienceScene mode={s.mode} className="absolute inset-0" />
                     </div>
                   </div>
                 </div>

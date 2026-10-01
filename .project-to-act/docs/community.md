@@ -17,8 +17,14 @@
 - 官网页面：`https://8.130.144.193/official/community/`
 - 公共列表 API：`/llmer-api/api/v1/community/posts`
 - 账号和头像仅代理明确的认证路由、资料路由和头像路由，其他 LLMer 后台和支付接口不通过官网暴露。
-- 官网静态版本目录：`/opt/aethericai-official/releases/20261001-community-v2`
-- LLMer 版本目录：`/srv/llmer-api/releases/20260930195000`
+- 官网静态版本目录：`/opt/aethericai-official/releases/20261001-community-layout-final`
+- LLMer 版本目录：`/srv/llmer-api/releases/20261001-community-layout`，基于当天已有版本增量更新社区路由。
+
+## 2026-10-01 页面结构
+
+参考 https://forum.sidereus-ai.com/ 的首页与话题详情，浏览器插件实看后采用双层导航、头像话题行、右侧发帖/小贴士/活跃会员/统计、独立正文阅读区及作者侧栏。保留 AethericAI 深色、浅蓝点缀及原字体，不复制第三方文章、头像或会员数据。
+
+板块沿用现有分类。排序支持默认、新帖、置顶、热门讨论和最新回复；热门按可见回复数排序。帖子链接使用兼容静态导出的 `?topic=<id>`，支持刷新与浏览器前进后退。统计来自 `GET /api/v1/community/overview`，会员仅统计公开发帖/回复者，不公开 LLMer 私有账户总量。
 
 ## 验收证据
 
@@ -26,3 +32,6 @@
 - 官网 `bun run lint`：0 errors，保留既有图片优化 warning。
 - 官网 `bun run build:ip`：静态构建通过，生成 `/official/community/`。
 - 公网 API、官网页面和 390px 移动端页面已通过浏览器检查。
+- 本轮社区与认证专项测试 11 项通过；验证排序分页、隐藏数据不计数和私有账户不计数。
+- 浏览器本地隔离数据库完成登录、发帖、统计更新、阅读页；桌面中英文及 390/768/1280/1440px 布局检查。测试账户和帖子仅存在于临时目录。
+- 本轮未测试真实短信收发，未指定管理员账号；此前的待办仍保留。

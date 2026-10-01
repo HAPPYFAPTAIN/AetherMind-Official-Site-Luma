@@ -5,6 +5,7 @@ import { assetUrl } from "@/lib/asset-url";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
 import Image from "next/image";
+import "./community.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/llmer-api";
 const ACCESS_KEY = "aethericai-community-access-token";
@@ -211,6 +212,13 @@ export function CommunityPage() {
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
+  const [order, setOrder] = useState("default");
+  const [overview, setOverview] = useState<{
+    members: number;
+    topics: number;
+    replies: number;
+    activeMembers: Profile[];
+  } | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [moreBusy, setMoreBusy] = useState(false);
   const [publicProfile, setPublicProfile] = useState<Profile | null>(null);
@@ -298,17 +306,17 @@ export function CommunityPage() {
   const loadPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await api<{ items: Post[]; nextCursor: string | null }>(
-        `/api/v1/community/posts?status=${status}&q=${encodeURIComponent(query)}${category === "all" ? "" : `&category=${encodeURIComponent(category)}`}`,
+      const data = await api<{ items: Post[]; nextOffset: number | null }>(
+        `/api/v1/community/posts?order=${order}&status=${status}&q=${encodeURIComponent(query)}${category === "all" ? "" : `&category=${encodeURIComponent(category)}`}`,
       );
       setPosts(data.items);
-      setNextCursor(data.nextCursor);
+      setNextCursor(data.nextOffset == null ? null : String(data.nextOffset));
     } catch (error) {
       setNotice(error instanceof Error ? error.message : labels.accountError);
     } finally {
       setLoading(false);
     }
-  }, [api, category, labels.accountError, status, query]);
+  }, [api, category, labels.accountError, status, query, order]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -320,7 +328,46 @@ export function CommunityPage() {
     const timer = window.setTimeout(() => setQuery(search.trim()), 300);
     return () => window.clearTimeout(timer);
   }, [search]);
-  const visiblePosts = posts;
+  useEffect(() => {
+    let cancelled = false;
+    void api<{
+      members: number;
+      topics: number;
+      replies: number;
+      activeMembers: Profile[];
+    }>("/api/v1/community/overview")
+      .then((data) => {
+        if (!cancelled) setOverview(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [api, posts]);
+  useEffect(() => {
+    const navigate = () => {
+      const id = new URLSearchParams(window.location.search).get("topic");
+      if (!id) {
+        setSelected(null);
+        return;
+      }
+      void api<Post>(`/api/v1/community/posts/${encodeURIComponent(id)}`)
+        .then(setSelected)
+        .catch((error) => setNotice(error.message));
+    };
+    const timer = window.setTimeout(navigate, 0);
+    window.addEventListener("popstate", navigate);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("popstate", navigate);
+    };
+  }, [api]);
+  const closeTopic = () => {
+    setSelected(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("topic");
+    window.history.pushState({}, "", url);
+  };
   const showProfile = async (author: Author) => {
     try {
       setPublicProfile(
@@ -349,14 +396,14 @@ export function CommunityPage() {
     if (!nextCursor || moreBusy) return;
     setMoreBusy(true);
     try {
-      const data = await api<{ items: Post[]; nextCursor: string | null }>(
-        `/api/v1/community/posts?status=${status}&q=${encodeURIComponent(query)}&cursor=${encodeURIComponent(nextCursor)}${category === "all" ? "" : `&category=${category}`}`,
+      const data = await api<{ items: Post[]; nextOffset: number | null }>(
+        `/api/v1/community/posts?order=${order}&status=${status}&q=${encodeURIComponent(query)}&offset=${encodeURIComponent(nextCursor)}${category === "all" ? "" : `&category=${category}`}`,
       );
       setPosts((previous) => [
         ...previous,
         ...data.items.filter((item) => !previous.some((p) => p.id === item.id)),
       ]);
-      setNextCursor(data.nextCursor);
+      setNextCursor(data.nextOffset == null ? null : String(data.nextOffset));
     } catch (error) {
       setNotice(error instanceof Error ? error.message : labels.accountError);
     } finally {
@@ -367,6 +414,10 @@ export function CommunityPage() {
   const openPost = async (post: Post) => {
     try {
       setSelected(await api<Post>(`/api/v1/community/posts/${post.id}`));
+      const url = new URL(window.location.href);
+      url.searchParams.set("topic", post.id);
+      window.history.pushState({}, "", url);
+      window.scrollTo({ top: 0, behavior: "instant" });
     } catch (error) {
       setNotice(error instanceof Error ? error.message : labels.accountError);
     }
@@ -412,14 +463,50 @@ export function CommunityPage() {
     <main className="community-page min-h-screen bg-bg-0 text-text-primary">
       <style>{`.community-page{--text-faint:#929aa4;--text-tertiary:#a1a9b2}.community-dialog{--text-faint:#929aa4;--text-tertiary:#a1a9b2}.community-page button:disabled,.community-dialog button:disabled{opacity:.5;cursor:wait}.community-page h1{text-wrap:balance}.community-dialog p,.community-page h2{overflow-wrap:anywhere}.community-page :focus-visible,.community-dialog :focus-visible{outline:2px solid var(--accent);outline-offset:3px}`}</style>
       <header className="sticky top-0 z-40 border-b border-line bg-bg-0/90 backdrop-blur-xl">
-        <div className="mx-auto flex min-h-16 max-w-[1400px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
+        <div className="forum-container forum-header">
           <a
             href={assetUrl("/")}
             className="font-display text-sm font-semibold tracking-[0.18em] text-white"
           >
             {tr(language, "AethericAI", "以太智元")}
           </a>
-          <div className="flex items-center gap-2">
+          <nav
+            className="forum-sections"
+            aria-label={zh ? "社区板块" : "Community sections"}
+          >
+            {[
+              ["all", zh ? "社区" : "Community"],
+              ["methods", zh ? "经验" : "Methods"],
+              ["materials", zh ? "材料" : "Materials"],
+              ["simulation", zh ? "模拟" : "Simulation"],
+              ["discussion", zh ? "交流" : "Discussion"],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                aria-current={category === value ? "page" : undefined}
+                onClick={() => {
+                  setCategory(value);
+                  closeTopic();
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+          <label className="forum-search">
+            <span className="sr-only">{labels.search}</span>
+            <input
+              aria-label={labels.search}
+              placeholder={labels.search}
+              value={search}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                if (selected) closeTopic();
+              }}
+              maxLength={100}
+            />
+          </label>
+          <div className="forum-account flex items-center gap-2">
             <button
               aria-label={zh ? "Switch to English" : "切换中文"}
               onClick={() => setLanguage(zh ? "en" : "zh")}
@@ -460,189 +547,472 @@ export function CommunityPage() {
           </div>
         </div>
       </header>
-      <div className="mx-auto grid max-w-[1400px] gap-8 px-5 py-9 sm:px-8 lg:grid-cols-[190px_minmax(0,1fr)_240px] lg:px-12 lg:py-14">
-        <aside className="flex flex-wrap gap-1 lg:block lg:space-y-1">
-          <p className="hidden mono-label px-3 pb-3 text-text-faint lg:block">
-            {zh ? "社区" : "COMMUNITY"}
-          </p>
-          {[
-            ["all", labels.all],
-            ["discussion", labels.discussion],
-            ["materials", labels.materials],
-            ["simulation", labels.simulation],
-            ["methods", labels.methods],
-          ].map(([value, label]) => (
+      <nav
+        className="forum-filter-bar"
+        aria-label={zh ? "话题排序" : "Topic order"}
+      >
+        <div className="forum-container forum-filter-inner">
+          {(
+            [
+              ["default", zh ? "默认" : "Overview"],
+              ["new", zh ? "新帖" : "New"],
+              ["pinned", zh ? "置顶" : "Pinned"],
+              ["popular", zh ? "热门讨论" : "Popular"],
+              ["replies", zh ? "最新回复" : "Latest replies"],
+            ] as const
+          ).map(([value, label]) => (
             <button
               key={value}
-              onClick={() => setCategory(value)}
-              aria-pressed={category === value}
-              className={`block whitespace-nowrap rounded-xl px-3 py-2.5 text-left text-sm transition lg:w-full ${category === value ? "bg-white/[0.08] text-white" : "text-text-tertiary hover:bg-white/[0.04] hover:text-white"}`}
+              aria-pressed={order === value}
+              onClick={() => {
+                setOrder(value);
+                closeTopic();
+              }}
             >
               {label}
             </button>
           ))}
-          <div className="hidden mt-7 border-t border-line pt-5 lg:block">
-            {profile ? (
-              <button
-                onClick={() => setProfileOpen(true)}
-                className="block w-full rounded-xl px-3 py-2.5 text-left text-sm text-text-tertiary hover:text-white"
-              >
-                {labels.profile}
-              </button>
-            ) : (
-              <button
-                onClick={() => setLoginOpen(true)}
-                className="block w-full rounded-xl px-3 py-2.5 text-left text-sm text-text-tertiary hover:text-white"
-              >
-                {labels.signIn}
-              </button>
-            )}
-          </div>
-        </aside>
-        <section className="min-w-0">
-          <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="mono-label text-accent">{labels.eyebrow}</p>
-              <h1 className="mt-3 max-w-2xl font-display text-[32px] leading-[1.2] font-semibold tracking-[-0.03em] text-white sm:text-[40px]">
-                {labels.title}
-              </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-text-tertiary">
-                {labels.sub}
-              </p>
-            </div>
-            <button
-              onClick={() =>
-                profile ? setComposeOpen(true) : setLoginOpen(true)
-              }
-              className="shrink-0 whitespace-nowrap rounded-full bg-white px-5 py-3 text-sm font-semibold text-bg-0"
-            >
-              {labels.write}
-            </button>
-          </div>
-          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex gap-2">
-              <button
-                onClick={() => setStatus("OPEN")}
-                className={`rounded-full px-4 py-2 text-xs ${status === "OPEN" ? "bg-accent text-bg-0" : "border border-line-strong text-text-tertiary"}`}
-              >
-                {labels.open}
-              </button>
-              <button
-                onClick={() => setStatus("CLOSED")}
-                className={`rounded-full px-4 py-2 text-xs ${status === "CLOSED" ? "bg-accent text-bg-0" : "border border-line-strong text-text-tertiary"}`}
-              >
-                {labels.closed}
-              </button>
-            </div>
-            <label className="flex items-center gap-2 rounded-full border border-line bg-white/[0.02] px-3 py-2 text-xs text-text-faint">
-              <span className="sr-only">{labels.search}</span>
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder={labels.search}
-                className="w-full bg-transparent text-sm text-white outline-none placeholder:text-text-faint sm:w-48"
-              />
-            </label>
-          </div>
+          <select
+            aria-label={zh ? "讨论状态" : "Discussion status"}
+            value={status}
+            onChange={(event) =>
+              setStatus(event.target.value as "OPEN" | "CLOSED")
+            }
+          >
+            <option value="OPEN">{labels.open}</option>
+            <option value="CLOSED">{labels.closed}</option>
+          </select>
+        </div>
+      </nav>
+      <div className="forum-container forum-layout">
+        <section className="forum-main">
           {notice && (
-            <div
-              className="mb-4 rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-white"
-              role="status"
-            >
+            <div className="forum-notice" role="status">
               {notice}
-              <button
-                onClick={() => setNotice("")}
-                className="float-right text-text-tertiary"
-                aria-label={labels.cancel}
-              >
+              <button onClick={() => setNotice("")} aria-label={labels.cancel}>
                 ×
               </button>
             </div>
           )}
-          <div className="space-y-3">
-            {loading ? (
-              <div className="rounded-2xl border border-line p-8 text-center text-sm text-text-tertiary">
-                {zh ? "正在加载讨论" : "Loading discussions"}
-              </div>
-            ) : visiblePosts.length === 0 ? (
-              <div className="rounded-2xl border border-line p-8 text-center text-sm text-text-tertiary">
-                {labels.empty}
-              </div>
-            ) : (
-              visiblePosts.map((post) => (
-                <article
-                  key={post.id}
-                  className="rounded-2xl border border-line bg-white/[0.025] p-5 transition hover:border-accent/40 hover:bg-white/[0.05]"
+          {selected ? (
+            <article className="forum-panel forum-topic">
+              <button onClick={closeTopic} className="forum-back">
+                ← {zh ? "返回话题列表" : "Back to discussions"}
+              </button>
+
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs text-text-faint">
+                    {selected.author.displayName} ·{" "}
+                    {formatTime(selected.createdAtEpochMs, language)}
+                  </p>
+                  <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                    {selected.title}
+                  </h1>
+                </div>
+                <button
+                  onClick={closeTopic}
+                  className="rounded-full px-2 text-2xl leading-none text-text-tertiary hover:text-white"
+                  aria-label={labels.cancel}
                 >
-                  <button
-                    onClick={() => void openPost(post)}
-                    className="block w-full text-left"
-                  >
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-text-faint">
-                      <span>{post.author.displayName}</span>
-                      <span aria-hidden>·</span>
-                      <span>{formatTime(post.updatedAtEpochMs, language)}</span>
-                      {post.pinned && (
-                        <span className="rounded-full bg-accent-faint px-2 py-0.5 text-accent">
-                          {zh ? "置顶" : "Pinned"}
-                        </span>
+                  ×
+                </button>
+              </div>
+              <p className="mt-6 whitespace-pre-wrap text-sm leading-7 text-text-secondary">
+                {selected.body}
+              </p>
+              {notice && (
+                <p role="alert" className="mt-3 text-sm text-accent">
+                  {notice}
+                </p>
+              )}
+              <button
+                onClick={() => void showProfile(selected.author)}
+                className="mt-3 flex items-center gap-2 text-xs text-text-tertiary"
+              >
+                <Avatar profile={selected.author} />
+                {zh ? "查看作者资料" : "View profile"}
+              </button>
+              {selected.status === "HIDDEN" && (
+                <p className="mt-4 rounded-xl border border-accent/30 bg-accent-soft px-3 py-2 text-sm text-white">
+                  {labels.hidden}
+                </p>
+              )}
+              <h2 className="mt-8 text-sm font-semibold">
+                {selected.replyCount} {labels.replies}
+              </h2>
+              <div className="mt-4 space-y-3">
+                {selected.replies?.length ? (
+                  selected.replies.map((reply) => (
+                    <div
+                      key={reply.id}
+                      className="rounded-xl border border-line p-4"
+                    >
+                      <p className="text-xs text-text-faint">
+                        {reply.author.displayName} ·{" "}
+                        {formatTime(reply.createdAtEpochMs, language)}
+                      </p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-text-secondary">
+                        {reply.body}
+                      </p>
+                      <div className="mt-3 flex gap-4">
+                        <button
+                          onClick={() => void showProfile(reply.author)}
+                          className="text-xs text-text-tertiary"
+                        >
+                          {zh ? "查看作者资料" : "View profile"}
+                        </button>
+                        {profile?.role && (
+                          <button
+                            onClick={() => void moderateReply(reply.id, "hide")}
+                            className="text-xs text-accent"
+                          >
+                            {labels.hide}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-text-faint">{labels.noReplies}</p>
+                )}
+              </div>
+              {selected.nextReplyOffset != null && (
+                <button
+                  className="mt-4 text-sm text-accent"
+                  onClick={async () => {
+                    try {
+                      const next = await api<{
+                        items: Reply[];
+                        nextOffset: number | null;
+                      }>(
+                        `/api/v1/community/posts/${selected.id}/replies?offset=${selected.nextReplyOffset}`,
+                      );
+                      setSelected({
+                        ...selected,
+                        replies: [...(selected.replies || []), ...next.items],
+                        nextReplyOffset: next.nextOffset,
+                      });
+                    } catch (error) {
+                      setNotice(
+                        error instanceof Error
+                          ? error.message
+                          : labels.accountError,
+                      );
+                    }
+                  }}
+                >
+                  {zh ? "更多回复" : "More replies"}
+                </button>
+              )}
+              {selected.status === "OPEN" && (
+                <ReplyForm
+                  labels={labels}
+                  onSubmit={async (body) => {
+                    try {
+                      await api(
+                        `/api/v1/community/posts/${selected.id}/replies`,
+                        {
+                          method: "POST",
+                          body: JSON.stringify({ body }),
+                        },
+                      );
+                      setSelected(
+                        await api<Post>(
+                          `/api/v1/community/posts/${selected.id}`,
+                        ),
+                      );
+                      await loadPosts();
+                    } catch (error) {
+                      throw error;
+                    }
+                  }}
+                  onNeedLogin={() => setLoginOpen(true)}
+                  loggedIn={Boolean(profile)}
+                />
+              )}
+              {profile &&
+                (selected.author.userId === profile.userId || profile.role) && (
+                  <>
+                    {(profile.role ||
+                      selected.author.userId === profile.userId) && (
+                      <label className="mt-5 block border-t border-line pt-4 text-xs text-text-tertiary">
+                        {profile.role
+                          ? labels.moderationReason
+                          : labels.closeReason}
+                        <input
+                          value={moderationReason}
+                          onChange={(event) =>
+                            setModerationReason(event.target.value)
+                          }
+                          maxLength={240}
+                          className="mt-2 w-full rounded-xl border border-line bg-bg-0 p-3 text-sm text-white outline-none focus:border-accent"
+                        />
+                      </label>
+                    )}
+                    <div className="mt-3 flex flex-wrap gap-3">
+                      {selected.status === "OPEN" &&
+                        (selected.author.userId === profile.userId ||
+                          profile.role) && (
+                          <button
+                            onClick={() => void moderate(selected, "close")}
+                            disabled={moderationBusy}
+                            className="rounded-full border border-line-strong px-4 py-2 text-xs text-text-secondary hover:border-accent/50 hover:text-white"
+                          >
+                            {labels.close}
+                          </button>
+                        )}
+                      {profile.role && selected.status === "CLOSED" && (
+                        <button
+                          onClick={() => void moderate(selected, "reopen")}
+                          className="rounded-full border border-line-strong px-4 py-2 text-xs text-text-secondary hover:border-accent/50 hover:text-white"
+                        >
+                          {labels.reopen}
+                        </button>
+                      )}
+                      {profile.role && (
+                        <>
+                          <button
+                            disabled={moderationBusy}
+                            onClick={() =>
+                              void moderate(
+                                selected,
+                                selected.pinned ? "unpin" : "pin",
+                              )
+                            }
+                            className="rounded-full border border-line-strong px-4 py-2 text-xs text-text-secondary hover:border-accent/50 hover:text-white"
+                          >
+                            {selected.pinned ? labels.unpin : labels.pin}
+                          </button>
+                          <button
+                            disabled={moderationBusy}
+                            onClick={() =>
+                              void moderate(
+                                selected,
+                                selected.status === "HIDDEN"
+                                  ? "restore"
+                                  : "hide",
+                              )
+                            }
+                            className="rounded-full border border-line-strong px-4 py-2 text-xs text-text-secondary hover:border-accent/50 hover:text-white"
+                          >
+                            {selected.status === "HIDDEN"
+                              ? labels.restore
+                              : labels.hide}
+                          </button>
+                        </>
                       )}
                     </div>
-                    <h2 className="mt-3 text-lg font-semibold text-white">
-                      {post.title}
-                    </h2>
-                    <p className="mt-2 line-clamp-2 whitespace-pre-wrap text-sm leading-6 text-text-tertiary">
-                      {post.body}
-                    </p>
-                    <div className="mt-4 text-xs text-text-faint">
-                      {post.replyCount} {labels.replies} ·{" "}
-                      {labels[post.category as keyof typeof labels] ||
-                        post.category}
-                    </div>
-                  </button>
+                  </>
+                )}
+            </article>
+          ) : (
+            <div className="forum-panel">
+              <div className="forum-list-heading">
+                <h1>{zh ? "社区话题" : "Community discussions"}</h1>
+                <span>
+                  {category === "all"
+                    ? zh
+                      ? "交流经验 探索科学"
+                      : "Ideas, methods, and research"
+                    : labels[category as keyof typeof labels]}
+                </span>
+              </div>
+              {loading ? (
+                <div className="forum-empty" role="status">
+                  {zh ? "正在加载话题" : "Loading discussions"}
+                </div>
+              ) : posts.length === 0 ? (
+                <div className="forum-empty">
+                  <span className="forum-empty-symbol" aria-hidden>
+                    ＋
+                  </span>
+                  <h2>
+                    {query
+                      ? zh
+                        ? "没有找到相关话题"
+                        : "No matching discussions"
+                      : zh
+                        ? "这里的讨论 从你开始"
+                        : "Start the conversation"}
+                  </h2>
+                  <p>
+                    {query
+                      ? zh
+                        ? "换个关键词试试，或查看其他板块。"
+                        : "Try another search or category."
+                      : zh
+                        ? "分享一次实践，提出一个问题，和更多研究者一起找到答案。"
+                        : "Share an experiment or ask a question. Build useful answers together."}
+                  </p>
                   <button
-                    onClick={() => void showProfile(post.author)}
-                    className="mt-3 flex items-center gap-2 text-xs text-text-tertiary hover:text-white"
+                    className="forum-primary"
+                    onClick={() =>
+                      profile ? setComposeOpen(true) : setLoginOpen(true)
+                    }
                   >
-                    <Avatar profile={post.author} />
-                    {zh ? "查看作者资料" : "View profile"}
+                    {labels.write}
                   </button>
-                </article>
-              ))
-            )}
-          </div>
-          {nextCursor && (
-            <div className="mt-5 flex justify-center">
-              <button
-                onClick={() => void loadMore()}
-                disabled={moreBusy}
-                className="rounded-full border border-line-strong px-5 py-2.5 text-sm text-text-secondary hover:border-accent/50 hover:text-white"
-              >
-                {moreBusy ? "…" : zh ? "加载更多" : "Load more"}
-              </button>
+                </div>
+              ) : (
+                posts.map((post) => (
+                  <article className="forum-topic-row" key={post.id}>
+                    <button
+                      onClick={() => void showProfile(post.author)}
+                      className="forum-author-avatar"
+                      aria-label={post.author.displayName}
+                    >
+                      <Avatar profile={post.author} />
+                    </button>
+                    <div className="forum-row-content">
+                      <div className="forum-row-title">
+                        <button
+                          className="forum-category"
+                          onClick={() => setCategory(post.category)}
+                        >
+                          {labels[post.category as keyof typeof labels] ||
+                            post.category}
+                        </button>
+                        <a
+                          href={`?topic=${encodeURIComponent(post.id)}`}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            void openPost(post);
+                          }}
+                        >
+                          {post.title}
+                        </a>
+                        {post.pinned && (
+                          <span className="forum-badge">
+                            {zh ? "置顶" : "Pinned"}
+                          </span>
+                        )}
+                        {post.status === "CLOSED" && (
+                          <span className="forum-badge muted">
+                            {labels.closed}
+                          </span>
+                        )}
+                      </div>
+                      <div className="forum-row-meta">
+                        <button onClick={() => void showProfile(post.author)}>
+                          {post.author.displayName}
+                        </button>
+                        <span>·</span>
+                        <span>
+                          {zh ? "更新于 " : "Updated "}
+                          {formatTime(post.updatedAtEpochMs, language)}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      className="forum-reply-count"
+                      onClick={() => void openPost(post)}
+                      aria-label={`${post.replyCount} ${labels.replies}`}
+                    >
+                      {post.replyCount}
+                    </button>
+                  </article>
+                ))
+              )}
+              {nextCursor && (
+                <div className="forum-pagination">
+                  <button disabled={moreBusy} onClick={() => void loadMore()}>
+                    {moreBusy
+                      ? zh
+                        ? "加载中"
+                        : "Loading"
+                      : zh
+                        ? "加载更多话题"
+                        : "More discussions"}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </section>
-        <aside>
-          <div className="rounded-2xl border border-line bg-white/[0.025] p-5">
-            <p className="mono-label text-accent">{labels.guide}</p>
-            <p className="mt-4 text-sm leading-7 text-text-tertiary">
-              {labels.guideBody}
+        <aside className="forum-sidebar">
+          {selected && (
+            <div className="forum-panel forum-author-card">
+              <button onClick={() => void showProfile(selected.author)}>
+                <Avatar profile={selected.author} />
+                <strong>{selected.author.displayName}</strong>
+              </button>
+              {selected.author.city && <p>{selected.author.city}</p>}
+              <span>
+                {selected.replyCount} {labels.replies}
+              </span>
+            </div>
+          )}
+          <div className="forum-panel forum-compose-card">
+            <button
+              className="forum-primary"
+              onClick={() =>
+                profile ? setComposeOpen(true) : setLoginOpen(true)
+              }
+            >
+              {zh ? "发布新话题" : "New discussion"}
+            </button>
+          </div>
+          <div className="forum-panel forum-tip">
+            <h2>{zh ? "小贴士" : "A useful starting point"}</h2>
+            <p>
+              {zh
+                ? "好问题从背景开始。附上软件版本、输入参数和报错信息，让别人更容易复现，也更容易帮到你。"
+                : "Include software versions, input parameters, and error messages so others can reproduce your question."}
             </p>
+          </div>
+          <div className="forum-panel forum-members">
+            <h2>{zh ? "活跃会员" : "Active members"}</h2>
+            {overview?.activeMembers.length ? (
+              <div className="forum-member-grid">
+                {overview.activeMembers.map((member) => (
+                  <button
+                    key={member.userId}
+                    onClick={() => void showProfile(member)}
+                    title={member.displayName}
+                  >
+                    <Avatar profile={member} />
+                    <span>{member.displayName}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p>
+                {overview
+                  ? zh
+                    ? "参与讨论，认识一起做研究的人。"
+                    : "Join a discussion and meet fellow researchers."
+                  : zh
+                    ? "正在加载"
+                    : "Loading"}
+              </p>
+            )}
+          </div>
+          <div className="forum-panel forum-stats">
+            <h2>{zh ? "社区统计" : "Community at a glance"}</h2>
+            <dl>
+              {[
+                [zh ? "参与会员" : "Contributors", overview?.members],
+                [zh ? "话题" : "Topics", overview?.topics],
+                [zh ? "回复" : "Replies", overview?.replies],
+              ].map(([name, value]) => (
+                <div key={name}>
+                  <dt>{name}</dt>
+                  <dd>{value ?? "…"}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <div className="forum-guidelines">
+            <h2>{labels.guide}</h2>
+            <p>{labels.guideBody}</p>
             {profile?.role && (
               <button
                 onClick={() =>
                   void api<Queue>("/api/v1/community/moderation/queue")
                     .then(setModeration)
-                    .catch((error) =>
-                      setNotice(
-                        error instanceof Error
-                          ? error.message
-                          : labels.accountError,
-                      ),
-                    )
+                    .catch((error) => setNotice(error.message))
                 }
-                className="mt-5 w-full rounded-xl border border-line-strong px-3 py-2 text-left text-sm text-white hover:border-accent/50"
               >
                 {labels.adminQueue}
               </button>
@@ -650,205 +1020,6 @@ export function CommunityPage() {
           </div>
         </aside>
       </div>
-      {selected && (
-        <Dialog onClose={() => setSelected(null)}>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs text-text-faint">
-                {selected.author.displayName} ·{" "}
-                {formatTime(selected.createdAtEpochMs, language)}
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-                {selected.title}
-              </h2>
-            </div>
-            <button
-              onClick={() => setSelected(null)}
-              className="rounded-full px-2 text-2xl leading-none text-text-tertiary hover:text-white"
-              aria-label={labels.cancel}
-            >
-              ×
-            </button>
-          </div>
-          <p className="mt-6 whitespace-pre-wrap text-sm leading-7 text-text-secondary">
-            {selected.body}
-          </p>
-          {notice && (
-            <p role="alert" className="mt-3 text-sm text-accent">
-              {notice}
-            </p>
-          )}
-          <button
-            onClick={() => void showProfile(selected.author)}
-            className="mt-3 flex items-center gap-2 text-xs text-text-tertiary"
-          >
-            <Avatar profile={selected.author} />
-            {zh ? "查看作者资料" : "View profile"}
-          </button>
-          {selected.status === "HIDDEN" && (
-            <p className="mt-4 rounded-xl border border-accent/30 bg-accent-soft px-3 py-2 text-sm text-white">
-              {labels.hidden}
-            </p>
-          )}
-          <div className="mt-8 space-y-3">
-            {selected.replies?.length ? (
-              selected.replies.map((reply) => (
-                <div
-                  key={reply.id}
-                  className="rounded-xl border border-line p-4"
-                >
-                  <p className="text-xs text-text-faint">
-                    {reply.author.displayName} ·{" "}
-                    {formatTime(reply.createdAtEpochMs, language)}
-                  </p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-text-secondary">
-                    {reply.body}
-                  </p>
-                  <div className="mt-3 flex gap-4">
-                    <button
-                      onClick={() => void showProfile(reply.author)}
-                      className="text-xs text-text-tertiary"
-                    >
-                      {zh ? "查看作者资料" : "View profile"}
-                    </button>
-                    {profile?.role && (
-                      <button
-                        onClick={() => void moderateReply(reply.id, "hide")}
-                        className="text-xs text-accent"
-                      >
-                        {labels.hide}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-text-faint">{labels.noReplies}</p>
-            )}
-          </div>
-          {selected.nextReplyOffset != null && (
-            <button
-              className="mt-4 text-sm text-accent"
-              onClick={async () => {
-                try {
-                  const next = await api<{
-                    items: Reply[];
-                    nextOffset: number | null;
-                  }>(
-                    `/api/v1/community/posts/${selected.id}/replies?offset=${selected.nextReplyOffset}`,
-                  );
-                  setSelected({
-                    ...selected,
-                    replies: [...(selected.replies || []), ...next.items],
-                    nextReplyOffset: next.nextOffset,
-                  });
-                } catch (error) {
-                  setNotice(
-                    error instanceof Error
-                      ? error.message
-                      : labels.accountError,
-                  );
-                }
-              }}
-            >
-              {zh ? "更多回复" : "More replies"}
-            </button>
-          )}
-          {selected.status === "OPEN" && (
-            <ReplyForm
-              labels={labels}
-              onSubmit={async (body) => {
-                try {
-                  await api(`/api/v1/community/posts/${selected.id}/replies`, {
-                    method: "POST",
-                    body: JSON.stringify({ body }),
-                  });
-                  setSelected(
-                    await api<Post>(`/api/v1/community/posts/${selected.id}`),
-                  );
-                  await loadPosts();
-                } catch (error) {
-                  throw error;
-                }
-              }}
-              onNeedLogin={() => setLoginOpen(true)}
-              loggedIn={Boolean(profile)}
-            />
-          )}
-          {profile &&
-            (selected.author.userId === profile.userId || profile.role) && (
-              <>
-                {(profile.role ||
-                  selected.author.userId === profile.userId) && (
-                  <label className="mt-5 block border-t border-line pt-4 text-xs text-text-tertiary">
-                    {profile.role
-                      ? labels.moderationReason
-                      : labels.closeReason}
-                    <input
-                      value={moderationReason}
-                      onChange={(event) =>
-                        setModerationReason(event.target.value)
-                      }
-                      maxLength={240}
-                      className="mt-2 w-full rounded-xl border border-line bg-bg-0 p-3 text-sm text-white outline-none focus:border-accent"
-                    />
-                  </label>
-                )}
-                <div className="mt-3 flex flex-wrap gap-3">
-                  {selected.status === "OPEN" &&
-                    (selected.author.userId === profile.userId ||
-                      profile.role) && (
-                      <button
-                        onClick={() => void moderate(selected, "close")}
-                        disabled={moderationBusy}
-                        className="rounded-full border border-line-strong px-4 py-2 text-xs text-text-secondary hover:border-accent/50 hover:text-white"
-                      >
-                        {labels.close}
-                      </button>
-                    )}
-                  {profile.role && selected.status === "CLOSED" && (
-                    <button
-                      onClick={() => void moderate(selected, "reopen")}
-                      className="rounded-full border border-line-strong px-4 py-2 text-xs text-text-secondary hover:border-accent/50 hover:text-white"
-                    >
-                      {labels.reopen}
-                    </button>
-                  )}
-                  {profile.role && (
-                    <>
-                      <button
-                        disabled={moderationBusy}
-                        onClick={() =>
-                          void moderate(
-                            selected,
-                            selected.pinned ? "unpin" : "pin",
-                          )
-                        }
-                        className="rounded-full border border-line-strong px-4 py-2 text-xs text-text-secondary hover:border-accent/50 hover:text-white"
-                      >
-                        {selected.pinned ? labels.unpin : labels.pin}
-                      </button>
-                      <button
-                        disabled={moderationBusy}
-                        onClick={() =>
-                          void moderate(
-                            selected,
-                            selected.status === "HIDDEN" ? "restore" : "hide",
-                          )
-                        }
-                        className="rounded-full border border-line-strong px-4 py-2 text-xs text-text-secondary hover:border-accent/50 hover:text-white"
-                      >
-                        {selected.status === "HIDDEN"
-                          ? labels.restore
-                          : labels.hide}
-                      </button>
-                    </>
-                  )}
-                </div>
-              </>
-            )}
-        </Dialog>
-      )}
       {composeOpen && (
         <Dialog onClose={() => setComposeOpen(false)}>
           <PostForm

@@ -17,7 +17,7 @@
 - 官网页面：`https://8.130.144.193/official/community/`
 - 公共列表 API：`/llmer-api/api/v1/community/posts`
 - 账号和头像仅代理明确的认证路由、资料路由和头像路由，其他 LLMer 后台和支付接口不通过官网暴露。
-- 官网静态版本目录：`/opt/aethericai-official/releases/20261001-community-layout-final`
+- 官网静态版本目录：`/opt/aethericai-official/releases/20261001-community-focus-fix`
 - LLMer 版本目录：`/srv/llmer-api/releases/20261001-community-layout`，基于当天已有版本增量更新社区路由。
 
 ## 2026-10-01 页面结构
@@ -35,3 +35,4 @@
 - 本轮社区与认证专项测试 11 项通过；验证排序分页、隐藏数据不计数和私有账户不计数。
 - 浏览器本地隔离数据库完成登录、发帖、统计更新、阅读页；桌面中英文及 390/768/1280/1440px 布局检查。测试账户和帖子仅存在于临时目录。
 - 本轮未测试真实短信收发，未指定管理员账号；此前的待办仍保留。
+- 2026-10-01 小修：入口简写为“登录”；筛选栏焦点轮廓内收，防止滚动容器裁切右侧边缘。生产构建通过，线上键盘聚焦截图确认四边完整。

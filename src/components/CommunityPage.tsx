@@ -132,7 +132,7 @@ const copy = {
     title: "一起把问题想清楚",
     sub: "讨论科学计算，分享可复现的方法，把经验沉淀成对研究真正有用的答案。",
     home: "返回官网",
-    signIn: "手机号登录",
+    signIn: "登录",
     signOut: "退出登录",
     profile: "我的资料",
     write: "发起讨论",

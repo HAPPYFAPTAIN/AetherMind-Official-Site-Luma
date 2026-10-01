@@ -77,6 +77,10 @@
 .forum-filter-inner button[aria-pressed="true"] {
   color: white;
 }
+.community-page .forum-filter-inner :focus-visible {
+  /* Keep keyboard focus inside the horizontally scrollable filter strip. */
+  outline-offset: -3px;
+}
 .forum-filter-inner select {
   margin-left: auto;
   background: #111820;

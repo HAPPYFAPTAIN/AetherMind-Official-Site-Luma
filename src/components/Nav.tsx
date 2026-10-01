@@ -88,7 +88,7 @@ export function Nav() {
       <nav className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6 sm:h-[72px] lg:px-12">
         <a href="#top" className="flex items-center gap-3 text-white">
           <Mark />
-          <span className="font-display text-[15px] font-semibold tracking-[0.22em]">
+          <span className="font-display text-[17px] font-semibold tracking-[0.22em]">
             {tr(language, BRAND.en, BRAND.zh)}
           </span>
         </a>
@@ -102,7 +102,7 @@ export function Nav() {
                   ? assetUrl(l.href)
                   : l.href
               }
-              className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[13px] font-medium"
+              className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium"
             >
               {tr(language, l.label.en, l.label.zh)}
             </a>
@@ -112,7 +112,7 @@ export function Nav() {
         <div className="flex items-center gap-2 sm:gap-3">
           <a
             href="#console"
-            className="hidden items-center gap-2 whitespace-nowrap rounded-full border border-line-strong bg-white/[0.03] px-4 py-2 text-[13.5px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft sm:flex"
+            className="hidden items-center gap-2 whitespace-nowrap rounded-full border border-line-strong bg-white/[0.03] px-4 py-2 text-[15.5px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft sm:flex"
           >
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent-green shadow-[0_0_8px_var(--accent-green)]" />
             {tr(language, "Open Console", "打开控制台")}
@@ -128,7 +128,7 @@ export function Nav() {
               onClick={() => setLanguage("en")}
               aria-pressed={language === "en"}
               title="English"
-              className={`h-8 min-w-8 rounded-full px-2 font-mono text-[10px] font-medium tracking-[0.08em] transition-colors ${
+              className={`h-8 min-w-8 rounded-full px-2 font-mono text-[12px] font-medium tracking-[0.08em] transition-colors ${
                 language === "en"
                   ? "bg-white text-bg-0"
                   : "text-text-tertiary hover:text-white"
@@ -141,7 +141,7 @@ export function Nav() {
               onClick={() => setLanguage("zh")}
               aria-pressed={language === "zh"}
               title="中文"
-              className={`h-8 min-w-8 rounded-full px-2 font-mono text-[10px] font-medium tracking-[0.08em] transition-colors ${
+              className={`h-8 min-w-8 rounded-full px-2 font-mono text-[12px] font-medium tracking-[0.08em] transition-colors ${
                 language === "zh"
                   ? "bg-white text-bg-0"
                   : "text-text-tertiary hover:text-white"

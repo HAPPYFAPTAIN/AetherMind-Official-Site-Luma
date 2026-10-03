@@ -11,7 +11,7 @@ import "./login.css";
 
 const apiBase = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/llmer-api";
 
-export function LoginPage() {
+export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onClose?: () => void }) {
   const { language, setLanguage } = useLanguage();
   const zh = language === "zh";
   const [phone, setPhone] = useState("");
@@ -122,25 +122,34 @@ export function LoginPage() {
         "aethericai-community-access-expires",
         String(data.accessTokenExpiresAtEpochMs),
       );
-      window.location.replace(
-        communityReturnPath(
-          new URLSearchParams(window.location.search).get("returnTo"),
-        ),
-      );
+      if (overlay) {
+        onClose?.();
+        window.location.reload();
+      } else {
+        window.location.replace(
+          communityReturnPath(
+            new URLSearchParams(window.location.search).get("returnTo"),
+          ),
+        );
+      }
     } catch (error) {
       setError(error instanceof Error ? error.message : String(error));
       setBusy(null);
     }
   };
   return (
-    <main className="login-page">
+    <main className={`login-page${overlay ? " login-overlay" : ""}`}>
       <nav
         className="login-nav"
         aria-label={zh ? "登录页导航" : "Sign-in navigation"}
       >
-        <a href={assetUrl("/community/")}>
-          ← {zh ? "返回社区" : "Back to community"}
-        </a>
+        <a
+          href={overlay ? "#close-login" : assetUrl("/community/")}
+          onClick={overlay ? (event) => { event.preventDefault(); onClose?.(); } : undefined}
+        aria-label={zh ? "关闭登录页" : "Close sign-in"}
+      >
+        ×
+      </a>
         <button
           onClick={() => setLanguage(zh ? "en" : "zh")}
           aria-label={zh ? "Switch to English" : "切换中文"}

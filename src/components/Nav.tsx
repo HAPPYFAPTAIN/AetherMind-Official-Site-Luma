@@ -5,6 +5,7 @@ import { BRAND, NAV_LINKS } from "@/lib/site";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
 import { assetUrl } from "@/lib/asset-url";
+import { LoginPage } from "@/components/LoginPage";
 
 function Mark() {
   return (
@@ -44,6 +45,7 @@ function Mark() {
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
@@ -180,12 +182,13 @@ export function Nav() {
             </div>
           </button>
 
-          <a
-            href={assetUrl("/login/")}
+          <button
+            type="button"
+            onClick={() => setLoginOpen(true)}
             className="hidden whitespace-nowrap rounded-full border border-line-strong bg-white/[0.03] px-4 py-2 text-[15.5px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft sm:flex"
           >
             {tr(language, "Sign in", "登录")}
-          </a>
+          </button>
         </div>
       </nav>
 
@@ -222,15 +225,16 @@ export function Nav() {
               </a>
             ),
           )}
-          <a
-            href={assetUrl("/login/")}
-            onClick={() => setOpen(false)}
+          <button
+            type="button"
+            onClick={() => { setOpen(false); setLoginOpen(true); }}
             className="mt-3 flex items-center justify-center gap-2 rounded-full border border-line-strong bg-white/[0.04] px-4 py-3 text-[15px] font-medium text-white"
           >
             {tr(language, "Sign in", "登录")}
-          </a>
+          </button>
         </div>
       </div>
+      {loginOpen && <LoginPage overlay onClose={() => setLoginOpen(false)} />}
     </header>
   );
 }

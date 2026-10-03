@@ -5,6 +5,7 @@ import { assetUrl } from "@/lib/asset-url";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
 import Image from "next/image";
+import { LoginPage } from "@/components/LoginPage";
 import "./community.css";
 
 const API_BASE = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/llmer-api";
@@ -225,15 +226,14 @@ export function CommunityPage() {
   const [moderationReason, setModerationReason] = useState("");
   const [moderationBusy, setModerationBusy] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [loginOpen, setLoginOpen] = useState(false);
   const [selected, setSelected] = useState<Post | null>(null);
   const goLogin = (compose = false) => {
     const next = new URL(window.location.href);
     if (compose) next.searchParams.set("compose", "1");
-    window.location.assign(
-      assetUrl("/login/") +
-        "?returnTo=" +
-        encodeURIComponent(next.pathname + next.search),
-    );
+    else next.searchParams.delete("compose");
+    window.history.replaceState({}, "", next);
+    setLoginOpen(true);
   };
   const [composeOpen, setComposeOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -1183,6 +1183,7 @@ export function CommunityPage() {
           </div>
         </Dialog>
       )}
+      {loginOpen && <LoginPage overlay onClose={() => setLoginOpen(false)} />}
     </main>
   );
 }

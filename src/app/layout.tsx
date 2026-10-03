@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Inter_Tight, Geist_Mono } from "next/font/google";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { BRAND } from "@/lib/site";
+import { ShowcaseLayer } from "@/components/ShowcaseLayer";
 import "./globals.css";
 
 const inter = Inter({
@@ -57,7 +58,10 @@ export default function RootLayout({
       className={`${inter.variable} ${interTight.variable} ${geistMono.variable}`}
     >
       <body>
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          {children}
+          <ShowcaseLayer />
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -5,9 +5,9 @@
   padding: 28px 24px 60px;
   --login-line: rgba(180, 210, 230, 0.18);
 }
-.login-overlay {position:fixed;inset:0;z-index:100;background:rgba(3,6,10,.72);backdrop-filter:blur(16px);overflow:auto;padding:24px;}
+.login-overlay {position:fixed;inset:0;z-index:100;background:rgba(3,6,10,.60);backdrop-filter:blur(8px);overflow:auto;padding:24px;}
 .login-overlay .login-nav {width:min(100%,620px);}
-.login-overlay .login-card {max-width:500px;margin:10vh auto 0;padding:30px 28px 30px;transform:scale(.8);transform-origin:top center;}
+.login-overlay .login-card {max-width:500px;margin:10vh auto 0;padding:30px 28px 30px;transform:scale(.88);transform-origin:top center;}
 .login-nav {
   max-width: 620px;
   margin: auto;

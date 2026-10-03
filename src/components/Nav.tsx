@@ -111,14 +111,6 @@ export function Nav() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <a
-            href="#console"
-            className="hidden items-center gap-2 whitespace-nowrap rounded-full border border-line-strong bg-white/[0.03] px-4 py-2 text-[15.5px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft sm:flex"
-          >
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent-green shadow-[0_0_8px_var(--accent-green)]" />
-            {tr(language, "Open Console", "打开控制台")}
-          </a>
-
           <div
             className="flex h-9 items-center rounded-full border border-line-strong bg-white/[0.03] p-0.5"
             role="group"
@@ -177,6 +169,13 @@ export function Nav() {
               />
             </div>
           </button>
+
+          <a
+            href={assetUrl("/login/")}
+            className="hidden whitespace-nowrap rounded-full border border-line-strong bg-white/[0.03] px-4 py-2 text-[15.5px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft sm:flex"
+          >
+            {tr(language, "Sign in", "登录")}
+          </a>
         </div>
       </nav>
 
@@ -204,11 +203,11 @@ export function Nav() {
             </a>
           ))}
           <a
-            href="#console"
+            href={assetUrl("/login/")}
             onClick={() => setOpen(false)}
             className="mt-3 flex items-center justify-center gap-2 rounded-full border border-line-strong bg-white/[0.04] px-4 py-3 text-[15px] font-medium text-white"
           >
-            {tr(language, "Open Console", "打开控制台")}
+            {tr(language, "Sign in", "登录")}
           </a>
         </div>
       </div>

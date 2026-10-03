@@ -95,19 +95,29 @@ export function Nav() {
 
         {/* Text spacing: (8px + 4px + 8px) × 1.18 = 23.6px. */}
         <div className="hidden items-center gap-[7.6px] xl:flex">
-          {NAV_LINKS.map((l) => (
-            <a
-              key={l.href}
-              href={
-                "externalPath" in l && l.externalPath
-                  ? assetUrl(l.href)
-                  : l.href
-              }
-              className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium"
-            >
-              {tr(language, l.label.en, l.label.zh)}
-            </a>
-          ))}
+          {NAV_LINKS.map((l) =>
+            "pending" in l && l.pending ? (
+              <span
+                key={l.href}
+                aria-disabled="true"
+                className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium"
+              >
+                {tr(language, l.label.en, l.label.zh)}
+              </span>
+            ) : (
+              <a
+                key={l.href}
+                href={
+                  "externalPath" in l && l.externalPath
+                    ? assetUrl(l.href)
+                    : l.href
+                }
+                className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium"
+              >
+                {tr(language, l.label.en, l.label.zh)}
+              </a>
+            ),
+          )}
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -188,20 +198,30 @@ export function Nav() {
         }`}
       >
         <div className="space-y-1 px-6 py-6">
-          {NAV_LINKS.map((l) => (
-            <a
-              key={l.href}
-              href={
-                "externalPath" in l && l.externalPath
-                  ? assetUrl(l.href)
-                  : l.href
-              }
-              onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary hover:text-white"
-            >
-              {tr(language, l.label.en, l.label.zh)}
-            </a>
-          ))}
+          {NAV_LINKS.map((l) =>
+            "pending" in l && l.pending ? (
+              <span
+                key={l.href}
+                aria-disabled="true"
+                className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary"
+              >
+                {tr(language, l.label.en, l.label.zh)}
+              </span>
+            ) : (
+              <a
+                key={l.href}
+                href={
+                  "externalPath" in l && l.externalPath
+                    ? assetUrl(l.href)
+                    : l.href
+                }
+                onClick={() => setOpen(false)}
+                className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary hover:text-white"
+              >
+                {tr(language, l.label.en, l.label.zh)}
+              </a>
+            ),
+          )}
           <a
             href={assetUrl("/login/")}
             onClick={() => setOpen(false)}

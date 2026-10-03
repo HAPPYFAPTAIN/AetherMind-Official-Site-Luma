@@ -8,7 +8,12 @@ export const NAV_LINKS = [
   { label: { en: "AI for Science", zh: "科学智能" }, href: "#ai-science" },
   { label: { en: "Workflow", zh: "科研流程" }, href: "#workflow" },
   { label: { en: "Research", zh: "研究场景" }, href: "#research" },
-  { label: { en: "Community", zh: "社区" }, href: "/community/", externalPath: true },
+  { label: { en: "Products", zh: "产品" }, href: "#products", pending: true },
+  {
+    label: { en: "Community", zh: "社区" },
+    href: "/community/",
+    externalPath: true,
+  },
 ];
 
 export const BRAND_NAME = BRAND;

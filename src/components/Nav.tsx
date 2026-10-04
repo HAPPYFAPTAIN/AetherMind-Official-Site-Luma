@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BRAND, NAV_LINKS } from "@/lib/site";
+import { AUX_NAV_LINKS, BRAND, ENTERPRISE_NAV, NAV_LINKS } from "@/lib/site";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
 import { assetUrl } from "@/lib/asset-url";
@@ -71,38 +71,24 @@ export function Nav() {
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6 sm:h-[72px] lg:px-12">
-        <a href="#top" className="flex items-center gap-3 text-white">
-          <Mark />
-          <span className="font-display text-[17px] font-semibold tracking-[0.22em]">
-            {tr(language, BRAND.en, BRAND.zh)}
-          </span>
-        </a>
+        <div className="flex items-center gap-5">
+          <a href="#top" className="flex items-center gap-3 text-white">
+            <Mark />
+            <span className="font-display text-[17px] font-semibold tracking-[0.22em]">
+              {tr(language, BRAND.en, BRAND.zh)}
+            </span>
+          </a>
+          <button data-showcase={ENTERPRISE_NAV.key} className="hidden whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium text-text-secondary hover:text-white xl:block">
+            {tr(language, ENTERPRISE_NAV.label.en, ENTERPRISE_NAV.label.zh)}
+          </button>
+        </div>
 
-        {/* Text spacing: (8px + 4px + 8px) × 1.18 = 23.6px. */}
         <div className="hidden items-center gap-[7.6px] xl:flex">
-          {NAV_LINKS.map((l) =>
-            "pending" in l && l.pending ? (
-              <span
-                key={l.href}
-                aria-disabled="true"
-                className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium"
-              >
-                {tr(language, l.label.en, l.label.zh)}
-              </span>
-            ) : (
-              <a
-                key={l.href}
-                href={
-                  "externalPath" in l && l.externalPath
-                    ? assetUrl(l.href)
-                    : l.href
-                }
-                className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium"
-              >
-                {tr(language, l.label.en, l.label.zh)}
-              </a>
-            ),
-          )}
+          {NAV_LINKS.map((l) => <a key={l.href} href={"externalPath" in l && l.externalPath ? assetUrl(l.href) : l.href} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">{tr(language, l.label.en, l.label.zh)}</a>)}
+        </div>
+
+        <div className="hidden items-center gap-[7.6px] xl:flex">
+          {AUX_NAV_LINKS.map((l) => <a key={l.href} href={l.href} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">{tr(language, l.label.en, l.label.zh)}</a>)}
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -184,30 +170,8 @@ export function Nav() {
         }`}
       >
         <div className="space-y-1 px-6 py-6">
-          {NAV_LINKS.map((l) =>
-            "pending" in l && l.pending ? (
-              <span
-                key={l.href}
-                aria-disabled="true"
-                className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary"
-              >
-                {tr(language, l.label.en, l.label.zh)}
-              </span>
-            ) : (
-              <a
-                key={l.href}
-                href={
-                  "externalPath" in l && l.externalPath
-                    ? assetUrl(l.href)
-                    : l.href
-                }
-                onClick={() => setOpen(false)}
-                className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary hover:text-white"
-              >
-                {tr(language, l.label.en, l.label.zh)}
-              </a>
-            ),
-          )}
+          <button data-showcase={ENTERPRISE_NAV.key} onClick={() => setOpen(false)} className="block w-full rounded-lg px-3 py-3 text-left text-lg font-medium text-text-secondary hover:text-white">{tr(language, ENTERPRISE_NAV.label.en, ENTERPRISE_NAV.label.zh)}</button>
+          {[...NAV_LINKS, ...AUX_NAV_LINKS].map((l) => <a key={l.href} href={"externalPath" in l && l.externalPath ? assetUrl(l.href) : l.href} onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary hover:text-white">{tr(language, l.label.en, l.label.zh)}</a>)}
           <button
             type="button"
             onClick={() => { setOpen(false); setLoginOpen(true); }}

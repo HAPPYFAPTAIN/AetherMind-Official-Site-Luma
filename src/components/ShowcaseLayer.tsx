@@ -5,6 +5,9 @@ import { useLanguage } from "./LanguageProvider";
 import "./showcase.css";
 
 const CONTENT = {
+  enterprise: { zh: ["企业服务", "为高校、研究机构和企业提供可控、可追溯的科学计算部署方案。", ["私有化部署", "HPC 集群接入", "团队权限与审计"]], en: ["Enterprise services", "Controlled and traceable scientific computing for universities, research teams and companies.", ["Private deployment", "HPC integration", "Team access and audit"]] },
+  careers: { zh: ["加入我们", "和我们一起把科学计算、智能体与真实研究问题连接起来。", ["研发岗位", "科研合作", "团队文化"]], en: ["Join us", "Help connect scientific computing, agents and real research questions.", ["Engineering roles", "Research collaboration", "Team culture"]] },
+  about: { zh: ["关于我们", "以太智元专注于 AI for Science，把计算能力变成更清晰、更可复现的研究工作流。", ["我们做什么", "技术方向", "联系团队"]], en: ["About us", "AethericAI focuses on AI for Science and turns compute into clearer, more reproducible research workflows.", ["What we do", "Technology", "Contact the team"]] },
   top: { zh: ["以太智元总览", "从科学问题开始，连接模型、计算、数据和协作。", ["科学计算", "AI for Science", "科研协作"]], en: ["AethericAI overview", "Start with a scientific question and connect models, compute, data and collaboration.", ["Scientific computing", "AI for Science", "Research collaboration"]] },
   platform: { zh: ["科学计算平台", "统一准备、运行和理解科学计算任务。", ["任务准备", "算力调度", "结果分析"]], en: ["Scientific computing platform", "Prepare, run and understand scientific workloads in one place.", ["Prepare a task", "Schedule compute", "Analyze results"]] },
   engine: { zh: ["计算引擎", "面向 LAMMPS、GPU 和 HPC 的计算任务面板。", ["GPU 集群", "任务队列", "运行日志"]], en: ["Compute engine", "A sample control surface for LAMMPS, GPU and HPC jobs.", ["GPU cluster", "Job queue", "Runtime logs"]] },

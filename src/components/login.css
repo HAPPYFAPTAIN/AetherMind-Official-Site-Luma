@@ -5,7 +5,7 @@
   padding: 28px 24px 60px;
   --login-line: rgba(180, 210, 230, 0.18);
 }
-.login-overlay {position:fixed;inset:0;z-index:100;background:rgba(3,6,10,.60);backdrop-filter:blur(8px);overflow:auto;padding:24px;}
+.login-overlay {position:fixed;inset:0;z-index:100;background:rgba(2,8,12,.38);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);overflow:auto;padding:24px;}
 .login-overlay .login-nav {width:min(100%,620px);}
 .login-overlay .login-card {max-width:500px;margin:10vh auto 0;padding:30px 28px 30px;transform:scale(.88);transform-origin:top center;}
 .login-nav {
@@ -26,11 +26,22 @@
 .login-nav a {font-size:42px;font-weight:300;color:#a7b2bd;order:2;line-height:.75;}
 .login-nav button {order:1;}
 .login-card {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
   width: 100%;
   max-width: 620px;
   margin: 34px auto 0;
   padding: 26px 0 40px;
+  border: 1px solid rgba(180,225,255,.72);
+  border-radius: 24px;
+  background: linear-gradient(145deg,rgba(65,88,105,.42),rgba(23,38,50,.52));
+  box-shadow: 0 0 0 1px rgba(100,200,255,.10), 0 0 14px rgba(78,185,255,.16), 0 18px 70px rgba(0,0,0,.28);
+  backdrop-filter: blur(32px) saturate(125%);
+  -webkit-backdrop-filter: blur(32px) saturate(125%);
 }
+.login-card::before{content:"";position:absolute;inset:-5px;border-radius:inherit;background:linear-gradient(135deg,rgba(120,210,255,.22),rgba(255,255,255,.04),rgba(75,170,230,.14));filter:blur(10px);opacity:.55;z-index:-1;pointer-events:none}
+.login-card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.10),transparent 30%,transparent 68%,rgba(110,200,255,.04));z-index:2}
 .login-brand {
   display: none;
   text-align: center;
@@ -59,9 +70,9 @@
   width: 100%;
   min-width: 0;
   height: 64px;
-  background: rgba(255,255,255,.045);
-  border: 1px solid transparent;
-  border-radius: 999px;
+  background: rgba(255,255,255,.075);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 13px;
   padding: 0 14px;
   font-size: 16px;
   outline-offset: 2px;
@@ -72,9 +83,9 @@
 .login-phone {
   display: flex;
   align-items: center;
-  background: rgba(255,255,255,.045);
-  border: 1px solid transparent;
-  border-radius: 999px;
+  background: rgba(255,255,255,.075);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 13px;
   overflow: hidden;
 }
 .login-prefix {
@@ -88,6 +99,8 @@
   border: 0;
   border-radius: 0;
 }
+.login-card input:not([type="checkbox"]):hover{background:rgba(255,255,255,.095)}
+.login-card input:not([type="checkbox"]):focus-visible{border-color:rgba(125,210,255,.62);box-shadow:0 0 0 3px rgba(100,190,255,.08);background:rgba(255,255,255,.11);outline:none}
 .login-phone:focus-within {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -198,6 +211,7 @@
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+@media (prefers-reduced-transparency: reduce){.login-card{backdrop-filter:none;-webkit-backdrop-filter:none;background:#15212b}.login-overlay{backdrop-filter:none;-webkit-backdrop-filter:none}}
 @media (max-width: 520px) {
   .login-page {
     padding: 20px 16px 36px;

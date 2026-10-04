@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
+import { Nav } from "@/components/Nav";
 import { assetUrl } from "@/lib/asset-url";
 import { tr } from "@/lib/i18n";
-import { BRAND } from "@/lib/site";
 import { productAssets } from "@/data/productAssets";
 import "./products.css";
 
@@ -40,7 +40,7 @@ const CATEGORIES = [
 ] as const;
 
 export function ProductsPage() {
-  const { language, setLanguage } = useLanguage();
+  const { language } = useLanguage();
   const zh = language === "zh";
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
@@ -53,7 +53,7 @@ export function ProductsPage() {
     return sort === "name" ? [...result].sort((a, b) => a.title.en.localeCompare(b.title.en)) : result;
   }, [category, search, sort]);
   return <main className="products-page">
-    <header className="products-header"><div className="products-container products-header-inner"><a href={assetUrl("/")} className="products-brand"><span className="products-mark" aria-hidden>◌</span>{tr(language, BRAND.en, BRAND.zh)}</a><label className="products-search"><span aria-hidden>⌕</span><input aria-label={labels.search} placeholder={labels.search} value={search} onChange={(event) => setSearch(event.target.value)} /></label><div className="products-header-actions"><button onClick={() => setLanguage(zh ? "en" : "zh")}>{zh ? "EN" : "中文"}</button><a href={assetUrl("/login/")}>{labels.signIn}</a></div></div><nav className="products-nav"><div className="products-container">{[["products", zh ? "产品" : "Products"], ["support", zh ? "支持" : "Support"], ["learn", zh ? "学习" : "Learn"], ["community", zh ? "社区" : "Community"]].map(([key, label]) => <button key={key} onClick={() => key === "community" ? window.location.assign(assetUrl("/community/")) : setCategory("all")}>{label}<span aria-hidden>⌄</span></button>)}</div></nav></header>
+    <Nav />
     <section className="products-hero"><Image src={assetUrl(productAssets.hero)} alt="" fill priority unoptimized sizes="100vw" className="products-hero-image" /><div className="products-hero-wash" /><div className="products-container products-hero-inner"><div><p className="products-eyebrow">{labels.hero}</p><h1>{labels.headline}</h1><p>{labels.sub}</p></div></div></section>
     <div className="products-container products-category-tabs">{CATEGORIES.map(([value, label]) => <button key={value} aria-pressed={category === value} onClick={() => setCategory(value)}><span className="products-tab-icon" aria-hidden>{value === "all" ? "▦" : value === "simulation" ? "⌁" : value === "agent" ? "✦" : value === "platform" ? "◇" : "◈"}</span>{tr(language, label.en, label.zh)}</button>)}</div>
     <section className="products-container products-catalog"><div className="products-catalog-heading"><div><h2>{labels.all}</h2><p>{labels.catalogSub}</p></div><div className="products-catalog-tools"><label><span className="sr-only">{labels.search}</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={labels.search} /></label><span>{labels.sort}</span><button className={sort === "popular" ? "active" : ""} onClick={() => setSort("popular")}>{labels.popular}⌄</button><button className={sort === "name" ? "active" : ""} onClick={() => setSort("name")}>{labels.alpha}</button></div></div><div className="products-grid">{filtered.map((product) => <article key={product.id} className="product-card" style={{ "--product-accent": product.accent } as React.CSSProperties}><div className="product-image"><Image src={assetUrl(product.image)} alt="" fill unoptimized sizes="(max-width: 768px) 100vw, 33vw" /></div><div className="product-card-body"><span className="product-icon">{product.icon}</span><div className="product-state">{tr(language, product.state.en, product.state.zh)}</div><h3>{tr(language, product.title.en, product.title.zh)}</h3><p>{tr(language, product.body.en, product.body.zh)}</p><div className="product-tags">{product.tags.map((tag) => <span key={tag.en}>{tr(language, tag.en, tag.zh)}</span>)}</div><button className="product-detail" onClick={() => setSelected(product)}>{labels.detail} <span>→</span></button></div></article>)}</div>{filtered.length === 0 && <div className="products-empty">{zh ? "没有找到相关产品。" : "No products match this search."}</div>}</section>

@@ -159,14 +159,24 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
           className="login-nav"
           aria-label={zh ? "登录页导航" : "Sign-in navigation"}
         >
-          <a
-            className="login-close"
-            href={overlay ? "#close-login" : assetUrl("/community/")}
-            onClick={overlay ? (event) => { event.preventDefault(); onClose?.(); } : undefined}
-            aria-label={zh ? "关闭登录页" : "Close sign-in"}
-          >
-            ×
-          </a>
+          {overlay ? (
+            <button
+              type="button"
+              className="login-close"
+              onClick={() => onClose?.()}
+              aria-label={zh ? "关闭登录页" : "Close sign-in"}
+            >
+              ×
+            </button>
+          ) : (
+            <a
+              className="login-close"
+              href={assetUrl("/community/")}
+              aria-label={zh ? "关闭登录页" : "Close sign-in"}
+            >
+              ×
+            </a>
+          )}
           {!overlay && (
             <button
               onClick={() => setLanguage(zh ? "en" : "zh")}

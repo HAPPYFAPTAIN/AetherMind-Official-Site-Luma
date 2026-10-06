@@ -68,6 +68,8 @@
 
 密码长度15–128字符，支持空格和长口令，禁止控制字符或全空格。使用带随机盐的 scrypt（N=32768、r=8、p=3），参数依据 [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)，最多两个并行 KDF。密码尝试按手机号8次/10分钟、IP40次/10分钟持久限流；未知手机号、未设置和错误密码返回统一提示。
 
+产品邀请码由总管理员生成，`productId` 只授予对应的 MD-Agent 产品资格；它不增加积分、不授予管理员身份，也不替代未来的 MD-Agent 账户绑定。资格记录在 `official_md_agent_qualifications`，登录完成后由邀请码事务写入，前端只显示是否具备资格。
+
 密码设置挑战绑定当前用户、手机号和本轮短信，重新发送、超时和成功使用后失效；普通登录短信不能独立作为改密凭证。凭证保存、消费挑战、撤销该用户全部旧会话和写入 PASSWORD_CHANGED 审计在同一事务完成。并发中的旧密码登录会在创建会话前重新核验密码版本；修改后需重新登录，其他用户会话不受影响。
 
 新增 `official_passwords`、`official_password_challenges`、`official_password_attempts` 表，旧账号初始无密码，无默认凭证。沿用现有 community/console Nginx 路由，无需扩大代理范围。

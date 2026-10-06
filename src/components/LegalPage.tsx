@@ -14,8 +14,8 @@ const sections = [
   {
     zhTitle: "注册与账户使用",
     enTitle: "Registration and account use",
-    zh: "请使用本人或已获合法授权使用的手机号。首次完成短信验证将创建账户；已有账户可直接登录。请妥善保管验证码和登录设备，不得冒用他人身份。邀请码为选填，仅用于记录邀请来源，不自动赋予管理员权限、余额或奖励。密码登录尚未开放。昵称和头像与同一手机号对应的 LLMer 账户共用，社区的其他公开资料单独设置。",
-    en: "Use a phone number you own or are authorized to use. First-time SMS verification creates an account; existing users can sign in directly. Protect your verification codes and signed-in devices. Optional invitation codes record referral sources and do not grant admin access, credit or rewards. Password sign-in is not yet available. Your name and avatar are shared with the LLMer account for the same phone number; other public community details are configured separately.",
+    zh: "请使用本人或已获合法授权使用的手机号。首次完成短信验证将创建账户；已有账户可直接登录。请妥善保管验证码和登录设备，不得冒用他人身份。总管理员生成的邀请码可在登录时解锁对应产品资格，但不授予管理员权限、积分余额或其他超出标注范围的权限。密码登录可在工作台内设置并通过绑定手机号验证。昵称和头像与同一手机号对应的 LLMer 账户共用，社区的其他公开资料单独设置。",
+    en: "Use a phone number you own or are authorized to use. First-time SMS verification creates an account; existing users can sign in directly. Protect your verification codes and signed-in devices. Invitations issued by the owner can unlock the product qualification they name, but do not grant admin access, credit balance or permissions beyond that product. Passwords can be set in the workspace after phone verification. Your name and avatar are shared with the LLMer account for the same phone number; other public community details are configured separately.",
   },
   {
     zhTitle: "发布内容与社区管理",

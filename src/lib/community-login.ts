@@ -10,7 +10,7 @@ export function communityReturnPath(candidate: string | null): string {
     const community = assetUrl("/community/");
     if (
       url.origin !== "https://local.invalid" ||
-      ![community, fallback, assetUrl("/products/")].includes(url.pathname)
+      ![community, fallback, assetUrl("/products/"), assetUrl("/console/")].includes(url.pathname)
     )
       return fallback;
     if (url.pathname !== community) return url.pathname;

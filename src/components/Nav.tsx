@@ -59,7 +59,7 @@ export function Nav() {
   }, []);
 
   const enterAccount = () => {
-    if (account || hasAccountSession()) window.location.assign(assetUrl("/dashboard/"));
+    if (account || hasAccountSession()) window.location.assign(assetUrl("/console/"));
     else setLoginOpen(true);
   };
 

@@ -190,7 +190,7 @@ export function Hero() {
                   <span className="transition-transform group-hover:translate-x-0.5">→</span>
                 </a>
                 <a
-                  href={assetUrl("/dashboard/")}
+                  href={assetUrl("/console/")}
                   className="inline-flex h-12 items-center gap-2 rounded-full border border-line-strong px-6 text-[14px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft"
                 >
                   {tr(language, "Open Console", "打开控制台")}

@@ -36,6 +36,14 @@ type ProductKey = {
   suffix: string;
   revoked_at_ms: number | null;
 };
+type Invitation = {
+  code: string;
+  label: string;
+  product_id: string | null;
+  uses: number;
+  expires_at_ms: number;
+  revoked_at_ms: number | null;
+};
 const date = (n: number) =>
   new Date(n).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
 
@@ -62,6 +70,7 @@ export function AdminPanel({
   const [batches, setBatches] = useState<Batch[]>([]);
   const [audits, setAudits] = useState<Audit[]>([]);
   const [keys, setKeys] = useState<ProductKey[]>([]);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(false);
   const [asOf, setAsOf] = useState(0);
@@ -90,6 +99,10 @@ export function AdminPanel({
   });
   const [editProduct, setEditProduct] = useState<AccountProduct | null>(null);
   const [newKey, setNewKey] = useState("");
+  const [inviteLabel, setInviteLabel] = useState("");
+  const [inviteProduct, setInviteProduct] = useState("md-exp");
+  const [inviteDays, setInviteDays] = useState(30);
+  const [newInvitation, setNewInvitation] = useState("");
   const [confirmRevoke, setConfirmRevoke] = useState<{
     type: "batches" | "keys";
     id: string;
@@ -134,6 +147,9 @@ export function AdminPanel({
         } else if (section === "products" && owner) {
           const r = await accountApi<{ items: ProductKey[] }>("/admin/keys");
           if (active) setKeys(r.items);
+        } else if (section === "invitations" && owner) {
+          const r = await accountApi<{ items: Invitation[] }>("/api/v1/community/admin/invitations");
+          if (active) setInvitations(r.items);
         }
       } catch (e) {
         if (active) setError(e instanceof Error ? e.message : String(e));
@@ -264,6 +280,17 @@ export function AdminPanel({
       t("产品配置已保存。", "Product settings saved."),
     );
   }
+  function createInvitation(e: FormEvent) {
+    e.preventDefault();
+    void run(async () => {
+      const r = await accountApi<{ code: string }>("/api/v1/community/admin/invitations", {
+        method: "POST",
+        body: JSON.stringify({ label: inviteLabel, productId: inviteProduct, validDays: inviteDays }),
+      });
+      setNewInvitation(r.code);
+      setInviteLabel("");
+    }, t("产品邀请码已生成。请立即复制保存。", "Product invitation created. Copy it now."));
+  }
 
   return (
     <section className="dash-admin">
@@ -298,6 +325,7 @@ export function AdminPanel({
         {[
           ["users", t("用户管理", "Users")],
           ["codes", t("激活码", "Activation codes")],
+          ...(owner ? [["invitations", t("产品邀请码", "Product invites")]] : []),
           ...(owner ? [["products", t("产品配置", "Product settings")]] : []),
           ["audit", t("操作记录", "Audit log")],
         ].map(([value, name]) => (
@@ -846,6 +874,21 @@ export function AdminPanel({
               </table>
             </div>
           </section>
+        </>
+      )}
+      {section === "invitations" && owner && (
+        <>
+          <section className="dash-panel">
+            <div className="dash-panel-title"><h3>{t("生成产品邀请码", "Generate product invites")}</h3><span>{t("登录时解锁产品资格", "Unlock product qualification at sign-in")}</span></div>
+            <form className="dash-admin-form" onSubmit={createInvitation}>
+              <label>{t("用途说明", "Label")}<input required maxLength={80} value={inviteLabel} onChange={(e) => setInviteLabel(e.target.value)} placeholder={t("例如：MD EXP 首批用户", "e.g. MD EXP early users")} /></label>
+              <label>{t("产品", "Product")}<select value={inviteProduct} onChange={(e) => setInviteProduct(e.target.value)}><option value="md-exp">MD EXP</option><option value="gromacs">GROMACS</option><option value="dft">DFT</option><option value="materials">{t("材料分析智能体", "Materials analysis")}</option></select></label>
+              <label>{t("有效天数", "Valid days")}<input type="number" min={1} max={365} value={inviteDays} onChange={(e) => setInviteDays(Number(e.target.value))} /></label>
+              <button className="dash-primary" disabled={busy}>{t("生成邀请码", "Generate invite")}</button>
+            </form>
+            {newInvitation && <div className="dash-code-result"><strong>{t("新邀请码（仅显示一次）", "New invite (shown once)")}</strong><input readOnly value={newInvitation} onFocus={(e) => e.target.select()} /><button className="dash-quiet-button" onClick={() => setNewInvitation("")}>{t("已保存，关闭", "Saved, close")}</button></div>}
+          </section>
+          <section className="dash-panel"><div className="dash-panel-title"><h3>{t("产品邀请码记录", "Product invitation history")}</h3></div><div className="dash-table-wrap"><table><thead><tr><th>{t("邀请码", "Code")}</th><th>{t("产品", "Product")}</th><th>{t("使用次数", "Uses")}</th><th>{t("截止时间", "Expiry")}</th><th>{t("状态", "Status")}</th></tr></thead><tbody>{invitations.map((item) => <tr key={item.code}><td><strong>{item.code}</strong><small>{item.label}</small></td><td>{item.product_id || "—"}</td><td>{item.uses}</td><td>{date(item.expires_at_ms)}</td><td>{item.revoked_at_ms ? t("已撤销", "Revoked") : t("有效", "Active")}</td></tr>)}</tbody></table>{!invitations.length && <p className="dash-empty-inline">{t("暂无产品邀请码。", "No product invites yet.")}</p>}</div></section>
         </>
       )}
       {section === "audit" && (

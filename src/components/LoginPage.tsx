@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useLanguage } from "./LanguageProvider";
 import { assetUrl } from "@/lib/asset-url";
 import {
@@ -9,7 +10,7 @@ import {
 } from "@/lib/community-login";
 import "./login.css";
 
-const apiBase = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/llmer-api";
+const apiBase = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/official-api";
 
 export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onClose?: () => void }) {
   const { language, setLanguage } = useLanguage();
@@ -33,6 +34,16 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
     );
     return () => window.clearTimeout(timer);
   }, [cooldown]);
+  useEffect(() => {
+    if (!overlay) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.body.classList.add("login-open");
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.classList.remove("login-open");
+    };
+  }, [overlay]);
   const request = async (path: string, body: object) => {
     const response = await fetch(apiBase + path, {
       method: "POST",
@@ -122,42 +133,37 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
         "aethericai-community-access-expires",
         String(data.accessTokenExpiresAtEpochMs),
       );
-      if (overlay) {
-        onClose?.();
-        window.location.reload();
-      } else {
-        window.location.replace(
-          communityReturnPath(
-            new URLSearchParams(window.location.search).get("returnTo"),
-          ),
-        );
-      }
+      const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+      window.location.replace(communityReturnPath(returnTo));
     } catch (error) {
       setError(error instanceof Error ? error.message : String(error));
       setBusy(null);
     }
   };
-  return (
+  const page = (
     <main className={`login-page${overlay ? " login-overlay" : ""}`}>
-      <nav
-        className="login-nav"
-        aria-label={zh ? "登录页导航" : "Sign-in navigation"}
-      >
-        <a
-          href={overlay ? "#close-login" : assetUrl("/community/")}
-          onClick={overlay ? (event) => { event.preventDefault(); onClose?.(); } : undefined}
-        aria-label={zh ? "关闭登录页" : "Close sign-in"}
-      >
-        ×
-      </a>
-        <button
-          onClick={() => setLanguage(zh ? "en" : "zh")}
-          aria-label={zh ? "Switch to English" : "切换中文"}
+      <section className="login-card login-panel" aria-labelledby="login-title">
+        <nav
+          className="login-nav"
+          aria-label={zh ? "登录页导航" : "Sign-in navigation"}
         >
-          {zh ? "EN" : "中文"}
-        </button>
-      </nav>
-      <section className="login-card" aria-labelledby="login-title">
+          <a
+            className="login-close"
+            href={overlay ? "#close-login" : assetUrl("/community/")}
+            onClick={overlay ? (event) => { event.preventDefault(); onClose?.(); } : undefined}
+            aria-label={zh ? "关闭登录页" : "Close sign-in"}
+          >
+            ×
+          </a>
+          {!overlay && (
+            <button
+              onClick={() => setLanguage(zh ? "en" : "zh")}
+              aria-label={zh ? "Switch to English" : "切换中文"}
+            >
+              {zh ? "EN" : "中文"}
+            </button>
+          )}
+        </nav>
         <a className="login-brand font-display" href={assetUrl("/")}>
           {zh ? "以太智元" : "AethericAI"}
         </a>
@@ -292,9 +298,16 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
           <button type="button" disabled>
             {zh ? "密码登录" : "Password sign-in"}
           </button>
-          <span>{zh ? "暂未开通" : "Coming later"}</span>
+          <button type="button" disabled>
+            {zh ? "暂未开通" : "Coming later"}
+          </button>
         </div>
       </section>
     </main>
   );
+
+  if (overlay && typeof document !== "undefined") {
+    return createPortal(page, document.body);
+  }
+  return page;
 }

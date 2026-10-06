@@ -4,10 +4,10 @@
 
 ## 当前验收结论
 
-- 结论：社区结构调整通过构建、专项测试和浏览器验收
-- 验收范围：社区结构、独立登录页、协议页、邀请码接口及权限
-- 最后检查：2026-10-01
-- 遗留问题：真实短信收发和首位管理员选择仍待实际账号验收，不属于本轮布局变更
+- 结论：统一账户工作台与总管理员功能已通过测试并上线；原社区回归通过
+- 验收范围：工作台、用户身份、积分、激活码、产品套餐、用量接口、统一登录及既有社区
+- 最后检查：2026-10-06
+- 遗留问题：正式产品价格/额度由总管理员配置；产品真实用量须由各产品接入记录接口，不以演示数据代替。生产已存在用户明确指定的短信验证账号并赋予 OWNER；本轮未发送真实短信。
 
 ## 验收标准
 
@@ -26,6 +26,12 @@
 | E-001 | 2026-09-29 | 初始化、validate、audit | 0 | `.project-to-act/` 当前文件 | managed 文档、索引和仓库说明已创建 | 本地命令输出 | 当前 |
 | E-002 | 2026-10-01 | build:ip、lint、社区/认证 pytest、浏览器插件 | 0 | `20261001-community-layout-final` | 11 项专项通过，中英文/响应式、隔离账户发帖和公网统计通过 | `docs/community.md` | 本发布版本 |
 | E-003 | 2026-10-01 | build:ip、lint、后端pytest、浏览器插件 | 0 | `20261001-community-login` | 247项完整/14项专项通过；页面与协议200；未同意协议拒绝；手机和桌面视觉通过 | `docs/community.md` | 本发布版本 |
+| E-004 | 2026-10-05 | build:ip、lint、SHA-256、乌兰察布公网与浏览器验收 | 0 | `20261005-login-controls-v2` | 语言切换和关闭按钮位于面板内；首页哈希、登录页、worker、healthz、社区 overview 通过；旧版本保留回滚 | `design-qa.md`、生产发布包备份 | 历史发布 |
+| E-005 | 2026-10-05 | build:ip、lint、SHA-256、乌兰察布公网与浏览器验收 | 0 | `20261005-login-controls-v3` | 弹层移除重复语言按钮，X 仍在框内右上角；桌面/390px 手机验证通过；首页哈希、登录页、healthz、社区 overview 通过 | `design-qa.md`、生产发布包备份 | 当前发布 |
+| E-006 | 2026-10-05 | 独立认证服务部署、前端 build/lint、Nginx、官方 API 与公网浏览器验收 | 0 | `20261005-official-api` | 乌兰察布新 `aethericai-auth.service` 使用独立 SQLite；RAM 角色 `SilverSmsAuthRole` 生效；`/official-api` overview、官网首页、登录页与 healthz 通过 | `/var/backups/aethericai-auth/20261005T141106Z/`、`/var/backups/aethericai-official/20261005-official-api/` | 当前发布 |
+| E-007 | 2026-10-05 | build:ip、lint、SHA-256、乌兰察布公网与浏览器验收 | 0 | `20261005-login-scale-v4` | 登录框桌面端缩放到原来的 0.9，手机端保持可用尺寸；首页哈希、登录页、healthz、社区 overview 通过；旧版本保留回滚 | `design-qa.md`、生产发布包备份 | 当前发布 |
+| E-008 | 2026-10-05 | build:ip、lint、SHA-256、乌兰察布公网与 Nginx 验收 | 0 | `20261005-nav-spacing-v5` | 桌面导航左/中/右三列对齐，产品与社区保持 7.6px 间距；首页哈希、healthz、Nginx 通过；旧版本保留回滚 | `design-qa.md`、生产发布包备份 | 当前发布 |
+| E-009 | 2026-10-06 | 15 项 Python 回归、登录跳转测试、build/lint、隔离浏览器流程、生产只读核验 | 0 | `20261006-account-workspace`; dashboard SHA-256 `5efa7df4538a81046a73ca7d3d598acc097841e8e14641199470fbb14ada4314` | 指定账号尾号 4824 为唯一 OWNER；生产1用户、0测试用量/激活码/余额记录；匿名私有接口401；公共产品/社区/health正常；数据库完整性ok | docs/account-workspace.md、design-qa.md、`/var/backups/aethericai-official/20261006-account-workspace/` | 当前工作台发布 |
 
 ## Gate 记录
 
@@ -43,6 +49,11 @@
 2026-10-05 复核并修正主官网顶栏：按用户最新确认的结构实际部署，主页与产品页均复用同一套 Nav；确认旧的六个 P3 入口已移除，产品/社区保留，企业服务在品牌右侧，加入我们/关于我们在右侧功能区，版本 `20261005-nav-structure-final`。
 2026-10-05 登录弹层玻璃质感：仅调整 Login Panel，加入 32px 强背景模糊、2px 全局弱遮罩、冰蓝细边缘光和输入层级，首页背景、导航、分子场景及底部区域未改。Chrome 线上截图确认，版本 `20261005-login-glass`。
 2026-10-04 登录弹层文字与间距：辅助文字统一上调一档；登录标题与手机号框增加 24px 下间距，避免标题贴住输入框上边缘。构建与 lint 通过，版本 `20261004-login-modal-text`。
+2026-10-05 登录框控件归位：语言切换和关闭 X 移入 Login Panel 顶部，桌面和 390px 手机尺寸验证通过；生产版本 `20261005-login-controls-v2`。
+2026-10-05 登录弹层去重：弹层移除语言按钮，保留全局顶部语言入口；X 保持框内右上角，桌面和 390px 手机尺寸验证通过；生产版本 `20261005-login-controls-v3`。
+2026-10-05 登录框比例：桌面端整体缩放至原来的 0.9，手机端保持可用尺寸，生产版本 `20261005-login-scale-v4`。
+2026-10-05 顶部导航均匀排布：桌面导航改为左/中/右三列对齐，产品与社区维持现有 7.6px 内间距，生产版本 `20261005-nav-spacing-v5`。
+2026-10-05 官网认证隔离：新增乌兰察布 `aethericai-auth.service`、独立 SQLite 和 `/official-api/` Nginx allowlist；短信通过 ECS RAM 角色 `SilverSmsAuthRole` 使用现有阿里云通道；小程序旧 `/llmer-api/` 保持不动，生产版本 `20261005-official-api`。
 
 | Gate ID | 日期 | Gate | 对象 | 结果 | 证据 ID | 豁免与确认人 |
 |---|---|---|---|---|---|---|

@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { Nav } from "@/components/Nav";
 import { assetUrl } from "@/lib/asset-url";
 import { tr } from "@/lib/i18n";
 import { productAssets } from "@/data/productAssets";
+import { ProductPurchase } from "./ProductPurchase";
+import { accountApi, type AccountProduct } from "@/lib/account-client";
 import "./products.css";
 
 type Product = {
@@ -46,18 +48,28 @@ export function ProductsPage() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"popular" | "name">("popular");
   const [selected, setSelected] = useState<Product | null>(null);
+  const [catalog, setCatalog] = useState<AccountProduct[]>([]);
+  useEffect(() => {
+    let active = true;
+    accountApi<{ items: AccountProduct[] }>('/products').then(r => { if (active) setCatalog(r.items); }).catch(() => {});
+    return () => { active = false; };
+  }, []);
   const labels = zh ? { signIn: "登录", search: "搜索产品、算法或解决方案", sort: "排序", popular: "常用", alpha: "按名称", detail: "产品详情", preview: "打开样板", close: "关闭", hero: "科学计算产品", headline: "让研究从问题走向结果", sub: "从原子尺度模拟到科学智能工作流，为每一个研究问题准备一套可执行的工具。", all: "所有产品", catalogSub: "覆盖从分子模拟到科学智能的完整工具链" } : { signIn: "Sign in", search: "Search products, algorithms or solutions", sort: "Sort", popular: "Popular", alpha: "By name", detail: "Product details", preview: "Open preview", close: "Close", hero: "SCIENTIFIC COMPUTING PRODUCTS", headline: "Move research from question to result", sub: "From atom-scale simulation to science agents, a focused set of tools for real research questions.", all: "All products", catalogSub: "A focused toolchain from molecular simulation to scientific intelligence" };
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    const result = PRODUCTS.filter((product) => (category === "all" || product.category === category) && (!query || `${product.title.en} ${product.title.zh} ${product.body.en} ${product.body.zh}`.toLowerCase().includes(query)));
+    const current = PRODUCTS.map(product => {
+      const live = catalog.find(p => p.id === product.id);
+      return live ? { ...product, title: { zh: live.name, en: live.name_en }, body: { ...product.body, zh: live.description }, state: live.status === 'AVAILABLE' ? { zh: `${live.price} 积分起`, en: `From ${live.price} credits` } : { zh: '暂未开放购买', en: 'Not for sale yet' } } : product;
+    });
+    const result = current.filter((product) => (category === "all" || product.category === category) && (!query || `${product.title.en} ${product.title.zh} ${product.body.en} ${product.body.zh}`.toLowerCase().includes(query)));
     return sort === "name" ? [...result].sort((a, b) => a.title.en.localeCompare(b.title.en)) : result;
-  }, [category, search, sort]);
+  }, [category, search, sort, catalog]);
   return <main className="products-page">
     <Nav />
     <section className="products-hero"><Image src={assetUrl(productAssets.hero)} alt="" fill priority unoptimized sizes="100vw" className="products-hero-image" /><div className="products-hero-wash" /><div className="products-container products-hero-inner"><div><p className="products-eyebrow">{labels.hero}</p><h1>{labels.headline}</h1><p>{labels.sub}</p></div></div></section>
     <div className="products-container products-category-tabs">{CATEGORIES.map(([value, label]) => <button key={value} aria-pressed={category === value} onClick={() => setCategory(value)}><span className="products-tab-icon" aria-hidden>{value === "all" ? "▦" : value === "simulation" ? "⌁" : value === "agent" ? "✦" : value === "platform" ? "◇" : "◈"}</span>{tr(language, label.en, label.zh)}</button>)}</div>
     <section className="products-container products-catalog"><div className="products-catalog-heading"><div><h2>{labels.all}</h2><p>{labels.catalogSub}</p></div><div className="products-catalog-tools"><label><span className="sr-only">{labels.search}</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={labels.search} /></label><span>{labels.sort}</span><button className={sort === "popular" ? "active" : ""} onClick={() => setSort("popular")}>{labels.popular}⌄</button><button className={sort === "name" ? "active" : ""} onClick={() => setSort("name")}>{labels.alpha}</button></div></div><div className="products-grid">{filtered.map((product) => <article key={product.id} className="product-card" style={{ "--product-accent": product.accent } as React.CSSProperties}><div className="product-image"><Image src={assetUrl(product.image)} alt="" fill unoptimized sizes="(max-width: 768px) 100vw, 33vw" /></div><div className="product-card-body"><span className="product-icon">{product.icon}</span><div className="product-state">{tr(language, product.state.en, product.state.zh)}</div><h3>{tr(language, product.title.en, product.title.zh)}</h3><p>{tr(language, product.body.en, product.body.zh)}</p><div className="product-tags">{product.tags.map((tag) => <span key={tag.en}>{tr(language, tag.en, tag.zh)}</span>)}</div><button className="product-detail" onClick={() => setSelected(product)}>{labels.detail} <span>→</span></button></div></article>)}</div>{filtered.length === 0 && <div className="products-empty">{zh ? "没有找到相关产品。" : "No products match this search."}</div>}</section>
-    <footer className="products-footer"><div className="products-container"><a href={assetUrl("/community/")}>{zh ? "进入社区交流" : "Join the community"}</a><span>{zh ? "产品页为当前阶段的功能样板，真实产品接入后会保留同一信息结构。" : "This page is a product preview. Connected products will keep this information structure."}</span></div></footer>
-    {selected && <div className="product-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}><article className="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title"><button className="product-modal-close" onClick={() => setSelected(null)} aria-label={labels.close}>×</button><span className="product-icon large">{selected.icon}</span><p className="products-eyebrow">{tr(language, selected.state.en, selected.state.zh)}</p><h2 id="product-modal-title">{tr(language, selected.title.en, selected.title.zh)}</h2><p>{tr(language, selected.body.en, selected.body.zh)}</p><div className="product-modal-list">{selected.tags.map((tag) => <span key={tag.en}>+ {tr(language, tag.en, tag.zh)}</span>)}</div><button className="product-primary" onClick={() => setSelected(null)}>{labels.preview}</button></article></div>}
+    <footer className="products-footer"><div className="products-container"><a href={assetUrl("/community/")}>{zh ? "进入社区交流" : "Join the community"}</a><span>{zh ? "产品介绍与权益购买，统一使用以太智元账号。" : "Explore products and manage access with your AethericAI account."}</span></div></footer>
+    {selected && <div className="product-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelected(null); }}><article className="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title"><button className="product-modal-close" onClick={() => setSelected(null)} aria-label={labels.close}>×</button><span className="product-icon large">{selected.icon}</span><p className="products-eyebrow">{tr(language, selected.state.en, selected.state.zh)}</p><h2 id="product-modal-title">{tr(language, selected.title.en, selected.title.zh)}</h2><p>{tr(language, selected.body.en, selected.body.zh)}</p><div className="product-modal-list">{selected.tags.map((tag) => <span key={tag.en}>+ {tr(language, tag.en, tag.zh)}</span>)}</div><ProductPurchase key={selected.id} productId={selected.id} zh={zh} /></article></div>}
   </main>;
 }

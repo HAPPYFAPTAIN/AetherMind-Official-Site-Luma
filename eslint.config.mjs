@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     // Bundled Three.js and generated visual verification artifacts.
     "public/science/scene-worker-*.js",
     "output/**",
+    // Unchanged snapshot of the independently deployed Python auth service.
+    "server/llmer_api/admin_web/**",
     "next-env.d.ts",
   ]),
 ]);

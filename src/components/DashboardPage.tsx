@@ -255,6 +255,7 @@ export function DashboardPage() {
   const [tab, setTab] = useState("overview");
   const [loginOpen, setLoginOpen] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const closePassword = useCallback(() => setPasswordOpen(false), []);
   const [redeemOpen, setRedeemOpen] = useState(false);
   const [code, setCode] = useState("");
@@ -356,23 +357,24 @@ export function DashboardPage() {
           </div>
           {data && !unauthorized && (
             <div className="dash-account">
-              <button className="dash-account-trigger" onClick={() => setPasswordOpen(true)}
+              <button className="dash-avatar-button" onClick={() => setAccountMenuOpen((open) => !open)}
+                aria-expanded={accountMenuOpen}
                 aria-label={t("账户安全：设置或修改密码", "Account security: set or change password")}
                 title={t("设置或修改密码", "Set or change password")}>
-              <span className="dash-avatar">
-                {data.profile.displayName.slice(0, 1)}
-              </span>
-              <div className="dash-account-details">
-                <strong>{data.profile.displayName}</strong>
-                <span>
-                  {data.profile.phoneMasked} · {roleName}
-                </span>
-              </div>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m3 4 3 3 3-3" stroke="currentColor" strokeWidth="1.5" /></svg>
+                <span className="dash-avatar">{data.profile.displayName.slice(0, 1)}</span>
               </button>
-              <button onClick={() => void logout()}>
-                {t("退出", "Sign out")}
-              </button>
+              {accountMenuOpen && (
+                <div className="dash-account-menu" role="menu">
+                  <strong>{data.profile.displayName}</strong>
+                  <span>{data.profile.phoneMasked} · {roleName}</span>
+                  <button role="menuitem" onClick={() => { setAccountMenuOpen(false); setPasswordOpen(true); }}>
+                    {t("账户安全", "Account security")}
+                  </button>
+                  <button role="menuitem" onClick={() => void logout()}>
+                    {t("退出", "Sign out")}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

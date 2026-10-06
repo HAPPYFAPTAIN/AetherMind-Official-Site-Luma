@@ -64,3 +64,53 @@ def test_product_invitation_grants_qualification_without_fake_entry(tmp_path, mo
 def test_md_agent_profile_requires_official_session(tmp_path):
     client, _ = build(tmp_path)
     assert client.get("/api/v1/console/md-agent/profile").status_code == 401
+
+
+def test_binding_creates_private_account_and_rewrites_entry_url(tmp_path, monkeypatch):
+    client, sms = build(tmp_path)
+    owner = login(client, sms, "13900000001")
+    uid = owner["profile"]["userId"]
+    with client.app.state.workspace.db.connect() as db:
+        db.execute(
+            "INSERT INTO community_invitations(code,label,created_at_ms,expires_at_ms,product_id) VALUES(?,?,?,?,?)",
+            ("ABCDEF123456", "test", client.app.state.workspace.now(), client.app.state.workspace.now() + 100000, "md-exp"),
+        )
+        db.execute(
+            "INSERT INTO official_md_agent_qualifications VALUES(?,?,?,?)",
+            (uid, "md-exp", "ABCDEF123456", client.app.state.workspace.now()),
+        )
+    monkeypatch.setenv("MDAGENT_ADMIN_TOKEN", "server-only-test-token")
+    calls = []
+
+    class Response:
+        def __init__(self, payload, status=200):
+            self._payload, self.status_code = payload, status
+            self.is_success = status < 400
+
+        def json(self):
+            return self._payload
+
+    def fake_request(method, url, **kwargs):
+        calls.append((method, url, kwargs.get("body")))
+        if url.endswith("/v1/admin/invites"):
+            return Response({"code": "inv_internal"}, 201)
+        if url.endswith("/v1/apply"):
+            return Response({"status": "pending"}, 200)
+        if "/v1/admin/approve/" in url:
+            return Response({"token": "mda_private_test_token"}, 200)
+        if url.endswith("/v1/web/entry"):
+            return Response({"url": "https://8.130.144.193:8081/mdagent/web/open?ticket=ticket123", "expires_in": 120}, 201)
+        raise AssertionError(url)
+
+    monkeypatch.setattr("official_api.md_agent.httpx.request", fake_request)
+    headers = {"Authorization": "Bearer " + owner["accessToken"]}
+    bound = client.post("/api/v1/console/md-agent/bind", headers=headers)
+    assert bound.status_code == 200
+    assert bound.json()["accountBinding"] == "bound"
+    entry = client.post("/api/v1/console/md-agent/enter", headers=headers)
+    assert entry.status_code == 200
+    assert entry.json()["url"] == "/official/md-agent/open?ticket=ticket123"
+    assert len(calls) == 4
+    with client.app.state.workspace.db.connect() as db:
+        stored = db.execute("SELECT token_ciphertext FROM official_md_agent_bindings WHERE user_id=?", (uid,)).fetchone()[0]
+        assert "mda_private_test_token" not in stored

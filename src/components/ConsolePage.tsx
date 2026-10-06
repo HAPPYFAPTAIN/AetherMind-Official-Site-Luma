@@ -77,14 +77,33 @@ export function ConsolePage() {
       : (zh ? "普通用户" : "Member");
   }, [account, zh]);
 
-  const enterMdExp = () => {
+  const enterMdExp = async () => {
     if (!account) {
       window.location.assign(assetUrl("/login/?returnTo=/official/console/"));
       return;
     }
-    setNotice(mdState?.qualifications.some((item) => item.product_id === "md-exp")
+    if (!mdState?.qualifications.some((item) => item.product_id === "md-exp")) {
+      setNotice(zh
+      ? "请先使用对应邀请码获得 MD EXP 产品资格。"
+      : "Use the matching invite code to unlock MD EXP first.");
+      return;
+    }
+    const popup = window.open("about:blank", "_blank", "noopener,noreferrer");
+    setNotice(zh
       ? (zh ? "你已获得 MD EXP 产品资格；个人 MD-Agent 账户绑定完成后，会在这里新标签页打开 dsh。" : "You have MD EXP qualification. dsh will open in a new tab after your personal MD-Agent account is bound.")
-      : (zh ? "请先使用对应邀请码获得 MD EXP 产品资格。绑定和对接密钥配置完成后，会在这里新标签页打开 dsh。" : "Use the matching invite code to unlock MD EXP first. dsh will open in a new tab after binding and key setup are complete."));
+      : "Preparing your MD-Agent workspace…");
+    try {
+      const nextState = mdState.accountBinding === "bound"
+        ? mdState
+        : await accountApi<MdAgentState>("/md-agent/bind", { method: "POST" });
+      const entry = await accountApi<{ url: string }>("/md-agent/enter", { method: "POST" });
+      if (popup) popup.location.href = entry.url;
+      else window.open(entry.url, "_blank", "noopener,noreferrer");
+      setMdState(nextState);
+    } catch (error) {
+      popup?.close();
+      setNotice(error instanceof Error ? error.message : String(error));
+    }
   };
 
   const sidebar = [
@@ -158,7 +177,7 @@ export function ConsolePage() {
                   <img src={assetUrl(agent.image)} alt="" />
                   <div className="agent-copy"><h2>{agent.title}</h2><p className="agent-subtitle">{agent.subtitle}</p><p className="agent-description">{agent.description}</p><div className="agent-tags">{agent.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
                   <div className="agent-status"><span className={agent.status}>{agent.status === "available" ? (zh ? "可用" : "Available") : (zh ? "下个月上架" : "Coming next month")}</span><small>{agent.status === "available" ? (mdState?.qualifications.some((item) => item.product_id === agent.id) ? (zh ? "已获得产品资格" : "Qualified") : (zh ? "需要绑定邀请码" : "Invite binding required")) : ""}</small></div>
-                  <button className="agent-action" disabled={agent.status !== "available"} onClick={enterMdExp}>{agent.status === "available" ? (zh ? "进入智能体  →" : "Open agent  →") : (zh ? "敬请期待" : "Stay tuned")}</button>
+                  <button className="agent-action" disabled={agent.status !== "available"} onClick={() => void enterMdExp()}>{agent.status === "available" ? (zh ? "进入智能体  →" : "Open agent  →") : (zh ? "敬请期待" : "Stay tuned")}</button>
                 </article>
               ))}
             </div>

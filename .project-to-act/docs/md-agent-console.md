@@ -24,19 +24,21 @@
 
 ## 当前已部署
 
-- 前端：`/opt/aethericai-official/releases/20261006-md-console-preview`
-- 后端：`/srv/aethericai-auth/releases/20261006-md-console-preview`
+- 前端：`/opt/aethericai-official/releases/20261006-md-entry`
+- 后端：`/srv/aethericai-auth/releases/20261006-md-entry`
 - 数据表：`official_md_agent_qualifications`；邀请码表新增 `product_id`
 - BFF：`GET /api/v1/console/md-agent/profile` 返回本人资格、模型未配置和超算未连接状态
-- BFF：`POST /api/v1/console/md-agent/enter` 当前明确返回 `MD_AGENT_BINDING_REQUIRED`，没有使用共享测试账户
-- 备份：`/var/backups/aethericai-official/20261006-md-console-preview/`
+- BFF：`POST /api/v1/console/md-agent/bind` 按本人产品资格自动创建/审批个人 MD-Agent 账号，并加密保存个人 Token
+- BFF：`POST /api/v1/console/md-agent/enter` 申请短票并改写为 `/official/md-agent/open?ticket=...`
+- 同域 dsh：`/official/md-agent/`，根级 dsh 资源和 API 由 Nginx 兼容转发
+- 备份：`/var/backups/aethericai-official/20261006-md-binding/`
 
 ## 待密钥和后端契约后完成
 
-1. 建立官网账号到 MD-Agent 账号的一人一绑定关系。
-2. 使用用户提供的服务端密钥调用 MD-Agent `/v1/web/entry`，校验返回目标后生成新标签页短票跳转。
-3. 将 dsh 从现有独立端口迁移到官网同域路径；需要核对 dsh 的 base path、Cookie path、可信 Host、SSE/RPC 和 WebSocket 路由。
+1. 用真实总管理员生成的产品邀请码完成一次生产绑定和短票进入验收。
+2. 使用用户提供的模型密钥完成 Kimi/DeepSeek 真实短对话验证。
+3. 继续核对 dsh 同域路径的已登录页面、SSE/RPC、WebSocket 和租户动态端口。
 4. 配置 Kimi 与 DeepSeek 的 provider/base URL/model 契约，完成错误 Key、429、超时和真实短对话验证。
 5. 接入 SSH 负责人的 connection/workspace/job 契约后，才开放超算连接和计算任务操作。
 
-在第 2 项完成前，MD EXP 卡片按钮只给出绑定/接入状态提示，不声称已进入 dsh。
+没有产品资格的账号仍不能绑定或进入；没有真实模型密钥时 dsh 可以进入，但模型状态保持未配置。

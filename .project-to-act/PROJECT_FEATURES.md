@@ -19,6 +19,7 @@
 | F-002 | 总管理员身份、用户角色、激活码及产品管理 | 本轮用户明确授权 | P1 | 已完成 | 通过 | 现有已验证账号 | 权限隔离、审计与生产账号配置通过 | docs/account-workspace.md | E-009 |
 | F-003 | 手机号密码登录与本人短信验证改密 | 用户明确要求 | P1 | 已完成 | 通过 | 官网现有短信与会话 | 本人验证、重放/过期拒绝、限流、会话撤销和上线核验通过 | docs/account-workspace.md | E-013 |
 | F-004 | MD-Agent 智能体卡片控制台与产品邀请码资格 | 用户确认的交接流程 | P1 | 进行中 | 阶段通过 | MD-Agent BFF、dsh短票、Kimi/DeepSeek密钥、SSH适配 | 卡片页、登录返回、后续卡片禁用、邀请码资格和待接入状态上线；真实 dsh/模型/SSH 联调待完成 | docs/md-agent-console.md | E-014 |
+| F-005 | MD-Agent 个人自动绑定与官网同域 dsh 入口 | 用户确认的接入方式 | P1 | 进行中 | 阶段通过 | official-bff 管理凭据、dsh 动态租户端口 | 个人资格触发开户/审批/Token 加密保存，短票改写到 `/official/md-agent/`；真实用户首次绑定和 dsh 完整会话待验收 | docs/md-agent-console.md | E-015 |
 
 ## 功能变更历史
 

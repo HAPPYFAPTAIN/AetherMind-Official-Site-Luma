@@ -4,7 +4,7 @@
 
 ## 当前验收结论
 
-- 结论：MD-Agent 卡片控制台阶段版已上线（E-014）；密码、邀请码资格、工作台和原短信/社区回归通过；真实 dsh/模型/SSH 联调仍待密钥与契约
+- 结论：MD-Agent 自动绑定与官网同域 dsh 阶段版已上线（E-015）；密码、邀请码资格、工作台和原短信/社区回归通过；真实用户首次绑定、模型和 SSH 联调仍待验证
 - 验收范围：卡片目录、产品邀请码资格、模型/超算状态页、密码登录/设置、工作台、用户身份、积分、激活码、产品套餐、用量接口、统一登录及既有社区
 - 最后检查：2026-10-06
 - 遗留问题：正式产品价格/额度由总管理员配置；产品真实用量须由各产品接入记录接口，不以演示数据代替。生产已存在用户明确指定的短信验证账号并赋予 OWNER；本轮未发送真实短信。
@@ -37,6 +37,7 @@
 | E-012 | 2026-10-06 | build:ip/lint、桌面/390px/320px浏览器、滚动及退出流程、公网哈希 | 0 | `20261006-workspace-topbar`; dashboard SHA-256 `7ec14f06c22913a9506549f74152c0f38117162ad4fc0ef6faf6a73b989be4ef` | 账户区仅一份且位于独立顶栏内；旧官网导航不存在；320px无重叠，滚动后顶栏Y=0；本地真实接口退出返回官网；公网HTML哈希一致，后台及Nginx PID不变 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css`、`/var/backups/aethericai-official/20261006-workspace-topbar/` | 当前静态发布 |
 | E-013 | 2026-10-06 | 25项后端测试、1项跳转测试、build/lint、桌面/390px表单、公网入口与哈希、SQLite只读核验 | 0 | `20261006-password-login`; login SHA-256 `2eeb62a7e3ca1f5feb1c31ef30d5a48754b2973bf49b1d238e9a2f22f3e2fa82` | 本人验证、限流、验证码单次/失效、并发旧密码拒绝、旧会话撤销通过；公网密码入口可切换，匿名设置401、无效登录400，health/产品200；生产1用户/1 OWNER/0密码/0挑战，未发送真实短信 | `server/tests/test_passwords.py`、`docs/account-workspace.md`、`/var/backups/aethericai-official/20261006-password-login/` | 当前认证发布 |
 | E-014 | 2026-10-06 | 27项后端测试、build/lint、设计 QA、桌面/390px浏览器、公网卡片页、匿名 BFF 401、生产 SQLite/服务核验 | 0 | `20261006-md-console-preview`; console HTML SHA-256 `1a36ac90e70cda215cb5376742311659cbc711407d83581bafdaf334d1084882` | 官网入口、卡片目录、MD EXP可用、后续卡片禁用、模型目录、超算待接入状态、产品邀请码生成和资格写入通过；生产2用户/0资格，MD-Agent进入明确409，未使用共享测试账户；真实 dsh、模型密钥、同域代理和SSH未宣称完成 | `design-qa.md`、`server/tests/test_md_agent_portal.py`、`docs/md-agent-console.md`、`/var/backups/aethericai-official/20261006-md-console-preview/` | 阶段发布 |
+| E-015 | 2026-10-06 | 28项后端测试、build/lint、Nginx `nginx -t`/reload、生产 official-bff 管理接口200、匿名 BFF401、同域 dsh 403、生产 SQLite/服务核验 | 0 | `20261006-md-entry`; console HTML SHA-256 `dc8000d8986a057bda85ac7d8c021c197715b880c65c9014be6905f4e6582f44` | official-bff 独立服务账号已创建；资格用户可自动开户/审批/加密保存 Token，短票 URL 改写到 `/official/md-agent/open`; 同域资源代理已配置；未带短票仍403；未使用现有 kkk/mdadmin Token；真实生产资格和 dsh会话待用户邀请码触发 | `server/tests/test_md_agent_portal.py`、`docs/md-agent-console.md`、`/var/backups/aethericai-official/20261006-md-binding/` | 阶段发布 |
 
 ## Gate 记录
 

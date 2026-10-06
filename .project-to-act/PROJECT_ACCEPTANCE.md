@@ -4,7 +4,7 @@
 
 ## 当前验收结论
 
-- 结论：统一账户工作台已上线；热力图提示裁切、横向滚动和悬浮跳动已修复并发布（E-011）
+- 结论：工作台独立顶栏已上线，账号信息位于右上角（E-012）；热力图修复沿用 E-011
 - 验收范围：工作台、用户身份、积分、激活码、产品套餐、用量接口、统一登录及既有社区
 - 最后检查：2026-10-06
 - 遗留问题：正式产品价格/额度由总管理员配置；产品真实用量须由各产品接入记录接口，不以演示数据代替。生产已存在用户明确指定的短信验证账号并赋予 OWNER；本轮未发送真实短信。
@@ -34,6 +34,7 @@
 | E-009 | 2026-10-06 | 15 项 Python 回归、登录跳转测试、build/lint、隔离浏览器流程、生产只读核验 | 0 | `20261006-account-workspace`; dashboard SHA-256 `5efa7df4538a81046a73ca7d3d598acc097841e8e14641199470fbb14ada4314` | 指定账号尾号 4824 为唯一 OWNER；生产1用户、0测试用量/激活码/余额记录；匿名私有接口401；公共产品/社区/health正常；数据库完整性ok | docs/account-workspace.md、design-qa.md、`/var/backups/aethericai-official/20261006-account-workspace/` | 当前工作台发布 |
 | E-010 | 2026-10-06 | build/lint、静态产物哈希、生产浏览器链接点击 | 0 | `20261006-account-workspace-links`; dashboard SHA-256 `3ccb85d29c74eeb34298f57edff2f8feda77e4ca3c2cff155cebd32e5ef4aaec` | 官网两处控制台链接均为 `/official/dashboard/`，点击进入工作台；生产哈希一致；仅切换静态版本 | `src/components/Hero.tsx`、`src/components/sections/FinalCTA.tsx`、生产备份目录 | 当前静态发布 |
 | E-011 | 2026-10-06 | build:ip/lint、桌面与390px浏览器、连续指针移动、键盘焦点、公网哈希 | 0 | `20261006-heatmap-layout`; dashboard SHA-256 `72511bae90769d4aca8fd77b69e951c2318aab2e0f805b96c7f633826f89dc69` | 原悬浮高度增加16px；修复后12次方格/间隙采样高度208px、图例Y623.55不变；桌面606px及手机318px均无横向溢出，182格完整，边缘提示在卡片内；公网HTML与构建相同，CSS/产品API正常 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css`、`/var/backups/aethericai-official/20261006-heatmap-layout/` | 当前静态发布 |
+| E-012 | 2026-10-06 | build:ip/lint、桌面/390px/320px浏览器、滚动及退出流程、公网哈希 | 0 | `20261006-workspace-topbar`; dashboard SHA-256 `7ec14f06c22913a9506549f74152c0f38117162ad4fc0ef6faf6a73b989be4ef` | 账户区仅一份且位于独立顶栏内；旧官网导航不存在；320px无重叠，滚动后顶栏Y=0；本地真实接口退出返回官网；公网HTML哈希一致，后台及Nginx PID不变 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css`、`/var/backups/aethericai-official/20261006-workspace-topbar/` | 当前静态发布 |
 
 ## Gate 记录
 

@@ -14,6 +14,39 @@
   max-width: 1360px;
   margin: auto;
 }
+.dash-topbar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  border-bottom: 1px solid var(--dash-line);
+  background: rgba(8, 14, 21, 0.94);
+  backdrop-filter: blur(16px);
+}
+.dash-topbar-inner {
+  min-height: 72px;
+  padding: 10px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.dash-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+.dash-topbar-brand a {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.dash-topbar-brand > span {
+  border-left: 1px solid var(--dash-line);
+  padding-left: 20px;
+  color: var(--dash-muted);
+  font-size: 13px;
+}
 .dash-heading {
   display: flex;
   align-items: center;
@@ -43,8 +76,15 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  margin-left: auto;
+}
+.dash-account-details {
+  min-width: 0;
+  max-width: 240px;
 }
 .dash-avatar {
+  flex-shrink: 0;
   width: 40px;
   height: 40px;
   border-radius: 14px;
@@ -58,6 +98,9 @@
   display: block;
   font-size: 14px;
   font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .dash-account span:not(.dash-avatar) {
   display: block;
@@ -66,9 +109,14 @@
   margin-top: 4px;
 }
 .dash-account button {
+  flex-shrink: 0;
   margin-left: 14px;
   font-size: 12px;
   color: var(--dash-muted);
+  padding: 8px 0;
+}
+.dash-account button:hover {
+  color: var(--dash-cyan);
 }
 .dash-actions {
   display: flex;
@@ -956,11 +1004,14 @@
   .dash-heading h1 {
     font-size: 27px;
   }
-  .dash-account .dash-avatar {
+  .dash-topbar-brand > span {
     display: none;
   }
+  .dash-topbar-inner {
+    padding-inline: 20px;
+  }
   .dash-account {
-    gap: 4px;
+    gap: 8px;
   }
   .dash-overview {
     grid-template-columns: 1fr;
@@ -1028,17 +1079,25 @@
     gap: 18px;
     margin-bottom: 24px;
   }
-  .dash-account {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .dash-account > div {
-    display: flex;
+  .dash-topbar-inner {
+    min-height: 64px;
+    padding: 8px 14px;
     gap: 12px;
-    align-items: center;
   }
-  .dash-account span:not(.dash-avatar) {
-    margin: 0;
+  .dash-topbar-brand a {
+    font-size: 13px;
+  }
+  .dash-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+  .dash-account-details {
+    max-width: 132px;
+  }
+  .dash-account strong {
+    font-size: 12px;
   }
   .dash-account button {
     margin-left: 0;

@@ -1,7 +1,6 @@
 "use client";
 
 import { CSSProperties, FormEvent, useCallback, useEffect, useState } from "react";
-import { Nav } from "./Nav";
 import { LoginPage } from "./LoginPage";
 import { useLanguage } from "./LanguageProvider";
 import { AdminPanel } from "./admin/AdminPanel";
@@ -14,6 +13,7 @@ import {
   type UsagePoint,
 } from "@/lib/account-client";
 import { assetUrl } from "@/lib/asset-url";
+import { BRAND } from "@/lib/site";
 import { useDialogFocus } from "@/lib/use-dialog-focus";
 import "./dashboard.css";
 
@@ -343,7 +343,32 @@ export function DashboardPage() {
     : 0;
   return (
     <main className="dashboard-page">
-      <Nav />
+      <header className="dash-topbar" aria-label={t("工作台顶栏", "Workspace header")}>
+        <div className="dash-topbar-inner">
+          <div className="dash-topbar-brand">
+            <a href={assetUrl("/")} aria-label={t("返回以太智元官网", "Back to AethericAI home")}>
+              {zh ? BRAND.zh : BRAND.en}
+            </a>
+            <span>{t("工作台", "Workspace")}</span>
+          </div>
+          {data && !unauthorized && (
+            <div className="dash-account">
+              <span className="dash-avatar">
+                {data.profile.displayName.slice(0, 1)}
+              </span>
+              <div className="dash-account-details">
+                <strong>{data.profile.displayName}</strong>
+                <span>
+                  {data.profile.phoneMasked} · {roleName}
+                </span>
+              </div>
+              <button onClick={() => void logout()}>
+                {t("退出", "Sign out")}
+              </button>
+            </div>
+          )}
+        </div>
+      </header>
       <div className="dash-shell">
         <div className="dash-heading">
           <div>
@@ -356,22 +381,6 @@ export function DashboardPage() {
               )}
             </p>
           </div>
-          {data && !unauthorized && (
-            <div className="dash-account">
-              <span className="dash-avatar">
-                {data.profile.displayName.slice(0, 1)}
-              </span>
-              <div>
-                <strong>{data.profile.displayName}</strong>
-                <span>
-                  {data.profile.phoneMasked} · {roleName}
-                </span>
-              </div>
-              <button onClick={() => void logout()}>
-                {t("退出", "Sign out")}
-              </button>
-            </div>
-          )}
         </div>
         {error && (
           <div className="dash-banner error" role="alert">

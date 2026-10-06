@@ -20,7 +20,7 @@
 | F-003 | 手机号密码登录与本人短信验证改密 | 用户明确要求 | P1 | 已完成 | 通过 | 官网现有短信与会话 | 本人验证、重放/过期拒绝、限流、会话撤销和上线核验通过 | docs/account-workspace.md | E-013 |
 | F-004 | MD-Agent 智能体卡片控制台与产品邀请码资格 | 用户确认的交接流程 | P1 | 进行中 | 阶段通过 | MD-Agent BFF、dsh短票、Kimi/DeepSeek密钥、SSH适配 | 卡片页、登录返回、后续卡片禁用、邀请码资格和待接入状态上线；真实 dsh/模型/SSH 联调待完成 | docs/md-agent-console.md | E-014 |
 | F-005 | MD-Agent 个人自动绑定与官网同域 dsh 入口 | 用户确认的接入方式 | P1 | 进行中 | 阶段通过 | official-bff 管理凭据、dsh 动态租户端口 | 个人资格触发开户/审批/Token 加密保存，短票改写到 `/official/md-agent/`；真实用户首次绑定和 dsh 完整会话待验收 | docs/md-agent-console.md | E-015 |
-| F-006 | DeepSeek/Kimi 模型供应商配置 | 用户提供两家模型 Key | P1 | 进行中 | 阶段通过 | 上游 API Key | DeepSeek 代理短请求200；Kimi Key无效未保存；模型目录与默认档位已配置 | docs/md-agent-console.md | E-016 |
+| F-006 | DeepSeek/Kimi 模型供应商配置 | 用户提供两家模型 Key | P1 | 进行中 | 阶段通过 | 上游 API Key | DeepSeek 和国内 Kimi 代理短请求均200；模型目录与默认档位已配置 | docs/md-agent-console.md | E-017 |
 
 ## 功能变更历史
 

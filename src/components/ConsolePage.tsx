@@ -196,13 +196,13 @@ export function ConsolePage() {
 
 function ModelPanel({ zh }: { zh: boolean }) {
   const models = [
-    ["Kimi", "kimi-k3", zh ? "旗舰，长上下文与视觉理解" : "Flagship, long context and vision"],
-    ["Kimi", "kimi-k2.7-code", zh ? "代码与 Agent 工作流" : "Coding and agent workflows"],
-    ["Kimi", "kimi-k2.6", zh ? "通用对话、视觉与 Agent" : "General, vision and agent tasks"],
-    ["DeepSeek", "deepseek-v4-pro", zh ? "旗舰推理与工具调用" : "Flagship reasoning and tools"],
-    ["DeepSeek", "deepseek-flash", zh ? "高吞吐、多模态 Flash" : "High-throughput multimodal Flash"],
+    ["Kimi", "kimi-k3", zh ? "旗舰，长上下文与视觉理解" : "Flagship, long context and vision", "pending"],
+    ["Kimi", "kimi-k2.7-code-highspeed", zh ? "高速代码与 Agent 工作流" : "High-speed coding and agent workflows", "verified"],
+    ["Kimi", "kimi-k2.6", zh ? "通用对话、视觉与 Agent" : "General, vision and agent tasks", "pending"],
+    ["DeepSeek", "deepseek-v4-pro", zh ? "旗舰推理与工具调用" : "Flagship reasoning and tools", "verified"],
+    ["DeepSeek", "deepseek-flash", zh ? "高吞吐、多模态 Flash" : "High-throughput multimodal Flash", "pending"],
   ];
-  return <section className="console-status-panel console-model-panel"><p className="console-kicker">MODEL PROVIDERS</p><h2>{zh ? "模型配置" : "Model settings"}</h2><span>{zh ? "等待对接密钥" : "Waiting for API keys"}</span><p>{zh ? "可以先选择模型；密钥到位后才会显示真实验证状态。密钥只提交给受保护的后端，不进入浏览器存储。" : "Choose a model now; real verification starts after the API keys arrive. Keys are sent only to the protected backend and never stored in the browser."}</p><div className="console-model-list">{models.map(([provider,id,desc]) => <div key={id}><b>{provider}</b><code>{id}</code><small>{desc}</small><em>{zh ? "待验证" : "Pending"}</em></div>)}</div></section>;
+  return <section className="console-status-panel console-model-panel"><p className="console-kicker">MODEL PROVIDERS</p><h2>{zh ? "模型配置" : "Model settings"}</h2><span>{zh ? "共享代理已接入" : "Shared proxy connected"}</span><p>{zh ? "Kimi 2.7 Highspeed 与 DeepSeek V4 Pro 已完成服务端短请求验证；用户级模型选择和对话状态仍由 dsh 会话读取。" : "Kimi 2.7 Highspeed and DeepSeek V4 Pro passed server-side smoke tests; per-user model selection and chat state are read by the dsh session."}</p><div className="console-model-list">{models.map(([provider,id,desc,status]) => <div key={id}><b>{provider}</b><code>{id}</code><small>{desc}</small><em className={status}>{status === "verified" ? (zh ? "已验证" : "Verified") : (zh ? "可选" : "Available")}</em></div>)}</div></section>;
 }
 
 function StatusPanel({ title, title2, body }: { title: string; title2: string; body: string }) {

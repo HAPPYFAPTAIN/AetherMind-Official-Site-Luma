@@ -15,12 +15,12 @@
 | provider | model_id | 当前状态 |
 |---|---|---|
 | `kimi` | `kimi-k3` | Key 验证失败，待重新提供 |
-| `kimi` | `kimi-k2.7-code` | 待密钥、待验证 |
+| `kimi` | `kimi-k2.7-code-highspeed` | 国内版 API 代理短请求返回200 |
 | `kimi` | `kimi-k2.6` | 待密钥、待验证 |
 | `deepseek` | `deepseek-v4-pro` | 已配置，代理短请求返回200 |
 | `deepseek` | `deepseek-flash` | 共用 DeepSeek Key，待独立验证 |
 
-模型 Key 只由受保护后端保存，不进入源码、前端环境变量、URL、localStorage 或日志。DeepSeek Key 已写入 MD-Agent 服务端受保护环境并通过真实代理短请求；本轮提供的 Kimi Key 在 Kimi Coding 与 Moonshot API 入口均返回401，未保存，需重新提供可用的 Kimi API Key。Kimi 当前官方 quickstart 推荐 `kimi-k3`，并列出 K2.7 Code 和 K2.6；DeepSeek 当前官方模型列表为 `deepseek-v4-pro` 与 `deepseek-flash`。
+模型 Key 只由受保护后端保存，不进入源码、前端环境变量、URL、localStorage 或日志。DeepSeek Key 已写入 MD-Agent 服务端受保护环境并通过真实代理短请求；Kimi 按国内版 `https://api.moonshot.cn/v1` 和 `kimi-k2.7-code-highspeed` 接入，代理短请求返回200。Kimi 当前官方 quickstart 推荐 `kimi-k3`，并列出 K2.7 Code 和 K2.6；DeepSeek 当前官方模型列表为 `deepseek-v4-pro` 与 `deepseek-flash`。
 
 ## 当前已部署
 

@@ -15,4 +15,5 @@
 .console-model-list code { color:#8ce3fa; font-size:12px; }
 .console-model-list small { color:#879eac; }
 .console-model-list em { font-style:normal; color:#8196a3; font-size:11px; }
+.console-model-list em.verified { color:#8cf0c1; }
 @media (max-width:620px) { .console-model-list > div { grid-template-columns:1fr auto; } .console-model-list small { grid-column:1/-1; } }

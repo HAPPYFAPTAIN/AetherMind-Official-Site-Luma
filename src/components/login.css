@@ -178,6 +178,16 @@ body.login-open > main:not(.login-overlay) {
 .login-description {
   display: none;
 }
+.login-password {
+  display: block;
+  margin-top: 18px;
+}
+.login-forgot {
+  display: block;
+  margin: 14px 0 0 auto;
+  color: #88d7fa;
+  font-size: 13px;
+}
 
 .login-card input:not([type="checkbox"]) {
   width: 100%;

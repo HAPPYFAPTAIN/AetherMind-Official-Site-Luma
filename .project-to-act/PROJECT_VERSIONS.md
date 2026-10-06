@@ -4,8 +4,8 @@
 
 ## 当前版本
 
-- 版本号：`20261006-workspace-topbar`
-- 发布状态：乌兰察布前端 `/opt/aethericai-official/releases/20261006-workspace-topbar`，独立后台 `/srv/aethericai-auth/releases/20261006-account-workspace`
+- 版本号：`20261006-password-login`
+- 发布状态：乌兰察布前端 `/opt/aethericai-official/releases/20261006-password-login`，独立后台 `/srv/aethericai-auth/releases/20261006-password-login`
 - 兼容性说明：Next.js 静态导出，生产使用 `/official/` 前缀
 - 最后更新：2026-10-06
 
@@ -31,3 +31,4 @@
 | `20261006-account-workspace-links` | 2026-10-06 | 已发布 | 首页两处“打开控制台”接入真实工作台；工作台实现沿用 E-009 | 仅静态入口修正，独立后台未重启 | E-010 | 通过 |
 | `20261006-heatmap-layout` | 2026-10-06 | 已发布 | 热力图提示限制在网格内、移除横向滚动容器、窄屏完整显示并消除悬浮布局跳动 | 静态修复；后台和 Nginx 未重启 | E-011 | 通过 |
 | `20261006-workspace-topbar` | 2026-10-06 | 已发布 | 工作台使用独立固定顶栏；用户头像、昵称、掩码手机号、身份和退出移到右侧 | 桌面及320/390px兼容；后台未重启 | E-012 | 通过 |
+| `20261006-password-login` | 2026-10-06 | 已发布 | 手机号密码登录、本人短信验证设置/修改密码、旧会话撤销 | 新增密码表；原短信/社区/工作台兼容，Nginx不变 | E-013 | 通过 |

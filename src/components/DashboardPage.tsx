@@ -2,6 +2,7 @@
 
 import { CSSProperties, FormEvent, useCallback, useEffect, useState } from "react";
 import { LoginPage } from "./LoginPage";
+import { PasswordSettings } from "./PasswordSettings";
 import { useLanguage } from "./LanguageProvider";
 import { AdminPanel } from "./admin/AdminPanel";
 import {
@@ -253,6 +254,8 @@ export function DashboardPage() {
   const [product, setProduct] = useState("all");
   const [tab, setTab] = useState("overview");
   const [loginOpen, setLoginOpen] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const closePassword = useCallback(() => setPasswordOpen(false), []);
   const [redeemOpen, setRedeemOpen] = useState(false);
   const [code, setCode] = useState("");
   const [redeeming, setRedeeming] = useState(false);
@@ -353,6 +356,9 @@ export function DashboardPage() {
           </div>
           {data && !unauthorized && (
             <div className="dash-account">
+              <button className="dash-account-trigger" onClick={() => setPasswordOpen(true)}
+                aria-label={t("账户安全：设置或修改密码", "Account security: set or change password")}
+                title={t("设置或修改密码", "Set or change password")}>
               <span className="dash-avatar">
                 {data.profile.displayName.slice(0, 1)}
               </span>
@@ -362,6 +368,8 @@ export function DashboardPage() {
                   {data.profile.phoneMasked} · {roleName}
                 </span>
               </div>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m3 4 3 3 3-3" stroke="currentColor" strokeWidth="1.5" /></svg>
+              </button>
               <button onClick={() => void logout()}>
                 {t("退出", "Sign out")}
               </button>
@@ -802,6 +810,7 @@ export function DashboardPage() {
         )}
       </div>
       {loginOpen && <LoginPage overlay onClose={() => setLoginOpen(false)} />}
+      {passwordOpen && data && !unauthorized && <PasswordSettings zh={zh} phoneMasked={data.profile.phoneMasked} onClose={closePassword} />}
       {redeemOpen && (
         <div className="dash-modal-backdrop">
           <section

@@ -8,6 +8,7 @@
 - 官网短信登录后默认进入工作台；已有会话的导航入口显示“控制台”。
 - 仪表盘是用户提供的第二张参考图所指的 dsh 界面，并非另一个网站。
 - 保留社区和产品页的受限本站返回路径，禁止外部 `returnTo`。
+- 登录支持短信验证码或手机号＋密码；工作台右上角账号按钮打开密码设置。首次设置和每次修改均需验证绑定手机号；忘记密码先用短信登录再设置。
 - 前期充值采用激活码。产品使用积分购买；不添加未配置的人民币支付通道。
 - 今日、近 7 天、累计用量、182 天活跃记录、7/30/90/180 天趋势和产品排行来自真实记录；空账户不填充示例数据。所有统计采用 Asia/Shanghai。
 
@@ -54,6 +55,23 @@
 | POST `/admin/keys/{id}/revoke` | 撤销产品凭据 |
 | GET `/admin/audit?offset=0` | 分页操作记录；管理员仅可读自己的记录 |
 
+## 密码与账号安全
+
+`server/official_api/passwords.py` 只挂载官网服务，不改变小程序认证。沿用原有阿里云短信、手机号哈希、会话格式和协议版本；不存储完整手机号或明文密码。
+
+| 路由（位于 `/official-api` 下） | 用途 |
+|---|---|
+| POST `/api/v1/community/auth/password` | 手机号＋密码登录，要求同意当前协议；不自动注册未验证账号 |
+| GET `/api/v1/console/security/password` | 登录用户查看是否已设置密码 |
+| POST `/api/v1/console/security/password/sms` | 校验输入手机号与当前用户绑定关系，再发密码设置验证码，返回一次性 challengeId |
+| PUT `/api/v1/console/security/password` | 本人会话、手机号、短信验证码、challengeId、新密码全部通过后保存 |
+
+密码长度15–128字符，支持空格和长口令，禁止控制字符或全空格。使用带随机盐的 scrypt（N=32768、r=8、p=3），参数依据 [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)，最多两个并行 KDF。密码尝试按手机号8次/10分钟、IP40次/10分钟持久限流；未知手机号、未设置和错误密码返回统一提示。
+
+密码设置挑战绑定当前用户、手机号和本轮短信，重新发送、超时和成功使用后失效；普通登录短信不能独立作为改密凭证。凭证保存、消费挑战、撤销该用户全部旧会话和写入 PASSWORD_CHANGED 审计在同一事务完成。并发中的旧密码登录会在创建会话前重新核验密码版本；修改后需重新登录，其他用户会话不受影响。
+
+新增 `official_passwords`、`official_password_challenges`、`official_password_attempts` 表，旧账号初始无密码，无默认凭证。沿用现有 community/console Nginx 路由，无需扩大代理范围。
+
 ## 产品接入
 
 当前没有已提供的各产品历史用量源，因此不会把登录次数或购买次数伪装成产品使用量。各产品服务端可使用总管理员发放的产品专属凭据，将真实调用记录到 `POST /integrations/usage`。
@@ -68,7 +86,8 @@
 
 - 权限、总管理员保护、幂等、并发单次兑换、过期/撤销、管理员范围、负余额保护、用量计费事务与跨用户隔离：`server/tests/test_workspace.py`。
 - 登录默认跳转及开放重定向拒绝：`tests/account-return.test.ts`。
+- 密码创建/登录/更改、本人手机号校验、短信重放/过期/重发、持久限流、并发保护、全部旧会话失效和原短信登录回归：`server/tests/test_passwords.py`。
 - `server/tests/preview.py` 仅用于 localhost 隔离数据浏览器验收，含模拟短信，禁止放入生产包。
 - 发布前使用 SQLite backup API 一致性备份，保留旧后端和静态版本；添加 console 路由，切换独立认证服务的启动模块为 `official_api`，仅重启 `aethericai-auth`。Nginx 配置通过后平滑 reload。
 - 回滚代码和路由时保留新增表及上线后写入，不能直接覆盖生产数据库回滚余额。
-- 生产后台版本 `20261006-account-workspace`，静态版本 `20261006-account-workspace-links`；首页两处“打开控制台”已连接 `/official/dashboard/`。独立后台/数据库/服务配置备份位于 `/var/backups/aethericai-official/20261006-account-workspace/`，静态入口修正回滚点位于 `/var/backups/aethericai-official/20261006-account-workspace-links/site-before.txt`。
+- 生产前后端版本均为 `20261006-password-login`；一致性数据库备份和前后端回滚路径位于 `/var/backups/aethericai-official/20261006-password-login/`。本次仅重启独立官网认证服务，未改短信配置和 Nginx 路由；生产不生成测试密码或测试账号。

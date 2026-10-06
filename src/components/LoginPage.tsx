@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useLanguage } from "./LanguageProvider";
 import { assetUrl } from "@/lib/asset-url";
@@ -11,12 +11,23 @@ import {
 import "./login.css";
 
 const apiBase = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/official-api";
+const subscribeLocation = (notify: () => void) => {
+  window.addEventListener("popstate", notify);
+  return () => window.removeEventListener("popstate", notify);
+};
+const locationSearch = () => window.location.search;
+const serverSearch = () => "";
 
 export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onClose?: () => void }) {
   const { language, setLanguage } = useLanguage();
   const zh = language === "zh";
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
+  const [selectedMode, setMode] = useState<"sms" | "password" | null>(null);
+  const search = useSyncExternalStore(subscribeLocation, locationSearch, serverSearch);
+  const params = new URLSearchParams(search);
+  const mode = selectedMode ?? (params.get("mode") === "password" ? "password" : "sms");
+  const [password, setPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState<"send" | "verify" | null>(null);
@@ -26,6 +37,8 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
   const [error, setError] = useState("");
   const phoneRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
+  const statusMessage = message || (params.get("passwordChanged") === "1"
+    ? (zh ? "密码已更新，请使用新密码登录。" : "Password updated. Sign in with your new password.") : "");
   useEffect(() => {
     if (!cooldown) return;
     const timer = window.setTimeout(
@@ -101,7 +114,7 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
     setMessage("");
     try {
       validatePhone();
-      if (sentPhone !== phone.trim())
+      if (mode === "sms" && sentPhone !== phone.trim())
         throw new Error(
           zh
             ? "请先获取该手机号的验证码。"
@@ -114,10 +127,9 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
             : "Please read and agree to the terms and privacy policy.",
         );
       setBusy("verify");
-      const data = await request("/api/v1/community/auth/sms/verify", {
+      const data = await request(mode === "sms" ? "/api/v1/community/auth/sms/verify" : "/api/v1/community/auth/password", {
         phone: phone.trim(),
-        code: code.trim(),
-        inviteCode: inviteCode.trim() || null,
+        ...(mode === "sms" ? { code: code.trim(), inviteCode: inviteCode.trim() || null } : { password }),
         acceptedTerms: true,
         termsVersion: COMMUNITY_TERMS_VERSION,
       });
@@ -167,7 +179,7 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
         <a className="login-brand font-display" href={assetUrl("/")}>
           {zh ? "以太智元" : "AethericAI"}
         </a>
-        <h1 id="login-title">{zh ? "登录" : "Sign in"}</h1>
+        <h1 id="login-title">{mode === "password" ? (zh ? "密码登录" : "Password sign-in") : (zh ? "登录" : "Sign in")}</h1>
         <p className="login-description">
           {zh
             ? "未注册的手机号将自动创建账号，资料可稍后填写。"
@@ -183,7 +195,7 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
               ref={phoneRef}
               type="tel"
               inputMode="tel"
-              autoComplete="tel-national"
+              autoComplete="username"
               placeholder={zh ? "请输入手机号" : "Phone number"}
               value={phone}
               onChange={(e) => {
@@ -196,7 +208,7 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
               disabled={busy !== null}
             />
           </label>
-          <div className="login-code-row">
+          {mode === "sms" ? <div className="login-code-row">
             <label>
               <span className="sr-only">
                 {zh ? "验证码" : "Verification code"}
@@ -232,8 +244,13 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
                     ? "获取验证码"
                     : "Send code"}
             </button>
-          </div>
-          <label className="login-invite">
+          </div> : <label className="login-password">
+            <span className="sr-only">{zh ? "密码" : "Password"}</span>
+            <input type="password" autoComplete="current-password" required maxLength={128}
+              value={password} onChange={(e) => setPassword(e.target.value)} disabled={busy !== null}
+              placeholder={zh ? "请输入密码" : "Password"} />
+          </label>}
+          {mode === "sms" && <label className="login-invite">
             <span className="sr-only">
               {zh ? "邀请码（选填）" : "Invitation code (optional)"}
             </span>
@@ -247,7 +264,11 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
               maxLength={32}
               disabled={busy === "verify"}
             />
-          </label>
+          </label>}
+          {mode === "password" && <button type="button" className="login-forgot" disabled={busy !== null}
+            onClick={() => { setMode("sms"); setPassword(""); setError(""); setMessage(zh ? "请先用验证码登录，再点击工作台右上角账号设置或修改密码。" : "Sign in by SMS, then click your account in the workspace header to set or reset your password."); }}>
+            {zh ? "未设置或忘记密码？" : "No password, or forgot it?"}
+          </button>}
           <button
             type="submit"
             className="login-submit"
@@ -285,9 +306,9 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
               {error}
             </p>
           )}
-          {message && (
+          {statusMessage && (
             <p className="login-message" role="status">
-              {message}
+              {statusMessage}
             </p>
           )}
         </form>
@@ -295,11 +316,10 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
           <span>{zh ? "其他登录方式" : "Other ways to sign in"}</span>
         </div>
         <div className="login-alternative">
-          <button type="button" disabled>
-            {zh ? "密码登录" : "Password sign-in"}
-          </button>
-          <button type="button" disabled>
-            {zh ? "暂未开通" : "Coming later"}
+          <button type="button" disabled={busy !== null} onClick={() => {
+            setMode(mode === "sms" ? "password" : "sms"); setPassword(""); setError(""); setMessage("");
+          }}>
+            {mode === "sms" ? (zh ? "密码登录" : "Password sign-in") : (zh ? "验证码登录" : "SMS sign-in")}
           </button>
         </div>
       </section>

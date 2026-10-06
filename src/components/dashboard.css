@@ -118,6 +118,35 @@
 .dash-account button:hover {
   color: var(--dash-cyan);
 }
+.dash-account .dash-account-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-left: 0;
+  color: inherit;
+  text-align: left;
+  flex-shrink: 1;
+}
+.dash-account-trigger > svg {
+  flex-shrink: 0;
+  color: var(--dash-muted);
+}
+.dash-password-code {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 14px 0;
+}
+.dash-password-code label {
+  flex: 1;
+  min-width: 0;
+}
+.dash-password-modal .dash-password-hint {
+  font-size: 12px;
+  margin: 8px 0 14px;
+  color: var(--dash-muted);
+}
 .dash-actions {
   display: flex;
   align-items: center;

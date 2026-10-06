@@ -4,8 +4,8 @@
 
 ## 当前验收结论
 
-- 结论：工作台独立顶栏已上线，账号信息位于右上角（E-012）；热力图修复沿用 E-011
-- 验收范围：工作台、用户身份、积分、激活码、产品套餐、用量接口、统一登录及既有社区
+- 结论：手机号密码登录与本人短信验证设置/修改密码已上线（E-013）；原短信、社区、工作台回归通过
+- 验收范围：密码登录/设置、旧会话撤销、工作台、用户身份、积分、激活码、产品套餐、用量接口、统一登录及既有社区
 - 最后检查：2026-10-06
 - 遗留问题：正式产品价格/额度由总管理员配置；产品真实用量须由各产品接入记录接口，不以演示数据代替。生产已存在用户明确指定的短信验证账号并赋予 OWNER；本轮未发送真实短信。
 
@@ -35,6 +35,7 @@
 | E-010 | 2026-10-06 | build/lint、静态产物哈希、生产浏览器链接点击 | 0 | `20261006-account-workspace-links`; dashboard SHA-256 `3ccb85d29c74eeb34298f57edff2f8feda77e4ca3c2cff155cebd32e5ef4aaec` | 官网两处控制台链接均为 `/official/dashboard/`，点击进入工作台；生产哈希一致；仅切换静态版本 | `src/components/Hero.tsx`、`src/components/sections/FinalCTA.tsx`、生产备份目录 | 当前静态发布 |
 | E-011 | 2026-10-06 | build:ip/lint、桌面与390px浏览器、连续指针移动、键盘焦点、公网哈希 | 0 | `20261006-heatmap-layout`; dashboard SHA-256 `72511bae90769d4aca8fd77b69e951c2318aab2e0f805b96c7f633826f89dc69` | 原悬浮高度增加16px；修复后12次方格/间隙采样高度208px、图例Y623.55不变；桌面606px及手机318px均无横向溢出，182格完整，边缘提示在卡片内；公网HTML与构建相同，CSS/产品API正常 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css`、`/var/backups/aethericai-official/20261006-heatmap-layout/` | 当前静态发布 |
 | E-012 | 2026-10-06 | build:ip/lint、桌面/390px/320px浏览器、滚动及退出流程、公网哈希 | 0 | `20261006-workspace-topbar`; dashboard SHA-256 `7ec14f06c22913a9506549f74152c0f38117162ad4fc0ef6faf6a73b989be4ef` | 账户区仅一份且位于独立顶栏内；旧官网导航不存在；320px无重叠，滚动后顶栏Y=0；本地真实接口退出返回官网；公网HTML哈希一致，后台及Nginx PID不变 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css`、`/var/backups/aethericai-official/20261006-workspace-topbar/` | 当前静态发布 |
+| E-013 | 2026-10-06 | 25项后端测试、1项跳转测试、build/lint、桌面/390px表单、公网入口与哈希、SQLite只读核验 | 0 | `20261006-password-login`; login SHA-256 `2eeb62a7e3ca1f5feb1c31ef30d5a48754b2973bf49b1d238e9a2f22f3e2fa82` | 本人验证、限流、验证码单次/失效、并发旧密码拒绝、旧会话撤销通过；公网密码入口可切换，匿名设置401、无效登录400，health/产品200；生产1用户/1 OWNER/0密码/0挑战，未发送真实短信 | `server/tests/test_passwords.py`、`docs/account-workspace.md`、`/var/backups/aethericai-official/20261006-password-login/` | 当前认证发布 |
 
 ## Gate 记录
 

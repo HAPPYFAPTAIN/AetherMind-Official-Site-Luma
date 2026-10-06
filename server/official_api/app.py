@@ -1,6 +1,7 @@
 from llmer_api.main import create_app as create_auth_app, bearer_token
 from fastapi import Request
 from .workspace import Workspace, mount_workspace
+from .passwords import mount_passwords
 
 
 def create_app(**kwargs):
@@ -13,4 +14,5 @@ def create_app(**kwargs):
         return app.state.auth_service.authenticate(bearer_token(request))
 
     mount_workspace(app, workspace, current_user)
+    mount_passwords(app, workspace, current_user)
     return app

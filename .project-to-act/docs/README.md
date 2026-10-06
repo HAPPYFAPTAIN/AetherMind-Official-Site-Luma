@@ -3,7 +3,7 @@
 | 文档 | 内容 | 读取时机 |
 |---|---|---|
 | [community.md](community.md) | 社区功能、数据边界、管理权限和上线版本 | 社区开发、发布或验收时 |
-| [account-workspace.md](account-workspace.md) | 官网工作台、总管理员、积分/激活码/产品权益、API 和部署边界 | 账户管理、产品接入或工作台发布时 |
+| [account-workspace.md](account-workspace.md) | 官网工作台、总管理员、密码与短信验证、积分/激活码/产品权益、API 和部署边界 | 账户管理、认证、产品接入或工作台发布时 |
 | [../../design-qa.md](../../design-qa.md) | 产品页素材映射、响应式和视觉验收 | 产品页修改或发布时 |
 | [project-to-act-repository.md](project-to-act-repository.md) | 治理仓库来源、managed 模式和本项目命令 | 维护项目状态、验收或发布时 |
 | [生产官网说明](https://github.com/redmaplewww/project-to-act) | `project-to-act` 上游仓库 | 需要了解治理工具时 |

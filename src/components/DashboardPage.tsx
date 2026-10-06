@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { CSSProperties, FormEvent, useCallback, useEffect, useState } from "react";
 import { Nav } from "./Nav";
 import { LoginPage } from "./LoginPage";
 import { useLanguage } from "./LanguageProvider";
@@ -189,7 +189,7 @@ function Heatmap({ values, zh }: { values: UsagePoint[]; zh: boolean }) {
           {active} {zh ? "活跃日" : "active days"}
         </span>
       </div>
-      <div className="dash-heatmap-scroll">
+      <div className="dash-heatmap-body">
         <div className="dash-heatmap-months">
           {values
             .map((v, i) => ({ month: v.day?.slice(0, 7), i }))
@@ -212,12 +212,16 @@ function Heatmap({ values, zh }: { values: UsagePoint[]; zh: boolean }) {
               : "Daily calls, ordered chronologically"
           }
         >
-          {values.map((v) => (
+          {values.map((v, i) => (
             <div
               key={v.day}
               tabIndex={0}
               className={`heat-level-${v.calls ? Math.min(4, Math.ceil((v.calls / max) * 4)) : 0}`}
               aria-label={`${v.day}: ${v.calls}`}
+              style={{
+                "--heat-column": Math.floor(i / 7) + 0.5,
+                "--heat-row": i % 7,
+              } as CSSProperties}
             >
               <span>
                 {v.day} · {v.calls} {zh ? "次" : "calls"}

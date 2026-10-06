@@ -424,31 +424,32 @@
   color: var(--dash-cyan);
   font-size: 12px;
 }
-.dash-heatmap-scroll {
-  overflow-x: auto;
+.dash-heatmap-body {
+  --heat-gap: 5px;
   padding: 8px 0 10px;
 }
 .dash-heatmap-months {
   display: grid;
-  grid-template-columns: repeat(26, 1fr);
-  gap: 5px;
-  min-width: 380px;
+  grid-template-columns: repeat(26, minmax(0, 1fr));
+  gap: var(--heat-gap);
+  min-width: 0;
   font-size: 10px;
   color: #849cae;
   margin-bottom: 15px;
 }
 .dash-heatmap-grid {
+  position: relative;
   display: grid;
   grid-template-rows: repeat(7, 1fr);
-  grid-template-columns: repeat(26, 1fr);
+  grid-template-columns: repeat(26, minmax(0, 1fr));
   grid-auto-flow: column;
-  gap: 5px;
-  min-width: 380px;
+  gap: var(--heat-gap);
+  min-width: 0;
 }
 .dash-heatmap-grid > div {
+  min-width: 0;
   aspect-ratio: 1;
   border-radius: 3px;
-  position: relative;
   cursor: default;
   outline-offset: 2px;
 }
@@ -472,10 +473,16 @@
   position: absolute;
   padding: 5px 7px;
   border-radius: 5px;
-  bottom: 100%;
-  left: -16px;
-  width: max-content;
-  z-index: 1;
+  /* Anchor to the whole grid so edge cells never grow or clip the scroll area. */
+  top: calc(var(--heat-row) * (100% + var(--heat-gap)) / 7);
+  left: clamp(0px, calc(var(--heat-column) * (100% + var(--heat-gap)) / 26 - 90px), calc(100% - 180px));
+  transform: translateY(calc(-100% - 6px));
+  width: 180px;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  overflow-wrap: anywhere;
+  z-index: 2;
   background: #07121c;
   color: #e6f1f8;
   font-size: 10px;
@@ -1136,8 +1143,8 @@
   .dash-ranking-row > span:last-child {
     display: none;
   }
-  .dash-heatmap-grid {
-    gap: 4px;
+  .dash-heatmap-body {
+    --heat-gap: 4px;
   }
   .dash-modal-backdrop {
     padding: 14px;
@@ -1168,4 +1175,7 @@
 }
 .dash-heatmap-months span {
   white-space: nowrap;
+}
+.dash-heatmap-months span:last-child {
+  justify-self: end;
 }

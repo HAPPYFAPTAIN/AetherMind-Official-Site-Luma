@@ -7,6 +7,7 @@ import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
 import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
+import { assetUrl } from "@/lib/asset-url";
 
 /* state content for the pinned scroll narrative */
 const STATES = [
@@ -189,7 +190,7 @@ export function Hero() {
                   <span className="transition-transform group-hover:translate-x-0.5">→</span>
                 </a>
                 <a
-                  href="#console"
+                  href={assetUrl("/dashboard/")}
                   className="inline-flex h-12 items-center gap-2 rounded-full border border-line-strong px-6 text-[14px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft"
                 >
                   {tr(language, "Open Console", "打开控制台")}

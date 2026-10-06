@@ -4,8 +4,8 @@
 
 ## 当前版本
 
-- 版本号：`20261006-account-workspace`
-- 发布状态：乌兰察布前端 `/opt/aethericai-official/releases/20261006-account-workspace`，独立后台 `/srv/aethericai-auth/releases/20261006-account-workspace`
+- 版本号：`20261006-account-workspace-links`
+- 发布状态：乌兰察布前端 `/opt/aethericai-official/releases/20261006-account-workspace-links`，独立后台 `/srv/aethericai-auth/releases/20261006-account-workspace`
 - 兼容性说明：Next.js 静态导出，生产使用 `/official/` 前缀
 - 最后更新：2026-10-06
 
@@ -28,3 +28,4 @@
 | `20261005-login-scale-v4` | 2026-10-05 | 已发布 | 登录框桌面端缩放至原来的 0.9，手机端保持可用尺寸；静态发布并完成公网浏览器验收 | `/official/` 静态导出 | E-007 | 通过 |
 | `20261005-nav-spacing-v5` | 2026-10-05 | 已发布 | 桌面导航按左/中/右三列对齐，产品与社区保持 7.6px 间距；静态发布并完成公网验收 | `/official/` 静态导出 | E-008 | 通过 |
 | `20261006-account-workspace` | 2026-10-06 | 已发布 | 统一账号工作台、OWNER/ADMIN/USER、积分流水、激活码、权益购买及用量接入 | 既有 SMS/会话和社区兼容；新增 official_* 表 | E-009 | 通过 |
+| `20261006-account-workspace-links` | 2026-10-06 | 已发布 | 首页两处“打开控制台”接入真实工作台；工作台实现沿用 E-009 | 仅静态入口修正，独立后台未重启 | E-010 | 通过 |

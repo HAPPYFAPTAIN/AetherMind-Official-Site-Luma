@@ -61,7 +61,7 @@ export function FinalCTA() {
         <Reveal delay={0.2}>
           <div className="mt-12 flex flex-wrap items-center gap-4">
             <a
-              href="#top"
+              href={assetUrl("/dashboard/")}
               className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-[15px] font-semibold text-bg-0 transition-colors hover:bg-accent"
             >
               {tr(language, "Open Console", "打开控制台")}

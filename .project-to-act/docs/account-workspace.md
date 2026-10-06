@@ -71,3 +71,4 @@
 - `server/tests/preview.py` 仅用于 localhost 隔离数据浏览器验收，含模拟短信，禁止放入生产包。
 - 发布前使用 SQLite backup API 一致性备份，保留旧后端和静态版本；添加 console 路由，切换独立认证服务的启动模块为 `official_api`，仅重启 `aethericai-auth`。Nginx 配置通过后平滑 reload。
 - 回滚代码和路由时保留新增表及上线后写入，不能直接覆盖生产数据库回滚余额。
+- 生产后台版本 `20261006-account-workspace`，静态版本 `20261006-account-workspace-links`；首页两处“打开控制台”已连接 `/official/dashboard/`。独立后台/数据库/服务配置备份位于 `/var/backups/aethericai-official/20261006-account-workspace/`，静态入口修正回滚点位于 `/var/backups/aethericai-official/20261006-account-workspace-links/site-before.txt`。

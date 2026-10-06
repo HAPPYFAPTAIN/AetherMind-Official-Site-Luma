@@ -24,7 +24,7 @@
 
 ## 当前已部署
 
-- 前端：`/opt/aethericai-official/releases/20261006-md-entry`
+- 前端：`/opt/aethericai-official/releases/20261007-model-kimi-cn`
 - 后端：`/srv/aethericai-auth/releases/20261006-md-entry`
 - 数据表：`official_md_agent_qualifications`；邀请码表新增 `product_id`
 - BFF：`GET /api/v1/console/md-agent/profile` 返回本人资格、模型未配置和超算未连接状态

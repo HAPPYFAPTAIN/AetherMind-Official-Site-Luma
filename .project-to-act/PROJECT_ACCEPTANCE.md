@@ -42,7 +42,7 @@
 | E-017 | 2026-10-07 | 国内 Kimi `api.moonshot.cn/v1` + `kimi-k2.7-code-highspeed` 官方短请求200、MD-Agent `/llm/kimi/chat/completions` 真实代理200、服务重启与健康检查 | 0 | `20261007-model-kimi-cn`; Key 只在 `/etc/mdagent/provider.env` 受保护文件 | 国内 Kimi 已接入代理并验证；DeepSeek保持200；Kimi Key不进入代码、前端或日志 | `docs/md-agent-console.md`、MD-Agent provider 备份 | 阶段发布 |
 | E-018 | 2026-10-07 | build/lint、云端控制台截图和可访问性树 | 0 | `20261007-console-header`; console HTML SHA-256 `a4c11e7c30155273cab0a12fba070199d62b5b738522d533050625048fc191ce` | 顶栏账户收敛为头像+下拉入口；官网轨道式 Logo 替换菱形占位；桌面控制台公网显示正常 | `src/components/ConsolePage.tsx`、`src/components/Nav.tsx`、`src/components/console.css` | 当前静态发布 |
 | E-019 | 2026-10-07 | build/lint、云端工作台截图、DOM SVG核验 | 0 | `20261007-workspace-brand`; dashboard HTML SHA-256 `facc5f1bc8ddfcfde6d3585b50ed2b2b272ac783af5acb61707893fbeb971885` | 工作台顶栏显示官网轨道 Logo，品牌文字与“工作台”对齐；未登录状态页面正常 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
-| E-020 | 2026-10-07 | build/lint、1280px/390px浏览器、侧栏收缩、移动抽屉、可访问性树 | 0 | `20261007-sidebar-workspace`; dashboard HTML SHA-256 `0c902f5fea59206a0401d44183e229cddce0ad55aeff1c2ade4fc6d19e7121ed` | P1 顶部工作台导航/产品/激活码已移入侧栏；P2 标题说明区移除；桌面侧栏可收缩，手机侧栏可抽屉打开；页面无横向溢出 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
+| E-020 | 2026-10-07 | build/lint、1280px/390px浏览器、侧栏完全收回、顶栏开关、移动抽屉、可访问性树 | 0 | `20261007-sidebar-topbar`; dashboard HTML SHA-256 `e051e4218ea2a289b21d98a1a17729e88a87ae874a861d4e4154f0ad77eae90c` | P1 顶部工作台导航/产品/激活码已移入侧栏；P2 标题说明区移除；桌面侧栏宽度收为0且主区域占满，开关移到顶栏；手机侧栏可抽屉打开；页面无横向溢出 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
 
 ## Gate 记录
 

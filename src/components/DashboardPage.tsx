@@ -367,7 +367,17 @@ export function DashboardPage() {
           </div>
           {data && !unauthorized && (
             <button
-              className="dash-mobile-sidebar-toggle"
+              className="dash-sidebar-toggle-topbar dash-sidebar-toggle-desktop"
+              onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+              aria-expanded={!sidebarCollapsed}
+              aria-label={sidebarCollapsed ? t("展开工作台菜单", "Open workspace menu") : t("收起工作台菜单", "Collapse workspace menu")}
+            >
+              {sidebarCollapsed ? "☰" : "‹"}
+            </button>
+          )}
+          {data && !unauthorized && (
+            <button
+              className="dash-sidebar-toggle-topbar dash-sidebar-toggle-mobile"
               onClick={() => setSidebarOpen((open) => !open)}
               aria-expanded={sidebarOpen}
               aria-label={t("打开工作台菜单", "Open workspace menu")}
@@ -405,9 +415,6 @@ export function DashboardPage() {
             <aside className={`dash-sidebar ${sidebarOpen ? "mobile-open" : ""}`} aria-label={t("工作台导航", "Workspace navigation")}>
               <div className="dash-sidebar-head">
                 <span>{t("工作台", "Workspace")}</span>
-                <button onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={t("收起侧栏", "Collapse sidebar")}>
-                  {sidebarCollapsed ? "→" : "←"}
-                </button>
               </div>
               <nav>
                 {workspaceTabs.map(([value, name, icon]) => (

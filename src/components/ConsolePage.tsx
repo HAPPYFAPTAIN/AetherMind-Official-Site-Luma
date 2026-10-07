@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { LoginPage } from "./LoginPage";
 import { Mark } from "./Nav";
 import { useLanguage } from "./LanguageProvider";
-import { accountApi, hasAccountSession, type AccountProfile } from "@/lib/account-client";
+import { accountApi, hasAccountSession, signOut, type AccountProfile } from "@/lib/account-client";
 import { assetUrl } from "@/lib/asset-url";
 import { BRAND } from "@/lib/site";
 import "./console.css";
@@ -62,6 +62,7 @@ export function ConsolePage() {
   const [section, setSection] = useState<Section>("agents");
   const [loginOpen, setLoginOpen] = useState(false);
   const [account, setAccount] = useState<AccountProfile | null>(null);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [mdState, setMdState] = useState<MdAgentState | null>(null);
   const [notice, setNotice] = useState("");
 
@@ -100,6 +101,11 @@ export function ConsolePage() {
     }
   };
 
+  async function logout() {
+    await signOut();
+    window.location.assign(assetUrl("/"));
+  }
+
   const sidebar = [
     ["agents", zh ? "智能体目录" : "Agent catalog"],
     ["compute", zh ? "超算连接" : "Compute connection"],
@@ -124,12 +130,20 @@ export function ConsolePage() {
             {zh ? "EN" : "中"}
           </button>
           {account ? (
-            <a className="console-account console-account-compact" href={assetUrl("/dashboard/")}
-              aria-label={zh ? `打开账户工作台：${account.displayName}，${account.phoneMasked}` : `Open account workspace: ${account.displayName}, ${account.phoneMasked}`}
-              title={zh ? `${account.displayName} · ${account.phoneMasked}` : `${account.displayName} · ${account.phoneMasked}`}>
+            <div className="console-account-wrap">
+            <button className="console-account console-account-compact" onClick={() => setAccountMenuOpen((open) => !open)} aria-expanded={accountMenuOpen}
+              aria-label={zh ? "打开个人中心菜单" : "Open account menu"}>
               <span>{account.displayName.slice(0, 1)}</span>
               <i>⌄</i>
-            </a>
+            </button>
+            {accountMenuOpen && <div className="console-account-menu" role="menu">
+              <strong>{account.phoneMasked}</strong>
+              <small>{account.userId}</small>
+              <a href={assetUrl("/profile/")} role="menuitem">♙ {zh ? "个人中心" : "Personal center"}</a>
+              <button role="menuitem">☼ {zh ? "暗色模式" : "Dark mode"}</button>
+              <button role="menuitem" onClick={() => void logout()}>⇥ {zh ? "退出登录" : "Sign out"}</button>
+            </div>}
+            </div>
           ) : (
             <button className="console-signin" onClick={() => setLoginOpen(true)}>
               {zh ? "登录" : "Sign in"}
@@ -149,15 +163,6 @@ export function ConsolePage() {
         </aside>
 
         <section className="console-content">
-          <div className="console-hero">
-            <div>
-              <p className="console-kicker">AETHERICAI / CONTROL CENTER</p>
-              <h1>{section === "agents" ? (zh ? "科学计算控制台" : "Scientific computing console") : sidebar.find(([id]) => id === section)?.[1]}</h1>
-              <p>{section === "agents" ? (zh ? "选择智能体，开始你的科研工作流" : "Choose an agent and start your research workflow") : (zh ? "这里的状态只显示已接入能力。" : "Only connected capabilities are shown here.")}</p>
-            </div>
-            <span className="console-hero-note">{zh ? "用计算，探索更大的科学世界" : "Compute further into science"}<i /></span>
-          </div>
-
           {notice && <div className="console-notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
 
           {section === "agents" && <>
@@ -182,7 +187,6 @@ export function ConsolePage() {
           {section === "model" && <ModelPanel zh={zh} />}
         </section>
       </div>
-      <footer className="console-footer"><span>{zh ? "官网 → 控制台 → MD EXP → dsh" : "Website → Console → MD EXP → dsh"}</span><span>{zh ? "界面示意 · 图片与 Logo 待替换" : "Interface preview · imagery and logo pending"}</span></footer>
       {loginOpen && <LoginPage overlay onClose={() => setLoginOpen(false)} />}
     </main>
   );

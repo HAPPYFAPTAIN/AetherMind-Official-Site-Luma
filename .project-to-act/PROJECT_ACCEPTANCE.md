@@ -48,6 +48,7 @@
 | E-023 | 2026-10-07 | build/lint、公网 DOM 文案/字体尺寸核验 | 0 | `20261007-console-size-restore`; dashboard HTML SHA-256 `1e04b03d3460c734ccbf299c04e4dfe6cf8b4557a3a98598ecb98119468cf0bc` | 顶栏保持“控制台”文案，品牌名、Logo和副标题恢复放大前尺寸 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
 | E-024 | 2026-10-07 | build/lint、公网主页可访问性树、顶部/ Hero 控制台按钮登录弹层 | 0 | `20261007-dashboard-entry`; homepage HTML SHA-256 `4a833034772336dad15a9088fdbe26fed7d705b887d06edaf7b94153007011b1` | 顶部“控制台”和 Hero“打开控制台”均为统一入口；未登录点击弹出登录，登录成功返回 dashboard | `src/components/ConsoleEntryButton.tsx`、`src/components/Hero.tsx`、`src/components/sections/FinalCTA.tsx`、`src/components/Nav.tsx` | 当前静态发布 |
 | E-024 | 2026-10-07 | build/lint、公网 DOM 文本核验 | 0 | `20261007-no-footer`; dashboard HTML SHA-256 `2b4cfbdb8c4378924b447f22df4004dc1a75345bfe748b227a5177411d1df9e3` | 工作台所有页面移除更新时间、刷新数据底部小字区块；公网无 `dash-footer`、更新文案和刷新文案 | `src/components/DashboardPage.tsx` | 当前静态发布 |
+| E-025 | 2026-10-07 | build/lint、控制台公网 DOM/交互核验、个人中心匿名保护 | 0 | `20261007-console-profile`; console/profile 静态页面 | 控制台移除 Hero 与底部路径占位；个人中心入口结构已接入；未登录个人中心返回登录；密码设置沿用短信验证 | `src/components/ConsolePage.tsx`、`src/components/ProfilePage.tsx`、`/official/profile/` | 当前静态发布 |
 
 ## Gate 记录
 

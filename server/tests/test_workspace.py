@@ -73,6 +73,17 @@ def test_wallet_idempotency_nonnegative_and_audit(setup):
         assert c.execute("SELECT COUNT(*) FROM official_audit WHERE action='CREDITS_ADJUSTED'").fetchone()[0] == 1
 
 
+def test_md_exp_activation_code_grants_dsh_qualification(setup):
+    _, w, _, ids = setup
+    owner, user, *_ = ids
+    code = w.create_batch(owner, BatchCreate(label='MD EXP dsh资格', quantity=1, productId='md-exp'))['codes'][0]
+    result = w.redeem(user, Redeem(code=code))
+    assert result['productId'] == 'md-exp'
+    with w.db.connect() as c:
+        qualification = c.execute('SELECT product_id FROM official_md_agent_qualifications WHERE user_id=?', (user,)).fetchone()
+    assert qualification['product_id'] == 'md-exp'
+
+
 def test_code_single_use_race_and_delegate_scope(setup):
     _, w, _, ids = setup
     owner, user, admin, other = ids

@@ -22,10 +22,12 @@ MAX_BALANCE = 1_000_000_000
 CATALOG = [
     ('platform', '以太智元平台', 'AethericAI Platform', '统一管理科研任务、算力与研究结果。', 'platform'),
     ('lammps', 'LAMMPS 计算引擎', 'LAMMPS Compute Engine', '分子动力学任务编排、监测与轨迹分析。', 'lammps'),
+    ('md-exp', 'MD EXP', 'MD EXP', '分子模拟智能体、模型对话与 dsh 科研工作流。', 'lammps'),
     ('agent', '科学智能体', 'Science Agents', '将研究问题转化为可执行的计算步骤。', 'ai-agent'),
     ('materials', '材料计算', 'Materials Computing', '围绕结构、缺陷和能量景观组织材料研究。', 'materials'),
     ('chemistry', '化学与分子计算', 'Molecular Computing', '分子结构、反应路径与计算结果。', 'chemistry'),
     ('biology', '生物计算', 'Biological Computing', '生物分子建模、结构分析与可复现流程。', 'biology'),
+    ('learn-everything', 'Learn Everything 学习 Agent', 'Learn Everything Learning Agent', '从学习路线、知识库问答到复习、测验和学习看板的一体化学习工作台。', 'ai-agent'),
 ]
 
 
@@ -272,7 +274,7 @@ class Workspace:
             return {'balance': result['balance_after']}
 
     def create_batch(self, actor, data):
-        if not (data.credits or data.units or data.days) or ((data.units or data.days) and not data.productId):
+        if not (data.credits or data.units or data.days or data.productId == 'md-exp') or ((data.units or data.days) and not data.productId):
             raise ApiError(400, 'INVALID_GRANT', '填写积分或指定产品权益')
         with self.db.connect() as c:
             c.execute('BEGIN IMMEDIATE')
@@ -335,6 +337,16 @@ class Workspace:
             self.credit(c, target, row['credits'], 'ACTIVATION', '激活码兑换 · ' + row['label'], actor,
                         'redeem:' + code_hash, code_hash, row['product_id'])
             self.grant(c, target, row['product_id'], row['units'], row['days'])
+            if row['product_id'] == 'md-exp':
+                source = 'activation:' + code_hash
+                c.execute(
+                    'INSERT OR IGNORE INTO community_invitations(code,label,created_by,created_at_ms,expires_at_ms,product_id) VALUES(?,?,?,?,?,?)',
+                    (source, row['label'], actor, now, now + 3650 * DAY, 'md-exp'),
+                )
+                c.execute(
+                    'INSERT OR IGNORE INTO official_md_agent_qualifications VALUES(?,?,?,?)',
+                    (target, 'md-exp', source, now),
+                )
             c.execute('UPDATE official_codes SET redeemed_by=?,redeemed_for=?,redeemed_at_ms=? WHERE code_hash=?', (actor, target, now, code_hash))
             self.audit(c, actor, target, 'CODE_REDEEMED', {'batchId': row['id'], 'credits': row['credits'], 'productId': row['product_id'], 'units': row['units'], 'days': row['days']})
             return {'balance': self.balance(c, target), 'credits': row['credits'], 'units': row['units'], 'days': row['days'], 'productId': row['product_id']}

@@ -637,7 +637,8 @@ export function AdminPanel({
                     busy ||
                     (!batchForm.credits &&
                       !batchForm.units &&
-                      !batchForm.days) ||
+                      !batchForm.days &&
+                      batchForm.productId !== "md-exp") ||
                     codes.length > 0
                   }
                 >

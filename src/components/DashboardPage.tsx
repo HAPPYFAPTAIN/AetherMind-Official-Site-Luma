@@ -257,6 +257,8 @@ export function DashboardPage() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const closePassword = useCallback(() => setPasswordOpen(false), []);
   const [redeemOpen, setRedeemOpen] = useState(false);
   const [code, setCode] = useState("");
@@ -346,6 +348,12 @@ export function DashboardPage() {
   const ratio = data?.walletTotals.credited
     ? Math.min(100, (data.profile.balance / data.walletTotals.credited) * 100)
     : 0;
+  const workspaceTabs = [
+    ["overview", t("用量概览", "Overview"), "◌"],
+    ["products", t("我的产品", "My products"), "▣"],
+    ["ledger", t("积分与订单", "Credits & orders"), "≡"],
+    ...(data?.profile.role !== "USER" ? [["admin", t("管理中心", "Administration"), "⚙"]] : []),
+  ];
   return (
     <main className="dashboard-page">
       <header className="dash-topbar" aria-label={t("工作台顶栏", "Workspace header")}>
@@ -357,6 +365,16 @@ export function DashboardPage() {
             </a>
             <span>{t("工作台", "Workspace")}</span>
           </div>
+          {data && !unauthorized && (
+            <button
+              className="dash-mobile-sidebar-toggle"
+              onClick={() => setSidebarOpen((open) => !open)}
+              aria-expanded={sidebarOpen}
+              aria-label={t("打开工作台菜单", "Open workspace menu")}
+            >
+              ☰
+            </button>
+          )}
           {data && !unauthorized && (
             <div className="dash-account">
               <button className="dash-avatar-button" onClick={() => setAccountMenuOpen((open) => !open)}
@@ -381,19 +399,37 @@ export function DashboardPage() {
           )}
         </div>
       </header>
-      <div className="dash-shell">
-        <div className="dash-heading">
-          <div>
-            <p className="dash-eyebrow">AETHERICAI / WORKSPACE</p>
-            <h1>{t("账户工作台", "Your workspace")}</h1>
-            <p>
-              {t(
-                "每一份用量、每一项权益，都在这里。",
-                "Your usage, access and credits, in one place.",
-              )}
-            </p>
-          </div>
-        </div>
+      <div className={`dash-workspace-layout ${data && !unauthorized ? "has-sidebar" : "no-sidebar"} ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+        {data && !unauthorized && (
+          <>
+            <aside className={`dash-sidebar ${sidebarOpen ? "mobile-open" : ""}`} aria-label={t("工作台导航", "Workspace navigation")}>
+              <div className="dash-sidebar-head">
+                <span>{t("工作台", "Workspace")}</span>
+                <button onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={t("收起侧栏", "Collapse sidebar")}>
+                  {sidebarCollapsed ? "→" : "←"}
+                </button>
+              </div>
+              <nav>
+                {workspaceTabs.map(([value, name, icon]) => (
+                  <button key={value} className={tab === value ? "active" : ""} aria-current={tab === value ? "page" : undefined} onClick={() => { setTab(value); setSidebarOpen(false); }}>
+                    <span className="dash-sidebar-icon" aria-hidden="true">{icon}</span>
+                    <span className="dash-sidebar-label">{name}</span>
+                  </button>
+                ))}
+              </nav>
+              <div className="dash-sidebar-actions">
+                <a className="dash-quiet-button" href={assetUrl("/products/")} onClick={() => setSidebarOpen(false)}>
+                  <span className="dash-sidebar-icon" aria-hidden="true">＋</span><span className="dash-sidebar-label">{t("浏览产品", "Explore products")}</span>
+                </a>
+                <button className="dash-primary" onClick={() => { setError(""); setRedeemOpen(true); setSidebarOpen(false); }}>
+                  <span className="dash-sidebar-icon" aria-hidden="true">◇</span><span className="dash-sidebar-label">{t("兑换激活码", "Redeem code")}</span>
+                </button>
+              </div>
+            </aside>
+            {sidebarOpen && <button className="dash-sidebar-backdrop" aria-label={t("关闭工作台菜单", "Close workspace menu")} onClick={() => setSidebarOpen(false)} />}
+          </>
+        )}
+        <div className="dash-shell">
         {error && (
           <div className="dash-banner error" role="alert">
             {error}
@@ -432,41 +468,6 @@ export function DashboardPage() {
           </section>
         ) : (
           <>
-            <div className="dash-actions">
-              <nav aria-label={t("工作台导航", "Workspace navigation")}>
-                {[
-                  ["overview", t("用量概览", "Overview")],
-                  ["products", t("我的产品", "My products")],
-                  ["ledger", t("积分与订单", "Credits & orders")],
-                  ...(data.profile.role !== "USER"
-                    ? [["admin", t("管理中心", "Administration")]]
-                    : []),
-                ].map(([value, name]) => (
-                  <button
-                    key={value}
-                    className={tab === value ? "active" : ""}
-                    aria-current={tab === value ? "page" : undefined}
-                    onClick={() => setTab(value)}
-                  >
-                    {name}
-                  </button>
-                ))}
-              </nav>
-              <div>
-                <a className="dash-quiet-button" href={assetUrl("/products/")}>
-                  {t("浏览产品", "Explore products")}
-                </a>
-                <button
-                  className="dash-primary"
-                  onClick={() => {
-                    setError("");
-                    setRedeemOpen(true);
-                  }}
-                >
-                  {t("兑换激活码", "Redeem code")}
-                </button>
-              </div>
-            </div>
             {tab === "overview" && (
               <>
                 <section className="dash-overview">
@@ -812,6 +813,7 @@ export function DashboardPage() {
             </footer>
           </>
         )}
+        </div>
       </div>
       {loginOpen && <LoginPage overlay onClose={() => setLoginOpen(false)} />}
       {passwordOpen && data && !unauthorized && <PasswordSettings zh={zh} phoneMasked={data.profile.phoneMasked} onClose={closePassword} />}

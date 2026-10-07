@@ -5,14 +5,121 @@
   --dash-muted: #95a8b9;
   --dash-line: rgba(183, 216, 238, 0.13);
   min-height: 100dvh;
-  padding: 122px 28px 42px;
+  padding: 0 0 42px;
   color: #edf6fc;
   background:
     radial-gradient(ellipse at 30% 0, #12202c 0, transparent 52%), #080e15;
 }
 .dash-shell {
-  max-width: 1360px;
+  min-width: 0;
   margin: auto;
+}
+.dash-workspace-layout {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 98px 28px 0;
+  align-items: start;
+}
+.dash-workspace-layout.no-sidebar {
+  grid-template-columns: minmax(0, 1360px);
+  justify-content: center;
+}
+.dash-sidebar {
+  position: sticky;
+  top: 92px;
+  z-index: 4;
+  min-height: calc(100dvh - 120px);
+  padding: 12px;
+  border: 1px solid var(--dash-line);
+  border-radius: 18px;
+  background: #0b151f;
+  transition: width 0.2s ease, padding 0.2s ease;
+}
+.dash-sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px 16px;
+  color: var(--dash-muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.dash-sidebar-head button {
+  color: var(--dash-muted);
+  font-size: 18px;
+  padding: 2px 6px;
+}
+.dash-sidebar nav,
+.dash-sidebar-actions {
+  display: grid;
+  gap: 6px;
+}
+.dash-sidebar nav button,
+.dash-sidebar-actions > * {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  color: #9eb3c1;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+}
+.dash-sidebar nav button:hover,
+.dash-sidebar nav button.active {
+  color: #dff7ff;
+  background: #1b3648;
+  box-shadow: inset 0 0 0 1px #6bc6e33b;
+}
+.dash-sidebar-icon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  flex: 0 0 24px;
+  color: var(--dash-cyan);
+  font-size: 18px;
+}
+.dash-sidebar-actions {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--dash-line);
+}
+.dash-sidebar-actions .dash-primary {
+  color: #081c29;
+  background: #8bd5f5;
+}
+.sidebar-collapsed {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+.sidebar-collapsed .dash-sidebar {
+  padding-inline: 8px;
+}
+.sidebar-collapsed .dash-sidebar-head {
+  justify-content: center;
+}
+.sidebar-collapsed .dash-sidebar-head > span,
+.sidebar-collapsed .dash-sidebar-label {
+  display: none;
+}
+.sidebar-collapsed .dash-sidebar-head button {
+  transform: rotate(180deg);
+}
+.sidebar-collapsed .dash-sidebar nav button,
+.sidebar-collapsed .dash-sidebar-actions > * {
+  justify-content: center;
+  padding-inline: 0;
+}
+.dash-mobile-sidebar-toggle,
+.dash-sidebar-backdrop {
+  display: none;
 }
 .dash-topbar {
   position: fixed;
@@ -1032,7 +1139,44 @@
 }
 @media (max-width: 820px) {
   .dashboard-page {
-    padding: 96px 20px 32px;
+    padding: 0 0 32px;
+  }
+  .dash-workspace-layout,
+  .dash-workspace-layout.no-sidebar {
+    display: block;
+    padding: 92px 20px 0;
+  }
+  .dash-sidebar {
+    position: fixed;
+    top: 72px;
+    bottom: 0;
+    left: 0;
+    width: 260px;
+    min-height: 0;
+    border-radius: 0 18px 18px 0;
+    transform: translateX(-105%);
+    transition: transform 0.2s ease;
+  }
+  .dash-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .dash-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 72px 0 0;
+    z-index: 3;
+    background: #02080dcc;
+  }
+  .dash-mobile-sidebar-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    margin-left: auto;
+    border: 1px solid var(--dash-line);
+    border-radius: 9px;
+    color: #cce7f1;
+    font-size: 19px;
   }
   .dash-heading {
     align-items: flex-start;
@@ -1045,6 +1189,9 @@
   }
   .dash-topbar-inner {
     padding-inline: 20px;
+  }
+  .dash-account {
+    margin-left: 0;
   }
   .dash-overview {
     grid-template-columns: 1fr;
@@ -1105,7 +1252,11 @@
 }
 @media (max-width: 520px) {
   .dashboard-page {
-    padding: 92px 14px 28px;
+    padding: 0 0 28px;
+  }
+  .dash-workspace-layout,
+  .dash-workspace-layout.no-sidebar {
+    padding: 82px 14px 0;
   }
   .dash-heading {
     flex-direction: column;

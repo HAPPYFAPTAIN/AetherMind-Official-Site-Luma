@@ -31,6 +31,7 @@
 - BFF：`POST /api/v1/console/md-agent/bind` 按本人产品资格自动创建/审批个人 MD-Agent 账号，并加密保存个人 Token
 - BFF：`POST /api/v1/console/md-agent/enter` 申请短票并改写为 `/official/md-agent/open?ticket=...`
 - 同域 dsh：`/official/md-agent/`，根级 dsh 资源和 API 由 Nginx 兼容转发
+- dsh 根级插件：`/plugins/` 映射到 `/opt/mdagent/web-preview/plugins/`；dsh 前端使用根绝对路径，缺少该映射会出现 `Failed to load plugins`。
 - 备份：`/var/backups/aethericai-official/20261006-md-binding/`
 
 ## 待密钥和后端契约后完成

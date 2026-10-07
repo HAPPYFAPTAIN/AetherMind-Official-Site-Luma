@@ -40,6 +40,7 @@
 | E-015 | 2026-10-06 | 28项后端测试、build/lint、Nginx `nginx -t`/reload、生产 official-bff 管理接口200、匿名 BFF401、同域 dsh 403、生产 SQLite/服务核验 | 0 | `20261006-md-entry`; console HTML SHA-256 `dc8000d8986a057bda85ac7d8c021c197715b880c65c9014be6905f4e6582f44` | official-bff 独立服务账号已创建；资格用户可自动开户/审批/加密保存 Token，短票 URL 改写到 `/official/md-agent/open`; 同域资源代理已配置；未带短票仍403；未使用现有 kkk/mdadmin Token；真实生产资格和 dsh会话待用户邀请码触发 | `server/tests/test_md_agent_portal.py`、`docs/md-agent-console.md`、`/var/backups/aethericai-official/20261006-md-binding/` | 阶段发布 |
 | E-016 | 2026-10-06 | DeepSeek `/models` 200、OpenAI-compatible `/llm/deepseek/chat/completions` 真实短请求200、Kimi Coding/Moonshot入口均401、服务重启与健康检查 | 0 | `20261006-model-deepseek`; Key 只在 `/etc/mdagent/provider.env` 受保护文件 | DeepSeek `deepseek-v4-pro` 已配置并验证；Kimi Key未保存，未宣称可用；默认新 MD-Agent 账号 provider 为 deepseek | `docs/md-agent-console.md`、MD-Agent provider 备份 | 阶段发布 |
 | E-017 | 2026-10-07 | 国内 Kimi `api.moonshot.cn/v1` + `kimi-k2.7-code-highspeed` 官方短请求200、MD-Agent `/llm/kimi/chat/completions` 真实代理200、服务重启与健康检查 | 0 | `20261007-model-kimi-cn`; Key 只在 `/etc/mdagent/provider.env` 受保护文件 | 国内 Kimi 已接入代理并验证；DeepSeek保持200；Kimi Key不进入代码、前端或日志 | `docs/md-agent-console.md`、MD-Agent provider 备份 | 阶段发布 |
+| E-018 | 2026-10-07 | build/lint、云端控制台截图和可访问性树 | 0 | `20261007-console-header`; console HTML SHA-256 `a4c11e7c30155273cab0a12fba070199d62b5b738522d533050625048fc191ce` | 顶栏账户收敛为头像+下拉入口；官网轨道式 Logo 替换菱形占位；桌面控制台公网显示正常 | `src/components/ConsolePage.tsx`、`src/components/Nav.tsx`、`src/components/console.css` | 当前静态发布 |
 
 ## Gate 记录
 

@@ -8,7 +8,7 @@ import { assetUrl } from "@/lib/asset-url";
 import { LoginPage } from "@/components/LoginPage";
 import { accountApi, hasAccountSession, type AccountProfile } from "@/lib/account-client";
 
-function Mark() {
+export function Mark() {
   return (
     <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden>
       <circle cx="13" cy="13" r="3.2" fill="var(--accent)" />

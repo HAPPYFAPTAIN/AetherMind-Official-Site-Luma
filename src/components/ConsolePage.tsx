@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { LoginPage } from "./LoginPage";
+import { Mark } from "./Nav";
 import { useLanguage } from "./LanguageProvider";
 import { accountApi, hasAccountSession, type AccountProfile } from "@/lib/account-client";
 import { assetUrl } from "@/lib/asset-url";
@@ -70,13 +71,6 @@ export function ConsolePage() {
     accountApi<MdAgentState>("/md-agent/profile").then(setMdState).catch(() => setMdState(null));
   }, []);
 
-  const roleName = useMemo(() => {
-    if (!account) return "";
-    return account.role === "OWNER" ? (zh ? "总管理员" : "Owner")
-      : account.role === "ADMIN" ? (zh ? "管理员" : "Administrator")
-      : (zh ? "普通用户" : "Member");
-  }, [account, zh]);
-
   const enterMdExp = async () => {
     if (!account) {
       window.location.assign(assetUrl("/login/?returnTo=/official/console/"));
@@ -118,7 +112,7 @@ export function ConsolePage() {
       <header className="console-topbar">
         <div className="console-brand">
           <a href={assetUrl("/")} aria-label={zh ? "返回官网" : "Back to website"}>
-            <span className="console-mark" aria-hidden="true">✧</span>
+            <span className="console-mark" aria-hidden="true"><Mark /></span>
             {zh ? BRAND.zh : BRAND.en}
           </a>
           <span className="console-divider" />
@@ -130,10 +124,10 @@ export function ConsolePage() {
             {zh ? "EN" : "中"}
           </button>
           {account ? (
-            <a className="console-account" href={assetUrl("/dashboard/")}>
+            <a className="console-account console-account-compact" href={assetUrl("/dashboard/")}
+              aria-label={zh ? `打开账户工作台：${account.displayName}，${account.phoneMasked}` : `Open account workspace: ${account.displayName}, ${account.phoneMasked}`}
+              title={zh ? `${account.displayName} · ${account.phoneMasked}` : `${account.displayName} · ${account.phoneMasked}`}>
               <span>{account.displayName.slice(0, 1)}</span>
-              <b>{account.displayName}</b>
-              <small>{account.phoneMasked} · {roleName}</small>
               <i>⌄</i>
             </a>
           ) : (

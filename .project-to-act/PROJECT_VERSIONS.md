@@ -36,3 +36,4 @@
 | `20261006-md-entry` | 2026-10-06 | 已发布（阶段版） | 独立 official-bff 服务账号、个人 MD-Agent 自动绑定、短票入口和 `/official/md-agent/` 同域 dsh 兼容层 | 真实用户短票、模型密钥验证、SSH 作业仍待联调 | E-015 | 阶段通过 |
 | `20261006-model-deepseek` | 2026-10-06 | 已发布（阶段版） | 配置 DeepSeek 共享 Key、默认 `deepseek-v4-pro` 与 OpenAI-compatible 代理；Kimi Key 401，未保存 | MD-Agent 服务重启；Kimi 待重新提供有效 API Key | E-016 | 阶段通过 |
 | `20261007-model-kimi-cn` | 2026-10-07 | 已发布（阶段版） | 按国内版 `api.moonshot.cn/v1` 配置 Kimi，验证 `kimi-k2.7-code-highspeed` 并接入 MD-Agent 代理 | 模型短请求通过；Kimi K3/K2.6和用户绑定账号待后续选择/验证 | E-017 | 阶段通过 |
+| `20261007-console-header` | 2026-10-07 | 已发布 | 控制台顶栏账户入口简化为头像菜单；品牌图标复用官网轨道 Logo | 仅静态前端；现有登录和 dsh 入口不变 | E-018 | 通过 |

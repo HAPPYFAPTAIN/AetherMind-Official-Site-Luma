@@ -372,7 +372,7 @@ export function DashboardPage() {
               aria-expanded={!sidebarCollapsed}
               aria-label={sidebarCollapsed ? t("展开工作台菜单", "Open workspace menu") : t("收起工作台菜单", "Collapse workspace menu")}
             >
-              {sidebarCollapsed ? "☰" : "‹"}
+              {sidebarCollapsed ? <MenuGlyph /> : "‹"}
             </button>
           )}
           {data && !unauthorized && (
@@ -382,7 +382,7 @@ export function DashboardPage() {
               aria-expanded={sidebarOpen}
               aria-label={t("打开工作台菜单", "Open workspace menu")}
             >
-              ☰
+              <MenuGlyph />
             </button>
           )}
           {data && !unauthorized && (
@@ -882,4 +882,8 @@ export function DashboardPage() {
       )}
     </main>
   );
+}
+
+function MenuGlyph() {
+  return <span className="dash-menu-glyph" aria-hidden="true"><i /><i /><i /></span>;
 }

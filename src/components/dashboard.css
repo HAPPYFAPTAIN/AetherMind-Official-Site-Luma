@@ -141,6 +141,24 @@
   border-radius: 9px;
   color: #cce7f1;
   font-size: 21px;
+  line-height: 1;
+  text-align: center;
+}
+.dash-menu-glyph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 18px;
+  height: 18px;
+}
+.dash-menu-glyph i {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
 }
 .dash-sidebar-toggle-topbar:hover {
   border-color: var(--dash-cyan);

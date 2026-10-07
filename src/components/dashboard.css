@@ -189,26 +189,26 @@
 .dash-topbar-brand {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 20px;
   flex-shrink: 0;
 }
 .dash-topbar-brand a {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 23px;
+  gap: 10px;
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: 0.04em;
 }
 .dash-topbar-brand > span {
   border-left: 1px solid var(--dash-line);
-  padding-left: 24px;
+  padding-left: 20px;
   color: var(--dash-muted);
-  font-size: 18px;
+  font-size: 13px;
 }
 .dash-topbar-brand a svg {
-  width: 34px;
-  height: 34px;
+  width: 26px;
+  height: 26px;
 }
 .dash-heading {
   display: flex;

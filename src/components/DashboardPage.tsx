@@ -363,7 +363,7 @@ export function DashboardPage() {
               <Mark />
               {zh ? BRAND.zh : BRAND.en}
             </a>
-            <span>{t("工作台", "Workspace")}</span>
+            <span>{t("控制台", "Console")}</span>
           </div>
           {data && !unauthorized && (
             <button

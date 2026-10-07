@@ -44,6 +44,7 @@
 | E-019 | 2026-10-07 | build/lint、云端工作台截图、DOM SVG核验 | 0 | `20261007-workspace-brand`; dashboard HTML SHA-256 `facc5f1bc8ddfcfde6d3585b50ed2b2b272ac783af5acb61707893fbeb971885` | 工作台顶栏显示官网轨道 Logo，品牌文字与“工作台”对齐；未登录状态页面正常 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
 | E-020 | 2026-10-07 | build/lint、1280px/390px浏览器、侧栏完全收回、顶栏开关、移动抽屉、可访问性树 | 0 | `20261007-sidebar-topbar`; dashboard HTML SHA-256 `e051e4218ea2a289b21d98a1a17729e88a87ae874a861d4e4154f0ad77eae90c` | P1 顶部工作台导航/产品/激活码已移入侧栏；P2 标题说明区移除；桌面侧栏宽度收为0且主区域占满，开关移到顶栏；手机侧栏可抽屉打开；页面无横向溢出 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
 | E-021 | 2026-10-07 | build/lint、390px/桌面浏览器、顶栏按钮几何尺寸与图标 DOM 核验 | 0 | `20261007-sidebar-glyph`; dashboard HTML SHA-256 `1b68804821bc109185bfa1cdfa95724224492c9388c486fb81b5afdc27be66d2` | 菜单图标由三条固定线组成，按钮使用 grid/flex 居中；收回和展开状态均保持居中 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
+| E-022 | 2026-10-07 | build/lint、公网 DOM 文案/字体尺寸/Logo SVG 核验 | 0 | `20261007-console-label`; dashboard HTML SHA-256 `2c1700449add23bac59e50e10038e398ce6b8dd8c8eb5ca2538847ef3929774f` | 顶栏“工作台”改为“控制台”；品牌文字23px、控制台文字18px、Logo34px；公网显示正常 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
 
 ## Gate 记录
 

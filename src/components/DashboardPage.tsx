@@ -813,14 +813,6 @@ export function DashboardPage() {
               />
             )}
             </div>
-            <footer className="dash-footer">
-              <span>
-                {loading
-                  ? t("正在更新…", "Updating…")
-                  : `${t("更新于", "Updated")} ${formatDate(data.asOf, true)}`}
-              </span>
-              <button onClick={refresh}>{t("刷新数据", "Refresh")}</button>
-            </footer>
           </>
         )}
         </div>

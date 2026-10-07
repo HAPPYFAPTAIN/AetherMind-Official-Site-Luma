@@ -46,6 +46,7 @@
 | E-021 | 2026-10-07 | build/lint、390px/桌面浏览器、顶栏按钮几何尺寸与图标 DOM 核验 | 0 | `20261007-sidebar-glyph`; dashboard HTML SHA-256 `1b68804821bc109185bfa1cdfa95724224492c9388c486fb81b5afdc27be66d2` | 菜单图标由三条固定线组成，按钮使用 grid/flex 居中；收回和展开状态均保持居中 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
 | E-022 | 2026-10-07 | build/lint、公网 DOM 文案/字体尺寸/Logo SVG 核验 | 0 | `20261007-console-label`; dashboard HTML SHA-256 `2c1700449add23bac59e50e10038e398ce6b8dd8c8eb5ca2538847ef3929774f` | 顶栏“工作台”改为“控制台”；品牌文字23px、控制台文字18px、Logo34px；公网显示正常 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
 | E-023 | 2026-10-07 | build/lint、公网 DOM 文案/字体尺寸核验 | 0 | `20261007-console-size-restore`; dashboard HTML SHA-256 `1e04b03d3460c734ccbf299c04e4dfe6cf8b4557a3a98598ecb98119468cf0bc` | 顶栏保持“控制台”文案，品牌名、Logo和副标题恢复放大前尺寸 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
+| E-024 | 2026-10-07 | build/lint、公网 DOM 文本核验 | 0 | `20261007-no-footer`; dashboard HTML SHA-256 `2b4cfbdb8c4378924b447f22df4004dc1a75345bfe748b227a5177411d1df9e3` | 工作台所有页面移除更新时间、刷新数据底部小字区块；公网无 `dash-footer`、更新文案和刷新文案 | `src/components/DashboardPage.tsx` | 当前静态发布 |
 
 ## Gate 记录
 

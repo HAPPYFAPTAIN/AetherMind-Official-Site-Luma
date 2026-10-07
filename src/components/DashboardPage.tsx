@@ -417,6 +417,7 @@ export function DashboardPage() {
                   </button>
                 ))}
               </nav>
+              <div className="dash-sidebar-section-label">{t("工具", "Tools")}</div>
               <div className="dash-sidebar-actions">
                 <a className="dash-quiet-button" href={assetUrl("/products/")} onClick={() => setSidebarOpen(false)}>
                   <span className="dash-sidebar-icon" aria-hidden="true">＋</span><span className="dash-sidebar-label">{t("浏览产品", "Explore products")}</span>
@@ -468,6 +469,7 @@ export function DashboardPage() {
           </section>
         ) : (
           <>
+            <div className="dash-tab-view" key={tab}>
             {tab === "overview" && (
               <>
                 <section className="dash-overview">
@@ -803,6 +805,7 @@ export function DashboardPage() {
                 onChanged={refresh}
               />
             )}
+            </div>
             <footer className="dash-footer">
               <span>
                 {loading

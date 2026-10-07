@@ -4,10 +4,10 @@
 
 ## 当前版本
 
-- 版本号：`20261006-md-entry`
-- 发布状态：乌兰察布前端 `/opt/aethericai-official/releases/20261006-md-entry`，独立后台 `/srv/aethericai-auth/releases/20261006-md-entry`
+- 版本号：`20261008-learn-everything`
+- 发布状态：乌兰察布前端 `/opt/aethericai-official/releases/20261008-learn-product-v2`，独立后台 `/srv/aethericai-auth/releases/20261008-learn-gateway`，学习服务由 `aethericai-learn.service` 提供
 - 兼容性说明：Next.js 静态导出，生产使用 `/official/` 前缀
-- 最后更新：2026-10-06
+- 最后更新：2026-10-08
 
 ## 下一版本计划
 
@@ -44,6 +44,7 @@
 | `20261007-dsh-plugin-root` | 2026-10-07 | 已发布 | 修复同域 dsh 根路径 `/plugins/` 未转发导致的插件加载失败 | Nginx 片段备份并平滑 reload | E-026 | 通过 |
 | `20261007-console-size-restore` | 2026-10-07 | 已发布 | 恢复顶栏品牌名、Logo 和“控制台”文案到放大前尺寸 | 仅静态前端 | E-023 | 通过 |
 | `20261007-dashboard-entry` | 2026-10-07 | 已发布 | 官网顶部和 Hero 两个控制台入口统一进入 dashboard；未登录弹登录，登录后进入工作台 | 仅静态前端；保留 `/official/console/` 卡片页独立入口 | E-024 | 通过 |
-| `20261007-no-footer` | 2026-10-07 | 已发布 | 移除工作台各页面底部更新时间和刷新数据小字区块 | 仅静态前端 | E-024 | 通过 |
+| `20261007-no-footer` | 2026-10-07 | 已发布 | 移除工作台各页面底部更新时间和刷新数据小字区块 | 仅静态前端 | E-030 | 通过 |
 | `20261007-md-exp-activation` | 2026-10-07 | 已发布 | 新增 MD EXP / dsh 产品激活码类型；兑换后写入 MD-Agent 资格并进入自动绑定链路 | 前后端、官网产品目录与管理员生成器同步 | E-025 | 阶段通过 |
-| `20261007-console-profile` | 2026-10-07 | 已发布 | 控制台移除底部路径和 Hero 说明；顶栏账号菜单增加个人中心、暗色模式和退出；新增个人中心页 | 个人中心沿用官网认证和密码设置流程 | E-025 | 通过 |
+| `20261007-console-profile` | 2026-10-07 | 已发布 | 控制台移除底部路径和 Hero 说明；顶栏账号菜单增加个人中心、暗色模式和退出；新增个人中心页 | 个人中心沿用官网认证和密码设置流程 | E-029 | 通过 |
+| `20261008-learn-everything` | 2026-10-08 | 已发布（阶段版） | 产品页新增 Learn Everything 详情和操作手册；官网账号权益门禁、短票和 Nginx 保护；服务器运行 Mac 版 Gradio 学习服务 | 单实例预览，资料/路线/复习数据尚未按官网账号隔离 | E-028 | 阶段通过 |

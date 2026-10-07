@@ -3,6 +3,7 @@ from fastapi import Request
 from .workspace import Workspace, mount_workspace
 from .passwords import mount_passwords
 from .md_agent import mount_md_agent
+from .learn_everything import mount_learn_everything
 
 
 def create_app(**kwargs):
@@ -17,4 +18,5 @@ def create_app(**kwargs):
     mount_workspace(app, workspace, current_user)
     mount_passwords(app, workspace, current_user)
     mount_md_agent(app, workspace, current_user)
+    mount_learn_everything(app, workspace, current_user)
     return app

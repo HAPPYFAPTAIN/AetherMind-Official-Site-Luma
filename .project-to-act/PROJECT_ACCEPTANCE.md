@@ -4,10 +4,10 @@
 
 ## 当前验收结论
 
-- 结论：MD-Agent 自动绑定与官网同域 dsh 阶段版已上线（E-015）；密码、邀请码资格、工作台和原短信/社区回归通过；真实用户首次绑定、模型和 SSH 联调仍待验证
+- 结论：Learn Everything 产品详情、操作手册、官网权益门禁和服务器单实例预览已上线（E-028）；服务端口与资源已保护；多账号数据隔离仍待改造。MD-Agent 自动绑定与官网同域 dsh 阶段版仍见 E-015
 - 验收范围：卡片目录、产品邀请码资格、模型/超算状态页、密码登录/设置、工作台、用户身份、积分、激活码、产品套餐、用量接口、统一登录及既有社区
-- 最后检查：2026-10-06
-- 遗留问题：正式产品价格/额度由总管理员配置；产品真实用量须由各产品接入记录接口，不以演示数据代替。生产已存在用户明确指定的短信验证账号并赋予 OWNER；本轮未发送真实短信。
+- 最后检查：2026-10-08
+- 遗留问题：Learn Everything 当前 Mac 架构是单用户实例，不能宣称多租户隔离；正式产品价格/额度由总管理员配置；产品真实用量须由各产品接入记录接口，不以演示数据代替。生产已存在用户明确指定的短信验证账号并赋予 OWNER；本轮未发送真实短信。
 
 ## 验收标准
 
@@ -47,10 +47,12 @@
 | E-022 | 2026-10-07 | build/lint、公网 DOM 文案/字体尺寸/Logo SVG 核验 | 0 | `20261007-console-label`; dashboard HTML SHA-256 `2c1700449add23bac59e50e10038e398ce6b8dd8c8eb5ca2538847ef3929774f` | 顶栏“工作台”改为“控制台”；品牌文字23px、控制台文字18px、Logo34px；公网显示正常 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
 | E-023 | 2026-10-07 | build/lint、公网 DOM 文案/字体尺寸核验 | 0 | `20261007-console-size-restore`; dashboard HTML SHA-256 `1e04b03d3460c734ccbf299c04e4dfe6cf8b4557a3a98598ecb98119468cf0bc` | 顶栏保持“控制台”文案，品牌名、Logo和副标题恢复放大前尺寸 | `src/components/DashboardPage.tsx`、`src/components/dashboard.css` | 当前静态发布 |
 | E-024 | 2026-10-07 | build/lint、公网主页可访问性树、顶部/ Hero 控制台按钮登录弹层 | 0 | `20261007-dashboard-entry`; homepage HTML SHA-256 `4a833034772336dad15a9088fdbe26fed7d705b887d06edaf7b94153007011b1` | 顶部“控制台”和 Hero“打开控制台”均为统一入口；未登录点击弹出登录，登录成功返回 dashboard | `src/components/ConsoleEntryButton.tsx`、`src/components/Hero.tsx`、`src/components/sections/FinalCTA.tsx`、`src/components/Nav.tsx` | 当前静态发布 |
-| E-024 | 2026-10-07 | build/lint、公网 DOM 文本核验 | 0 | `20261007-no-footer`; dashboard HTML SHA-256 `2b4cfbdb8c4378924b447f22df4004dc1a75345bfe748b227a5177411d1df9e3` | 工作台所有页面移除更新时间、刷新数据底部小字区块；公网无 `dash-footer`、更新文案和刷新文案 | `src/components/DashboardPage.tsx` | 当前静态发布 |
+| E-030 | 2026-10-07 | build/lint、公网 DOM 文本核验 | 0 | `20261007-no-footer`; dashboard HTML SHA-256 `2b4cfbdb8c4378924b447f22df4004dc1a75345bfe748b227a5177411d1df9e3` | 工作台所有页面移除更新时间、刷新数据底部小字区块；公网无 `dash-footer`、更新文案和刷新文案 | `src/components/DashboardPage.tsx` | 当前静态发布 |
 | E-025 | 2026-10-07 | 11项工作台/MD-Agent后端测试、build/lint、公网产品目录核验、生产健康检查 | 0 | `20261007-md-exp-activation`; md-exp product API 返回正常 | P1 激活码生成器新增 MD EXP 类型；兑换零积分/零次数的 MD EXP 码会写入资格表；BFF 可据此自动绑定 dsh 账号；P2 dsh 内部提示需用户实际兑换后再做会话验收 | `server/tests/test_workspace.py`、`server/tests/test_md_agent_portal.py`、`/var/backups/aethericai-official/20261007-md-exp-activation/` | 当前发布 |
 | E-026 | 2026-10-07 | dsh 插件根 URL 只读响应、Nginx `nginx -t`/reload | 0 | `20261007-dsh-plugin-root`; `/plugins/@deepseek-ai/dsh-session-log-export/client.js` HTTP 200，JavaScript 11446 bytes | 原因是 dsh 使用根路径 `/plugins/`，官网同域层之前只代理 `/official/md-agent/plugins/`；已新增根 `/plugins/` 到 `/opt/mdagent/web-preview/plugins/` 的映射 | `/var/backups/aethericai-official/20261007-dsh-plugin-fix/` | 当前发布 |
-| E-025 | 2026-10-07 | build/lint、控制台公网 DOM/交互核验、个人中心匿名保护 | 0 | `20261007-console-profile`; console/profile 静态页面 | 控制台移除 Hero 与底部路径占位；个人中心入口结构已接入；未登录个人中心返回登录；密码设置沿用短信验证 | `src/components/ConsolePage.tsx`、`src/components/ProfilePage.tsx`、`/official/profile/` | 当前静态发布 |
+| E-027 | 2026-10-07 | dsh-files 插件源文件/预览文件 SHA-256、根 URL HTTP 响应头、Nginx/官方认证/MD-Agent 服务状态 | 0 | `20261007-dsh-plugin-fix`; `/plugins/dsh-files/client.js` HTTP 200，`application/javascript`，15961 bytes；源文件与预览文件 SHA-256 一致 | 第二个报错原因是 `dsh-files` 只存在于 MD-Agent 源码插件目录，官网同域预览目录缺少对应 bundle；已补齐 `/opt/mdagent/web-preview/plugins/dsh-files/client.js`，并复用已生效的根 `/plugins/` 映射 | `/var/backups/aethericai-official/20261007-dsh-plugin-fix/` | 当前发布 |
+| E-028 | 2026-10-08 | `bun run lint`、`bun run build:ip`、服务器服务/端口/公网页面/Nginx 保护验收 | 0 | `20261008-learn-everything`; 详情页 HTML SHA-256 `c14933c495c937bee5e7285b5389190f845abdb949e3067acb9e8ad5e90db270` | Learn Everything 详情页与操作手册公网 200；官方 API 无票据403；工作台 HTML、资源和队列路径无票据均403；上游仅127.0.0.1:7860；服务与认证 API active | `.project-to-act/docs/learn-everything.md`、`/var/backups/aethericai-official/20261008-learn-gateway/` | 阶段发布 |
+| E-029 | 2026-10-07 | build/lint、控制台公网 DOM/交互核验、个人中心匿名保护 | 0 | `20261007-console-profile`; console/profile 静态页面 | 控制台移除 Hero 与底部路径占位；个人中心入口结构已接入；未登录个人中心返回登录；密码设置沿用短信验证 | `src/components/ConsolePage.tsx`、`src/components/ProfilePage.tsx`、`/official/profile/` | 当前静态发布 |
 
 ## Gate 记录
 

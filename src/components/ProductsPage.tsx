@@ -61,7 +61,7 @@ export function ProductsPage() {
     const query = search.trim().toLowerCase();
     const current = PRODUCTS.map(product => {
       const live = catalog.find(p => p.id === product.id);
-      return live ? { ...product, title: { zh: live.name, en: live.name_en }, body: { ...product.body, zh: live.description }, state: live.status === 'AVAILABLE' ? { zh: `${live.price} 积分起`, en: `From ${live.price} credits` } : { zh: '暂未开放购买', en: 'Not for sale yet' } } : product;
+      return live ? { ...product, title: { zh: live.name, en: live.name_en }, body: { ...product.body, zh: live.description }, state: product.id === 'learn-everything' && live.status !== 'AVAILABLE' ? product.state : live.status === 'AVAILABLE' ? { zh: `${live.price} 积分起`, en: `From ${live.price} credits` } : { zh: '暂未开放购买', en: 'Not for sale yet' } } : product;
     });
     const result = current.filter((product) => (category === "all" || product.category === category) && (!query || `${product.title.en} ${product.title.zh} ${product.body.en} ${product.body.zh}`.toLowerCase().includes(query)));
     return sort === "name" ? [...result].sort((a, b) => a.title.en.localeCompare(b.title.en)) : result;

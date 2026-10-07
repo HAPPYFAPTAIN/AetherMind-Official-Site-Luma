@@ -21,6 +21,7 @@
 | F-004 | MD-Agent 智能体卡片控制台与产品邀请码资格 | 用户确认的交接流程 | P1 | 进行中 | 阶段通过 | MD-Agent BFF、dsh短票、Kimi/DeepSeek密钥、SSH适配 | 卡片页、登录返回、后续卡片禁用、邀请码资格和待接入状态上线；真实 dsh/模型/SSH 联调待完成 | docs/md-agent-console.md | E-014 |
 | F-005 | MD-Agent 个人自动绑定与官网同域 dsh 入口 | 用户确认的接入方式 | P1 | 进行中 | 阶段通过 | official-bff 管理凭据、dsh 动态租户端口 | 个人资格触发开户/审批/Token 加密保存，短票改写到 `/official/md-agent/`；真实用户首次绑定和 dsh 完整会话待验收 | docs/md-agent-console.md | E-015 |
 | F-006 | DeepSeek/Kimi 模型供应商配置 | 用户提供两家模型 Key | P1 | 进行中 | 阶段通过 | 上游 API Key | DeepSeek 和国内 Kimi 代理短请求均200；模型目录与默认档位已配置 | docs/md-agent-console.md | E-017 |
+| F-007 | Learn Everything 产品详情、操作手册与激活门禁 | 用户要求接入 learn-everything-mac 并按文件增加说明 | P1 | 进行中 | 阶段通过 | 官网账号、官方产品权益、Gradio 服务和 Nginx 入口 | 详见 docs/learn-everything.md | E-028 |
 
 ## 功能变更历史
 

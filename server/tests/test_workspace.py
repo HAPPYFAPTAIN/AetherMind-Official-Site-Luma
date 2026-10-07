@@ -84,6 +84,24 @@ def test_md_exp_activation_code_grants_dsh_qualification(setup):
     assert qualification['product_id'] == 'md-exp'
 
 
+def test_learn_everything_entry_is_activation_gated(setup):
+    app, w, sessions, ids = setup
+    owner, user, *_ = ids
+    client = TestClient(app)
+    path = '/api/v1/console/learn-everything'
+
+    assert client.post(path + '/entry', headers=header(sessions[1])).status_code == 403
+    batch = w.create_batch(owner, BatchCreate(
+        label='Learn Everything 资格', quantity=1, productId='learn-everything', units=1,
+    ))
+    w.redeem(user, Redeem(code=batch['codes'][0]))
+    entry = client.post(path + '/entry', headers=header(sessions[1]))
+    assert entry.status_code == 200
+    ticket = entry.json()['url'].split('ticket=', 1)[1]
+    assert client.get(path + '/authorize', headers={'X-Learn-Ticket': ticket}).status_code == 204
+    assert client.get(path + '/authorize').status_code == 403
+
+
 def test_code_single_use_race_and_delegate_scope(setup):
     _, w, _, ids = setup
     owner, user, admin, other = ids

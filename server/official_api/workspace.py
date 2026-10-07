@@ -111,6 +111,8 @@ class Workspace:
             for pid, name, en, desc, image in CATALOG:
                 c.execute('INSERT OR IGNORE INTO official_products(id,name,name_en,description,image) VALUES(?,?,?,?,?)',
                           (pid, name, en, desc, f'/assets/products/{image}.png'))
+            c.execute("UPDATE official_products SET entry_url=? WHERE id=? AND (entry_url='' OR entry_url IS NULL)",
+                      ('/official/products/learn-everything/', 'learn-everything'))
 
     def role(self, c, uid):
         row = c.execute('SELECT role FROM official_roles WHERE user_id=?', (uid,)).fetchone()

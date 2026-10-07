@@ -3,6 +3,7 @@
 import { CSSProperties, FormEvent, useCallback, useEffect, useState } from "react";
 import { LoginPage } from "./LoginPage";
 import { PasswordSettings } from "./PasswordSettings";
+import { Mark } from "./Nav";
 import { useLanguage } from "./LanguageProvider";
 import { AdminPanel } from "./admin/AdminPanel";
 import {
@@ -351,6 +352,7 @@ export function DashboardPage() {
         <div className="dash-topbar-inner">
           <div className="dash-topbar-brand">
             <a href={assetUrl("/")} aria-label={t("返回以太智元官网", "Back to AethericAI home")}>
+              <Mark />
               {zh ? BRAND.zh : BRAND.en}
             </a>
             <span>{t("工作台", "Workspace")}</span>

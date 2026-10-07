@@ -37,6 +37,9 @@
   flex-shrink: 0;
 }
 .dash-topbar-brand a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 17px;
   font-weight: 600;
   letter-spacing: 0.04em;

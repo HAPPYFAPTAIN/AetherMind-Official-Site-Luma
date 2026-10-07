@@ -8,6 +8,7 @@ import { useLanguage } from "@/components/LanguageProvider";
 import { BRAND } from "@/lib/site";
 import { tr } from "@/lib/i18n";
 import { assetUrl } from "@/lib/asset-url";
+import { ConsoleEntryButton } from "@/components/ConsoleEntryButton";
 
 export function FinalCTA() {
   const { language } = useLanguage();
@@ -60,13 +61,12 @@ export function FinalCTA() {
         </Reveal>
         <Reveal delay={0.2}>
           <div className="mt-12 flex flex-wrap items-center gap-4">
-            <a
-              href={assetUrl("/console/")}
+            <ConsoleEntryButton
               className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-[15px] font-semibold text-bg-0 transition-colors hover:bg-accent"
             >
               {tr(language, "Open Console", "打开控制台")}
               <span className="transition-transform group-hover:translate-x-0.5">→</span>
-            </a>
+            </ConsoleEntryButton>
             <a
               href="mailto:research@angsheng.ai"
               className="inline-flex items-center rounded-full border border-line-strong px-7 py-3.5 text-[15px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft"

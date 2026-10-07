@@ -18,7 +18,7 @@ const subscribeLocation = (notify: () => void) => {
 const locationSearch = () => window.location.search;
 const serverSearch = () => "";
 
-export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onClose?: () => void }) {
+export function LoginPage({ overlay = false, onClose, returnTo: returnToProp }: { overlay?: boolean; onClose?: () => void; returnTo?: string }) {
   const { language, setLanguage } = useLanguage();
   const zh = language === "zh";
   const [phone, setPhone] = useState("");
@@ -145,7 +145,7 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
         "aethericai-community-access-expires",
         String(data.accessTokenExpiresAtEpochMs),
       );
-      const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+      const returnTo = returnToProp || new URLSearchParams(window.location.search).get("returnTo");
       window.location.replace(communityReturnPath(returnTo));
     } catch (error) {
       setError(error instanceof Error ? error.message : String(error));

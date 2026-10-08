@@ -15,7 +15,7 @@
 | T-007 | MD-Agent 卡片控制台与邀请码产品资格阶段接入 | 进行中 | Codex | 卡片页、后续卡片禁用、资格表、模型/超算状态页和公网阶段发布 | E-014 | 2026-10-06 |
 | T-008 | MD-Agent 自动绑定与官网同域 dsh 入口 | 进行中 | Codex | official-bff、个人 Token 加密、短票转发、Nginx 同域兼容层完成；真实用户与模型密钥待验证 | E-015 | 2026-10-06 |
 | T-009 | DeepSeek/Kimi 模型 Key 接入 | 进行中 | Codex | DeepSeek 与国内 Kimi `kimi-k2.7-code-highspeed` 真实代理请求均200；Kimi K3/K2.6待选择 | E-017 | 2026-10-07 |
-| T-010 | Learn Everything 产品页与服务器预览接入 | 进行中 | Codex | 产品详情、按 Mac 指南整理的操作手册、登录/激活门禁、官方票据和本机 Gradio 服务上线；多账号数据隔离仍待改造 | E-028 | 2026-10-08 |
+| T-010 | Learn Everything 产品页与服务器预览接入 | 已完成 | Codex | 产品详情、ACT 激活门禁、UID 隔离、网关计量、服务器 Gradio 服务和公网验收完成；资料库按确认范围共享 | E-031 | 2026-10-08 |
 
 ## 阻塞项
 

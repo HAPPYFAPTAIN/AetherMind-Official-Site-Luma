@@ -4,7 +4,7 @@
 
 ## 当前验收结论
 
-- 结论：Learn Everything 产品详情、操作手册、官网权益门禁和服务器单实例预览已上线（E-028）；服务端口与资源已保护；多账号数据隔离仍待改造。MD-Agent 自动绑定与官网同域 dsh 阶段版仍见 E-015
+- 结论：官网模块化后端、数据库迁移、ACT 激活码、统一积分、LLM 网关、Learn Everything UID 隔离、dsh/HPC 计量接入和生产软链发布均已完成（E-029）；资料库共享仍是已确认边界。官网产品详情、操作手册和账号门禁保持可用。
 - 验收范围：卡片目录、产品邀请码资格、模型/超算状态页、密码登录/设置、工作台、用户身份、积分、激活码、产品套餐、用量接口、统一登录及既有社区
 - 最后检查：2026-10-08
 - 遗留问题：Learn Everything 当前 Mac 架构是单用户实例，不能宣称多租户隔离；正式产品价格/额度由总管理员配置；产品真实用量须由各产品接入记录接口，不以演示数据代替。生产已存在用户明确指定的短信验证账号并赋予 OWNER；本轮未发送真实短信。
@@ -52,6 +52,7 @@
 | E-026 | 2026-10-07 | dsh 插件根 URL 只读响应、Nginx `nginx -t`/reload | 0 | `20261007-dsh-plugin-root`; `/plugins/@deepseek-ai/dsh-session-log-export/client.js` HTTP 200，JavaScript 11446 bytes | 原因是 dsh 使用根路径 `/plugins/`，官网同域层之前只代理 `/official/md-agent/plugins/`；已新增根 `/plugins/` 到 `/opt/mdagent/web-preview/plugins/` 的映射 | `/var/backups/aethericai-official/20261007-dsh-plugin-fix/` | 当前发布 |
 | E-027 | 2026-10-07 | dsh-files 插件源文件/预览文件 SHA-256、根 URL HTTP 响应头、Nginx/官方认证/MD-Agent 服务状态 | 0 | `20261007-dsh-plugin-fix`; `/plugins/dsh-files/client.js` HTTP 200，`application/javascript`，15961 bytes；源文件与预览文件 SHA-256 一致 | 第二个报错原因是 `dsh-files` 只存在于 MD-Agent 源码插件目录，官网同域预览目录缺少对应 bundle；已补齐 `/opt/mdagent/web-preview/plugins/dsh-files/client.js`，并复用已生效的根 `/plugins/` 映射 | `/var/backups/aethericai-official/20261007-dsh-plugin-fix/` | 当前发布 |
 | E-028 | 2026-10-08 | `bun run lint`、`bun run build:ip`、服务器服务/端口/公网页面/Nginx 保护验收 | 0 | `20261008-learn-everything`; 详情页 HTML SHA-256 `c14933c495c937bee5e7285b5389190f845abdb949e3067acb9e8ad5e90db270` | Learn Everything 详情页与操作手册公网 200；官方 API 无票据403；工作台 HTML、资源和队列路径无票据均403；上游仅127.0.0.1:7860；服务与认证 API active | `.project-to-act/docs/learn-everything.md`、`/var/backups/aethericai-official/20261008-learn-gateway/` | 阶段发布 |
+| E-031 | 2026-10-08 | 生产快照迁移、47 项后端测试、156 项 Learn Everything 测试、独立网关/服务/Nginx/公网联验 | 0 | `e3847558`; DB integrity ok、migrations 1–5、user_version 3；详情页 200、无票据工作台403、gateway health 200、models 200 | 生产 5 用户/26 会话/3钱包流水/4权益/3批次/2绑定保留；auth/gateway/learn/mdagent/nginx active；网关和 Learn Everything UID 隔离完成，资料库共享边界记录 | `/var/backups/aethericai-official/20261008-modular/`、`.project-to-act/docs/official-site-refactor-plan.md` | 当前发布 |
 | E-029 | 2026-10-07 | build/lint、控制台公网 DOM/交互核验、个人中心匿名保护 | 0 | `20261007-console-profile`; console/profile 静态页面 | 控制台移除 Hero 与底部路径占位；个人中心入口结构已接入；未登录个人中心返回登录；密码设置沿用短信验证 | `src/components/ConsolePage.tsx`、`src/components/ProfilePage.tsx`、`/official/profile/` | 当前静态发布 |
 
 ## Gate 记录

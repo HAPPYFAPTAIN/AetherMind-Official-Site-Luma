@@ -110,7 +110,7 @@ LLM token 价格按百万 token 向上取整；输入 token 拆分为非缓存�
 - 删除运行时散落的 `CREATE TABLE`/`ALTER TABLE` 和 `schema.sql`。
 - 验证新库、旧库基线同化、重复启动幂等、schema 差异和角色同步。
 
-**状态：已完成本地验证。** 0001–0005、基线同化、并发启动锁、失败回滚和 SQLite 快照演练均通过；生产数据库尚未切换。
+**状态：已完成。** 0001–0005、基线同化、并发启动锁、失败回滚和 SQLite 快照演练通过；生产数据库已迁移，user_version 仍保持兼容值 3。
 
 ### Phase 3 — 统一计量
 
@@ -128,7 +128,7 @@ LLM token 价格按百万 token 向上取整；输入 token 拆分为非缓存�
 - 认证使用产品 key + `X-End-User` + entitlement；费用直接调用 `official_api.billing.charge()`。
 - 验证 `/healthz`、`/v1/models`、非流式/流式 chat、embeddings、402 预检、event replay。
 
-**状态：代码与测试已完成，待生产启用。** 独立 `server/gateway/` 已支持模型、非流式/流式对话、embeddings、幂等、防重复上游调用、断流后继续计费和关闭排空；部署单元和环境模板已存在。
+**状态：已完成。** 独立 `server/gateway/` 已在 127.0.0.1:18040 启用，支持模型、非流式/流式对话、embeddings、幂等、防重复上游调用、断流后继续计费和关闭排空。
 
 ### Phase 5 — ACT- 统一与前端修复
 
@@ -145,7 +145,7 @@ LLM token 价格按百万 token 向上取整；输入 token 拆分为非缓存�
 - 生产发布：备份 DB，构建 release，原子切换 auth/gateway/site 软链，启动两个 systemd 服务，验证 healthz、现有 session refresh、短信登录、激活、Learn Everything chat 和 usage ledger。
 - 回滚：代码/软链/Nginx 可回退；数据库迁移前向兼容，必要时按发布备份恢复。
 
-**状态：本地代码与测试完成，生产发布待执行。** Learn Everything 已启用官网 UID 隔离、服务器模式认证、网关模型调用、模型配置锁定和命令执行禁用；资料库仍按已确认范围共享。生产网关、dsh/HPC 适配和软链发布需在同一快照保护流程中切换。
+**状态：已完成。** Learn Everything 已启用官网 UID 隔离、服务器模式认证、网关模型调用、模型配置锁定和命令执行禁用；资料库仍按已确认范围共享。生产网关、dsh/HPC 适配和软链发布已通过服务/公网验收。
 
 ## 当前阻塞与下一步
 

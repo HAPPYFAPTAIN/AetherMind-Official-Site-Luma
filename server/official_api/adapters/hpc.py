@@ -10,7 +10,7 @@ import httpx
 from cryptography.fernet import Fernet, InvalidToken
 from fastapi import APIRouter, Body, Depends, Query
 from fastapi.responses import JSONResponse
-from llmer_api.errors import ApiError
+from ..errors import ApiError
 
 CONNECTION_CREDENTIAL_LIMIT_BYTES = 64 * 1024
 JOB_INPUT_LIMIT_BYTES = 2 * 1024 * 1024

@@ -1,8 +1,8 @@
 """Operator-only owner assignment. Requires an existing SMS-verified account."""
 import argparse
-from llmer_api.config import Settings
-from llmer_api.database import Database
-from llmer_api.auth_service import AuthService
+from .auth.service import AuthService
+from .config import Settings
+from .db import Database
 from .workspace import Workspace
 
 

@@ -1,1 +1,1 @@
-"""Official-site account workspace, backed by the existing verified SMS identities."""
+__version__ = "0.1.0"

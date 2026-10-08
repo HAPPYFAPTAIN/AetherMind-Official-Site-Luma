@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
-from llmer_api.config import Settings
-from llmer_api.community_auth import TERMS_VERSION
+from official_api.config import Settings
+from official_api.community.consent import TERMS_VERSION
 from official_api.app import create_app
 
 
@@ -102,7 +102,7 @@ def test_binding_creates_private_account_and_rewrites_entry_url(tmp_path, monkey
             return Response({"url": "https://8.130.144.193:8081/mdagent/web/open?ticket=ticket123", "expires_in": 120}, 201)
         raise AssertionError(url)
 
-    monkeypatch.setattr("official_api.md_agent.httpx.request", fake_request)
+    monkeypatch.setattr("official_api.adapters.md_agent.httpx.request", fake_request)
     headers = {"Authorization": "Bearer " + owner["accessToken"]}
     bound = client.post("/api/v1/console/md-agent/bind", headers=headers)
     assert bound.status_code == 200

@@ -8,13 +8,13 @@ import threading
 
 from fastapi import Depends, Request, Response
 from pydantic import Field, SecretStr
-from llmer_api.auth_service import normalize_phone, normalize_code, normalize_ip, safe_log_provider_error
-from llmer_api.aliyun_sms import SmsProviderError
-from llmer_api.community_auth import TERMS_VERSION
-from llmer_api.crypto import random_id
-from llmer_api.errors import ApiError
-from llmer_api.main import client_ip
-from .workspace import Strict
+
+from .service import normalize_phone, normalize_code, normalize_ip, safe_log_provider_error
+from .sms import SmsProviderError
+from ..community.consent import TERMS_VERSION
+from ..crypto import random_id
+from ..errors import ApiError
+from ..http import Strict, bearer_token, client_ip
 
 
 class PasswordLogin(Strict):
@@ -107,16 +107,16 @@ class Passwords:
         if not valid or not row:
             raise ApiError(401, 'INVALID_CREDENTIALS', '手机号或密码错误；未设置密码可先用短信登录')
         now = self.auth.now()
-        access, refresh, values = self.auth._new_session_values(now)
+        access, refresh, values = self.auth.new_session_values(now)
         with self.db.connect() as c:
             c.execute('BEGIN IMMEDIATE')
             current = c.execute('SELECT password_hash FROM official_passwords WHERE user_id=?', (row['user_id'],)).fetchone()
             if not current or not hmac.compare_digest(current['password_hash'], row['password_hash']):
                 raise ApiError(401, 'INVALID_CREDENTIALS', '密码已更新，请重新登录')
-            self.db._insert_session(c, user_id=row['user_id'], access_hash=self.auth.hash('access-token', access),
-                                    refresh_hash=self.auth.hash('refresh-token', refresh), now_ms=now, **values)
+            self.db.insert_session(c, user_id=row['user_id'], access_hash=self.auth.hash('access-token', access),
+                                   refresh_hash=self.auth.hash('refresh-token', refresh), now_ms=now, **values)
             c.execute('INSERT OR IGNORE INTO community_consents VALUES(?,?,?)', (row['user_id'], TERMS_VERSION, now))
-        return self.auth._session_response(row['user_id'], access, refresh, values)
+        return self.auth.session_response(row['user_id'], access, refresh, values)
 
     def bound_phone(self, uid, phone_input):
         phone = normalize_phone(phone_input)
@@ -151,7 +151,7 @@ class Passwords:
     def change(self, uid, body, ip, access_token):
         phone, digest = self.bound_phone(uid, body.phone)
         code = normalize_code(body.code)
-        with self.auth._exclusive(self.auth._active_verifications, digest, 'VERIFY_IN_PROGRESS', '验证码正在核验，请稍候'):
+        with self.auth.exclusive(self.auth.active_verifications, digest, 'VERIFY_IN_PROGRESS', '验证码正在核验，请稍候'):
             with self.db.connect() as c:
                 self.require_challenge(c, uid, body, digest)
             self.db.reserve_sms_verify(digest, self.auth.hash('ip', normalize_ip(ip)), self.auth.now())
@@ -181,7 +181,6 @@ class Passwords:
 
 
 def mount_passwords(app, workspace, current_user):
-    from llmer_api.main import bearer_token
     service = Passwords(workspace)
     app.state.passwords = service
 

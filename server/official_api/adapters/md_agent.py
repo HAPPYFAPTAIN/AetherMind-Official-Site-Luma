@@ -11,7 +11,7 @@ from urllib.parse import parse_qs, urlsplit
 import httpx
 from cryptography.fernet import Fernet, InvalidToken
 from fastapi import APIRouter, Depends
-from llmer_api.errors import ApiError
+from ..errors import ApiError
 
 
 def mount_md_agent(app, workspace, current_user):

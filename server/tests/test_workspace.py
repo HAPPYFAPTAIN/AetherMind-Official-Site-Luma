@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from llmer_api.config import Settings
-from llmer_api.errors import ApiError
+from official_api.config import Settings
+from official_api.errors import ApiError
 from official_api.app import create_app
 from official_api.workspace import BatchCreate, CreditChange, ProductEdit, Redeem, RoleChange, Usage
 

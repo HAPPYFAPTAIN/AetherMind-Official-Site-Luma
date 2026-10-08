@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from llmer_api.config import Settings
+from official_api.config import Settings
 from official_api.app import create_app
 from official_api.workspace import BatchCreate, CreditChange, ProductEdit, Redeem, RoleChange, Usage
 import uvicorn

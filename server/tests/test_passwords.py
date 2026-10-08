@@ -2,9 +2,9 @@ import concurrent.futures
 
 import pytest
 from fastapi.testclient import TestClient
-from llmer_api.aliyun_sms import SmsProviderError
-from llmer_api.community_auth import TERMS_VERSION
-from llmer_api.config import Settings
+from official_api.auth.sms import SmsProviderError
+from official_api.community.consent import TERMS_VERSION
+from official_api.config import Settings
 from official_api.app import create_app
 
 PHONE = '13900000001'
@@ -150,8 +150,8 @@ def test_login_limits_persist_across_service_instances_and_expire(setup):
         assert login(c, phone='13900000009').status_code == 401
     response = login(c, phone='13900000009')
     assert response.status_code == 429 and response.headers['retry-after'] == '600'
-    from official_api.passwords import Passwords, PasswordLogin
-    from llmer_api.errors import ApiError
+    from official_api.auth.passwords import Passwords, PasswordLogin
+    from official_api.errors import ApiError
     service = Passwords(app.state.workspace)
     with pytest.raises(ApiError) as e:
         service.login(PasswordLogin(phone='13900000009', password=PASSWORD, acceptedTerms=True, termsVersion=TERMS_VERSION), 'testclient')

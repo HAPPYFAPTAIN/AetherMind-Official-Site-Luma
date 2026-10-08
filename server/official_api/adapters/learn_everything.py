@@ -9,7 +9,7 @@ import secrets
 from urllib.parse import parse_qs, quote, urlsplit
 
 from fastapi import APIRouter, Depends, Request, Response
-from llmer_api.errors import ApiError
+from ..errors import ApiError
 
 
 PRODUCT_ID = "learn-everything"

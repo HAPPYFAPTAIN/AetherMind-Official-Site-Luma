@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Nav } from "./Nav";
+import { LoginPage } from "./LoginPage";
 import { useLanguage } from "./LanguageProvider";
 import {
   accountApi,
+  AccountError,
   fetchDashboard,
   hasAccountSession,
 } from "@/lib/account-client";
 import { hasActiveEntitlement, redeemAndReload } from "@/lib/activate";
 import { assetUrl } from "@/lib/asset-url";
+import { useDialogFocus } from "@/lib/use-dialog-focus";
 import "./learn-everything.css";
 
 type AccessState = "checking" | "active" | "inactive" | "unknown";
@@ -18,7 +21,7 @@ const MANUAL = [
   {
     title: { zh: "30 秒快速上手", en: "Get started in 30 seconds" },
     items: [
-      { zh: "打开模型配置，填写可用的模型接口并测试连接。", en: "Open Model settings, enter a supported model endpoint and test it." },
+      { zh: "登录官网并使用 ACT- 产品激活码开通学习工作台。模型由平台统一配置，无需填写接口密钥。", en: "Sign in and redeem an ACT- product activation code. Models are configured by the platform; no API key is required." },
       { zh: "在学习路线输入选题、背景、目标和每周投入时间，生成路线。", en: "Enter a topic, background, goal and weekly time in Learning routes." },
       { zh: "确认路线后保存到项目，再进入学习工作台推进知识点。", en: "Save the route to a project, then work through its knowledge nodes." },
       { zh: "学习后使用间隔复习和查漏测验，最后在看板查看进度。", en: "Review and test after studying, then track progress on the dashboard." },
@@ -34,21 +37,22 @@ const MANUAL = [
       { zh: "查漏测验：按薄弱知识点生成选择、填空、简答或实操题并自动批改。", en: "Quizzes: generate and grade multiple-choice, fill-in, short-answer or practical questions." },
       { zh: "学习看板：查看掌握度、学习热力图和日报，并导出 Markdown、Anki 或打印报告。", en: "Dashboard: inspect mastery, activity heatmaps and reports, then export Markdown, Anki or print views." },
       { zh: "资料库：文件会被解析、分块并建立索引，供知识问答引用。", en: "Library: files are parsed, chunked and indexed for cited Q&A." },
-      { zh: "设置与帮助：调整推理模式、语言、上下文长度，并查看底座帮助。", en: "Settings and Help: adjust reasoning, language and context length, and read the built-in help." },
+      { zh: "使用指南与帮助：查看功能说明和推荐流程；服务器版的模型配置由平台管理员维护。", en: "Guide and Help: read the feature guide and recommended workflow. Server model settings are maintained by the platform owner." },
     ],
   },
   {
     title: { zh: "推荐学习流程", en: "Recommended flow" },
     items: [
-      { zh: "配置模型 → 生成并保存路线 → 上传资料 → 按路线学习 → 随时知识问答 → 每天复习 → 每阶段测验 → 看板复盘。", en: "Configure a model → build and save a route → upload references → study by node → ask questions → review daily → test each stage → inspect the dashboard." },
+      { zh: "登录并激活 → 生成并保存路线 → 选择资料 → 按路线学习 → 随时知识问答 → 每天复习 → 每阶段测验 → 看板复盘。", en: "Sign in and activate → build and save a route → select references → study by node → ask questions → review daily → test each stage → inspect the dashboard." },
     ],
   },
   {
     title: { zh: "常见问题", en: "Common questions" },
     items: [
-      { zh: "路线生成失败通常是模型接口或模型名未配置正确，请先在模型配置里测试，再到知识问答发送一句“你好”。", en: "Route failures usually mean the endpoint or model name is wrong. Test it in Model settings, then send “hello” in Q&A." },
+      { zh: "路线生成失败时，请检查控制台中的产品有效期和积分余额，再到知识问答尝试简短提问；持续失败可联系管理员。", en: "If route generation fails, check your product access and credit balance, then try a short question in Q&A. Contact the administrator if it persists." },
       { zh: "复习和测验没有内容时，先生成并保存学习路线，知识点才会进入复习系统。", en: "If Review or Quiz is empty, save a learning route first so its nodes can enter the review system." },
-      { zh: "资料和学习记录保存在学习服务的数据目录；调用模型时会发送问题及选中的资料片段。", en: "Files and study records stay in the learning service data directory; selected snippets are sent to the configured model." },
+      { zh: "学习路线、复习、测验、进度和笔记按官网账号隔离。当前资料库为共享资料库，上传前请确认资料可供其他使用者访问。", en: "Learning routes, reviews, quizzes, progress and notes are isolated by account. The library is currently shared; only upload material you can share with other users." },
+      { zh: "模型调用由平台网关计量并扣除积分；调用时会发送你的问题与选中的资料片段。", en: "Model calls are metered in platform credits and include your question and selected reference snippets." },
     ],
   },
 ];
@@ -57,61 +61,72 @@ export function LearnEverythingPage() {
   const { language } = useLanguage();
   const zh = language === "zh";
   const [activationOpen, setActivationOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const [activationCode, setActivationCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [opening, setOpening] = useState(false);
   const [error, setError] = useState("");
-  const [access, setAccess] = useState<AccessState>(() =>
-    hasAccountSession() ? "checking" : "inactive",
-  );
+  const [access, setAccess] = useState<AccessState>("checking");
+
+  const closeActivation = useCallback(() => setActivationOpen(false), []);
+  useDialogFocus(activationOpen, closeActivation, ".learn-modal");
 
   const t = (cn: string, en: string) => (zh ? cn : en);
 
   useEffect(() => {
-    if (!hasAccountSession()) return;
-    fetchDashboard(7, "learn-everything")
+    let live = true;
+    const load = async () => {
+      if (!hasAccountSession()) return "inactive" as const;
+      const data = await fetchDashboard(7, "learn-everything");
+      return hasActiveEntitlement(data, "learn-everything") ? "active" as const : "inactive" as const;
+    };
+    load()
       .then((data) => {
-        setAccess(
-          hasActiveEntitlement(data, "learn-everything")
-            ? "active"
-            : "inactive",
-        );
+        if (live) setAccess(data);
       })
-      .catch(() => setAccess("unknown"));
+      .catch(() => { if (live) setAccess("unknown"); });
+    return () => { live = false; };
   }, []);
 
   async function open() {
     if (opening || access === "checking") return;
     if (!hasAccountSession()) {
-      const returnTo = encodeURIComponent(assetUrl("/products/learn-everything/"));
-      window.location.assign(`${assetUrl("/login/")}?returnTo=${returnTo}`);
-      return;
-    }
-    if (access !== "active") {
-      setError(
-        access === "unknown"
-          ? t("暂时无法检查产品资格，请稍后重试。", "The product status could not be checked. Try again shortly.")
-          : "",
-      );
-      setActivationOpen(true);
+      setError("");
+      setLoginOpen(true);
       return;
     }
     setOpening(true);
     setError("");
     try {
+      const data = await fetchDashboard(7, "learn-everything");
+      if (!hasActiveEntitlement(data, "learn-everything")) {
+        setAccess("inactive");
+        setActivationOpen(true);
+        return;
+      }
+      setAccess("active");
       const entry = await accountApi<{ url: string }>("/learn-everything/entry", {
         method: "POST",
       });
       window.location.assign(entry.url);
     } catch (e) {
+      if (e instanceof AccountError && e.status === 401) {
+        setLoginOpen(true);
+        setAccess("inactive");
+        return;
+      }
+      if (e instanceof AccountError && e.status === 403) {
+        setAccess("inactive");
+        setActivationOpen(true);
+      }
       setError(e instanceof Error ? e.message : String(e));
-      setAccess("unknown");
     } finally {
       setOpening(false);
     }
   }
 
-  async function redeem() {
+  async function redeem(event: FormEvent) {
+    event.preventDefault();
     if (!activationCode.trim() || busy) return;
     setBusy(true);
     setError("");
@@ -159,7 +174,9 @@ export function LearnEverythingPage() {
                   ? t("打开学习工作台", "Open learning workspace")
                   : access === "checking"
                     ? t("正在检查资格…", "Checking access…")
-                    : t("使用邀请码激活", "Activate with invite")}
+                    : hasAccountSession()
+                      ? t("使用激活码激活", "Activate with code")
+                      : t("登录后使用", "Sign in to use")}
             </button>
             <a className="learn-secondary" href="#manual">
               {t("查看操作手册", "Read the manual")} ↓
@@ -192,8 +209,8 @@ export function LearnEverythingPage() {
           <h2>{t("操作说明", "How to use it")}</h2>
           <p className="learn-manual-intro">
             {t(
-              "以下内容根据 Mac 版 Learn Everything 的使用指南整理，进入工作台后仍可在“使用指南”页查看完整说明。",
-              "This manual follows the Mac Learn Everything guide. The full guide remains available in the workspace’s Guide tab.",
+              "以下内容根据 Learn Everything 使用指南整理，并适配官网账号、激活码与服务器版操作流程。",
+              "This manual adapts the Learn Everything guide to website accounts, activation codes and the server workflow.",
             )}
           </p>
         </div>
@@ -219,12 +236,22 @@ export function LearnEverythingPage() {
             <button className="learn-modal-close" onClick={() => setActivationOpen(false)} aria-label={t("关闭", "Close")}>×</button>
             <p className="learn-kicker">PRODUCT ACTIVATION</p>
             <h2 id="learn-activation-title">{t("激活 Learn Everything", "Activate Learn Everything")}</h2>
-            <p>{t("输入总管理员发放的产品邀请码。激活成功后即可打开学习工作台。", "Enter a product invite issued by the owner to open the learning workspace.")}</p>
-            <input value={activationCode} onChange={(e) => setActivationCode(e.target.value)} placeholder="INV-…" autoComplete="off" />
-            <button className="learn-primary" disabled={busy} onClick={() => void redeem()}>{busy ? t("正在激活…", "Activating…") : t("确认激活", "Activate")}</button>
-            {error && <p className="learn-error" role="alert">{error}</p>}
+            <p>{t("输入总管理员发放的产品激活码。激活成功后即可打开学习工作台。", "Enter a product activation code issued by the owner to open the learning workspace.")}</p>
+            <form onSubmit={(event) => void redeem(event)}>
+              <label htmlFor="learn-activation-code">{t("产品激活码", "Product activation code")}</label>
+              <input id="learn-activation-code" required minLength={8} maxLength={100} disabled={busy} value={activationCode} onChange={(e) => setActivationCode(e.target.value.toUpperCase())} placeholder="ACT-…" autoComplete="off" aria-describedby={error ? "learn-activation-error" : undefined} />
+              <button className="learn-primary" disabled={busy}>{busy ? t("正在激活…", "Activating…") : t("确认激活", "Activate")}</button>
+              <p id="learn-activation-error" className="learn-error" role="alert">{error}</p>
+            </form>
           </section>
         </div>
+      )}
+      {loginOpen && (
+        <LoginPage
+          overlay
+          onClose={() => setLoginOpen(false)}
+          returnTo={assetUrl("/products/learn-everything/")}
+        />
       )}
     </main>
   );

@@ -1,12 +1,16 @@
 import { useEffect } from "react";
 
-export function useDialogFocus(open: boolean, close: () => void) {
+export function useDialogFocus(
+  open: boolean,
+  close: () => void,
+  panelSelector = ".dash-modal",
+) {
   useEffect(() => {
     if (!open) return;
     const previous = document.activeElement as HTMLElement | null;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const panel = document.querySelector<HTMLElement>(".dash-modal");
+    const panel = document.querySelector<HTMLElement>(panelSelector);
     const selector =
       "button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled)";
     panel?.querySelector<HTMLElement>(selector)?.focus();
@@ -36,5 +40,5 @@ export function useDialogFocus(open: boolean, close: () => void) {
       window.removeEventListener("keydown", keydown);
       previous?.focus();
     };
-  }, [open, close]);
+  }, [open, close, panelSelector]);
 }

@@ -54,6 +54,17 @@ def test_auth_owner_and_ordinary_privileges(setup):
     assert 'phone_hash' not in str(c.get('/api/v1/console/admin/users', headers=header(sessions[0])).json())
 
 
+def test_community_role_follows_official_role_and_downgrade(setup, monkeypatch):
+    app, w, sessions, ids = setup
+    owner, _, admin, _ = ids
+    w.change_role(owner, admin, RoleChange(role='ADMIN', productIds=['lammps']))
+    monkeypatch.setenv('COMMUNITY_ADMIN_USER_IDS', admin)
+    client = TestClient(app)
+    assert client.get('/api/v1/community/me', headers=header(sessions[2])).json()['role'] == 'ADMIN'
+    w.change_role(owner, admin, RoleChange(role='USER'))
+    assert client.get('/api/v1/community/me', headers=header(sessions[2])).json()['role'] is None
+
+
 def test_wallet_idempotency_nonnegative_and_audit(setup):
     _, w, _, ids = setup
     owner, user, *_ = ids
@@ -73,15 +84,18 @@ def test_wallet_idempotency_nonnegative_and_audit(setup):
         assert c.execute("SELECT COUNT(*) FROM official_audit WHERE action='CREDITS_ADJUSTED'").fetchone()[0] == 1
 
 
-def test_md_exp_activation_code_grants_dsh_qualification(setup):
+def test_md_exp_activation_code_grants_canonical_entitlement(setup):
     _, w, _, ids = setup
     owner, user, *_ = ids
-    code = w.create_batch(owner, BatchCreate(label='MD EXP dsh资格', quantity=1, productId='md-exp'))['codes'][0]
+    code = w.create_batch(owner, BatchCreate(label='MD EXP dsh资格', quantity=1, productId='md-exp', units=1))['codes'][0]
     result = w.redeem(user, Redeem(code=code))
     assert result['productId'] == 'md-exp'
     with w.db.connect() as c:
         qualification = c.execute('SELECT product_id FROM official_md_agent_qualifications WHERE user_id=?', (user,)).fetchone()
-    assert qualification['product_id'] == 'md-exp'
+        entitlement = c.execute('SELECT units,expires_at_ms FROM official_entitlements WHERE user_id=? AND product_id=?', (user, 'md-exp')).fetchone()
+    assert qualification is None
+    assert entitlement['units'] == 1
+    assert entitlement['expires_at_ms'] is None
 
 
 def test_learn_everything_entry_is_activation_gated(setup):

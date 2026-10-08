@@ -9,6 +9,14 @@ from ..errors import ApiError
 from ..http import Strict
 
 
+def active(c, uid: str, product: str, now: int) -> bool:
+    row = c.execute(
+        'SELECT units, expires_at_ms FROM official_entitlements WHERE user_id=? AND product_id=?',
+        (uid, product),
+    ).fetchone()
+    return bool(row and (row['units'] > 0 or (row['expires_at_ms'] or 0) > now))
+
+
 class Purchase(Strict):
     productId: str = Field(max_length=80)
     requestId: str = Field(min_length=8, max_length=80)

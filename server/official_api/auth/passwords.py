@@ -39,31 +39,6 @@ class Passwords:
         self.workspace = workspace
         self.db, self.auth = workspace.db, workspace.auth
         self.hash_slots = threading.BoundedSemaphore(2)
-        with self.db.connect() as c:
-            c.executescript("""
-                CREATE TABLE IF NOT EXISTS official_passwords (
-                    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                    password_hash TEXT NOT NULL,
-                    updated_at_ms INTEGER NOT NULL
-                );
-                CREATE TABLE IF NOT EXISTS official_password_challenges (
-                    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                    challenge_id TEXT NOT NULL UNIQUE,
-                    phone_hash TEXT NOT NULL,
-                    sms_created_at_ms INTEGER NOT NULL,
-                    expires_at_ms INTEGER NOT NULL
-                );
-                CREATE TABLE IF NOT EXISTS official_password_attempts (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    phone_hash TEXT NOT NULL,
-                    ip_hash TEXT NOT NULL,
-                    created_at_ms INTEGER NOT NULL
-                );
-                CREATE INDEX IF NOT EXISTS official_password_attempt_phone
-                    ON official_password_attempts(phone_hash, created_at_ms);
-                CREATE INDEX IF NOT EXISTS official_password_attempt_ip
-                    ON official_password_attempts(ip_hash, created_at_ms);
-            """)
 
     def derive(self, password, salt):
         if not self.hash_slots.acquire(blocking=False):

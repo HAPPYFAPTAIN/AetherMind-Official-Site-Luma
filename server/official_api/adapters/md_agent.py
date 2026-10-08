@@ -12,21 +12,14 @@ import httpx
 from cryptography.fernet import Fernet, InvalidToken
 from fastapi import APIRouter, Depends
 from ..errors import ApiError
+from ..products.entitlements import active
 
 
 def mount_md_agent(app, workspace, current_user):
     router = APIRouter(prefix="/api/v1/console/md-agent", tags=["md-agent-portal"])
     database = workspace.db
     binding_lock = threading.Lock()
-    with database.connect() as c:
-        c.executescript("""
-            CREATE TABLE IF NOT EXISTS official_md_agent_bindings (
-                user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                md_username TEXT NOT NULL UNIQUE,
-                token_ciphertext TEXT NOT NULL,
-                created_at_ms INTEGER NOT NULL
-            );
-        """)
+    # official_md_agent_bindings 表结构由 Database.migrate() 统一执行。
 
     def cipher() -> Fernet:
         secret = workspace.auth.settings.hash_secret
@@ -64,6 +57,14 @@ def mount_md_agent(app, workspace, current_user):
                 "SELECT product_id, invitation_code, created_at_ms FROM official_md_agent_qualifications WHERE user_id=? ORDER BY created_at_ms DESC",
                 (uid,),
             )]
+            for row in c.execute(
+                "SELECT product_id, NULL AS invitation_code, NULL AS created_at_ms FROM official_entitlements WHERE user_id=? AND product_id='md-exp'",
+                (uid,),
+            ):
+                if not any(item["product_id"] == row["product_id"] for item in qualifications):
+                    qualifications.append(dict(row))
+            if not active(c, uid, "md-exp", workspace.now()):
+                qualifications = []
             binding = c.execute(
                 "SELECT md_username, created_at_ms FROM official_md_agent_bindings WHERE user_id=?",
                 (uid,),
@@ -79,12 +80,11 @@ def mount_md_agent(app, workspace, current_user):
 
     def ensure_binding(uid: str):
         with database.connect() as c:
+            if not active(c, uid, "md-exp", workspace.now()):
+                raise ApiError(409, "MD_AGENT_QUALIFICATION_REQUIRED", "请先使用 ACT- 激活码获得产品资格")
             existing = c.execute("SELECT md_username FROM official_md_agent_bindings WHERE user_id=?", (uid,)).fetchone()
-            qualified = c.execute("SELECT 1 FROM official_md_agent_qualifications WHERE user_id=? LIMIT 1", (uid,)).fetchone()
         if existing:
             return existing["md_username"]
-        if not qualified:
-            raise ApiError(409, "MD_AGENT_QUALIFICATION_REQUIRED", "请先使用对应邀请码获得产品资格")
         if not admin_token():
             raise ApiError(503, "MD_AGENT_BINDING_CONFIG_MISSING", "MD-Agent 绑定服务尚未配置")
         with binding_lock:
@@ -124,6 +124,9 @@ def mount_md_agent(app, workspace, current_user):
 
     @router.post("/enter")
     def enter(uid: str = Depends(current_user)):
+        with database.connect() as c:
+            if not active(c, uid, "md-exp", workspace.now()):
+                raise ApiError(409, "MD_AGENT_QUALIFICATION_REQUIRED", "请先使用 ACT- 激活码获得产品资格")
         with database.connect() as c:
             binding = c.execute("SELECT token_ciphertext FROM official_md_agent_bindings WHERE user_id=?", (uid,)).fetchone()
         if not binding:

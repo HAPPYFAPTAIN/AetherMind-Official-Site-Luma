@@ -39,6 +39,7 @@ def products(c):
 
 def edit_product(w, actor, pid, data):
     from ..admin.roles import require, audit
+    from ..billing.rates import RateEdit, set_rate
     url = urlsplit(data.entryUrl)
     if data.entryUrl and not ((data.entryUrl.startswith('/official/') and not url.netloc and not url.scheme) or (url.scheme == 'https' and url.hostname and not url.username and not url.password)):
         raise ApiError(400, 'INVALID_ENTRY_URL', '入口须为 HTTPS 网址或本站 /official/ 路径')
@@ -49,5 +50,7 @@ def edit_product(w, actor, pid, data):
         require(c, actor, owner=True)
         if not c.execute('UPDATE official_products SET name=?,name_en=?,description=?,entry_url=?,status=?,price=?,package_units=?,package_days=?,unit_point_cost=? WHERE id=?', (data.name.strip(), data.nameEn.strip(), data.description.strip(), data.entryUrl, data.status, data.price, data.packageUnits, data.packageDays, data.unitPointCost, pid)).rowcount:
             raise ApiError(404, 'PRODUCT_NOT_FOUND', '产品不存在')
+        # 产品目录仍是单价的事实来源；同步费率表供统一计量使用。
+        set_rate(w, c, RateEdit(scope='product-unit', key=pid, pointsPerUnit=data.unitPointCost), actor)
         audit(w, c, actor, pid, 'PRODUCT_UPDATED', data.model_dump())
         return {'updated': True}

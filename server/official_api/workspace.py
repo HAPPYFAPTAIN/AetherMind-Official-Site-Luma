@@ -6,13 +6,13 @@ from __future__ import annotations
 
 import time
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
 from .admin import roles as _roles
 from .admin.roles import RoleChange
 from .billing import usage as _usage, wallet as _wallet
 from .billing.usage import Usage
-from .billing.wallet import DAY, MAX_BALANCE, CreditChange, fingerprint
+from .billing.wallet import DAY, MAX_BALANCE, ChargeResult, CreditChange, UsageEvent, fingerprint
+from .crypto import random_id
 from .http import Strict
 from .products import catalog as _catalog, codes as _codes, entitlements as _entitlements
 from .products.catalog import CATALOG, ProductEdit
@@ -23,7 +23,8 @@ TZ = timezone(timedelta(hours=8))
 
 __all__ = [
     'CATALOG', 'DAY', 'MAX_BALANCE', 'TZ', 'Strict', 'fingerprint', 'Workspace', 'mount_workspace',
-    'BatchCreate', 'CreditChange', 'ProductEdit', 'Purchase', 'Redeem', 'RoleChange', 'Usage',
+    'BatchCreate', 'ChargeResult', 'CreditChange', 'ProductEdit', 'Purchase', 'Redeem', 'RoleChange', 'Usage',
+    'UsageEvent',
 ]
 
 
@@ -33,11 +34,15 @@ class Workspace:
         self.now = lambda: int(time.time() * 1000)
 
     def initialize(self):
+        # 表结构由 Database.migrate() 统一执行（db/migrations/），这里只负责产品目录种子数据。
         with self.db.connect() as c:
-            c.executescript(Path(__file__).with_name('schema.sql').read_text())
             for pid, name, en, desc, image in CATALOG:
                 c.execute('INSERT OR IGNORE INTO official_products(id,name,name_en,description,image) VALUES(?,?,?,?,?)',
                           (pid, name, en, desc, f'/assets/products/{image}.png'))
+                c.execute(
+                    "INSERT OR IGNORE INTO official_rates(id,scope,key,points_per_unit,updated_at_ms) VALUES(?,?,?,?,?)",
+                    (random_id(), 'product-unit', pid, 0, self.now()),
+                )
             c.execute("UPDATE official_products SET entry_url=? WHERE id=? AND (entry_url='' OR entry_url IS NULL)",
                       ('/official/products/learn-everything/', 'learn-everything'))
 
@@ -69,6 +74,10 @@ class Workspace:
 
     def adjust_credits(self, actor, target, data):
         return _wallet.adjust_credits(self, actor, target, data)
+
+    def charge(self, c, *, user_id, product_id, event_id, usage, reason=None, actor=None, allow_clamp=False):
+        return _wallet.charge(self, c, user_id=user_id, product_id=product_id, event_id=event_id,
+                              usage=usage, reason=reason, actor=actor, allow_clamp=allow_clamp)
 
     # --- 产品目录与权益（products） ---
     def products(self, c):

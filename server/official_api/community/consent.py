@@ -28,41 +28,9 @@ class InviteCreate(BaseModel):
     productId: Optional[str] = Field(default=None, max_length=80)
 
 def mount_community_auth(router, database, service, current_user, role_for):
-    with database.connect() as connection:
-        connection.executescript("""
-            CREATE TABLE IF NOT EXISTS community_invitations (
-                code TEXT PRIMARY KEY,
-                label TEXT NOT NULL,
-                created_by TEXT REFERENCES users(id) ON DELETE SET NULL,
-                created_at_ms INTEGER NOT NULL,
-                expires_at_ms INTEGER NOT NULL,
-                revoked_at_ms INTEGER
-            );
-            CREATE TABLE IF NOT EXISTS community_invitation_members (
-                user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                code TEXT NOT NULL REFERENCES community_invitations(code),
-                joined_at_ms INTEGER NOT NULL
-            );
-            CREATE TABLE IF NOT EXISTS community_consents (
-                user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                version TEXT NOT NULL,
-                accepted_at_ms INTEGER NOT NULL,
-                PRIMARY KEY(user_id,version)
-            );
-            CREATE TABLE IF NOT EXISTS official_md_agent_qualifications (
-                user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                product_id TEXT NOT NULL,
-                invitation_code TEXT NOT NULL REFERENCES community_invitations(code),
-                created_at_ms INTEGER NOT NULL,
-                PRIMARY KEY(user_id, product_id)
-            );
-        """)
-        columns = {row[1] for row in connection.execute("PRAGMA table_info(community_invitations)").fetchall()}
-        if "product_id" not in columns:
-            connection.execute("ALTER TABLE community_invitations ADD COLUMN product_id TEXT")
-
+    # 表结构由 Database.migrate() 统一执行（db/migrations/0001_baseline.sql）。
     def require_admin(user_id):
-        if role_for(user_id) != "ADMIN":
+        if role_for(user_id) not in {"ADMIN", "OWNER"}:
             raise ApiError(403,"COMMUNITY_ADMIN_REQUIRED","需要社区管理员权限")
 
     def require_invitation(connection,code,now):
@@ -94,11 +62,6 @@ def mount_community_auth(router, database, service, current_user, role_for):
                     if existing and existing["code"] != invite:
                         raise ApiError(409,"INVITATION_ALREADY_LINKED","此账号已经关联其他邀请码，请留空登录")
                     connection.execute("INSERT OR IGNORE INTO community_invitation_members VALUES(?,?,?)",(user_id,invite,now))
-                    if invitation["product_id"]:
-                        connection.execute(
-                            "INSERT OR IGNORE INTO official_md_agent_qualifications VALUES(?,?,?,?)",
-                            (user_id, invitation["product_id"], invite, now),
-                        )
                 connection.execute("INSERT OR IGNORE INTO community_consents VALUES(?,?,?)",(user_id,TERMS_VERSION,now))
         except Exception:
             service.logout(session["accessToken"])
@@ -108,16 +71,15 @@ def mount_community_auth(router, database, service, current_user, role_for):
     @router.post("/admin/invitations",status_code=201)
     def create(body:InviteCreate,user_id:str=Depends(current_user)):
         require_admin(user_id)
+        if body.productId:
+            raise ApiError(400, "COMMUNITY_INVITE_PRODUCT_FORBIDDEN", "社区邀请码不再授予产品，请使用 ACT- 激活码")
         now=int(time.time()*1000)
         code=secrets.token_hex(6).upper()
         expires=now+body.validDays*86400000
-        product_id = (body.productId or "").strip().lower() or None
-        if product_id and not re.fullmatch(r"[a-z0-9][a-z0-9_-]{0,79}", product_id):
-            raise ApiError(400,"INVALID_PRODUCT_ID","产品标识格式不正确")
         with database.connect() as connection:
             connection.execute("INSERT INTO community_invitations(code,label,created_by,created_at_ms,expires_at_ms,product_id) VALUES(?,?,?,?,?,?)",
-                               (code,body.label.strip(),user_id,now,expires,product_id))
-        return {"code":code,"label":body.label.strip(),"productId":product_id,"expiresAtEpochMs":expires}
+                               (code,body.label.strip(),user_id,now,expires,None))
+        return {"code":code,"label":body.label.strip(),"expiresAtEpochMs":expires}
 
     @router.get("/admin/invitations")
     def invitations(user_id:str=Depends(current_user)):

@@ -10,6 +10,7 @@ from urllib.parse import parse_qs, quote, urlsplit
 
 from fastapi import APIRouter, Depends, Request, Response
 from ..errors import ApiError
+from ..products.entitlements import active as has_active_entitlement
 
 
 PRODUCT_ID = "learn-everything"
@@ -41,11 +42,7 @@ def mount_learn_everything(app, workspace, current_user):
     def active(uid: str) -> bool:
         now = workspace.now()
         with workspace.db.connect() as connection:
-            row = connection.execute(
-                "SELECT units, expires_at_ms FROM official_entitlements WHERE user_id=? AND product_id=?",
-                (uid, PRODUCT_ID),
-            ).fetchone()
-        return bool(row and (row["units"] > 0 or (row["expires_at_ms"] or 0) > now))
+            return has_active_entitlement(connection, uid, PRODUCT_ID, now)
 
     def make_ticket(uid: str) -> tuple[str, int]:
         expires = workspace.now() + TICKET_TTL_MS

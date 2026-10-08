@@ -37,13 +37,23 @@ type ProductKey = {
   suffix: string;
   revoked_at_ms: number | null;
 };
-type Invitation = {
-  code: string;
-  label: string;
-  product_id: string | null;
-  uses: number;
-  expires_at_ms: number;
-  revoked_at_ms: number | null;
+type Rate = {
+  id: string;
+  scope: "product-unit" | "llm-model" | "hpc-core-minute";
+  key: string;
+  points_per_unit: number;
+  points_per_mtok_input: number;
+  points_per_mtok_cached: number;
+  points_per_mtok_output: number;
+  updated_at_ms: number;
+  updated_by: string;
+};
+type LlmModel = {
+  model: string;
+  provider: string;
+  upstream_model: string;
+  enabled: number;
+  updated_at_ms: number;
 };
 const date = (n: number) =>
   new Date(n).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
@@ -71,7 +81,8 @@ export function AdminPanel({
   const [batches, setBatches] = useState<Batch[]>([]);
   const [audits, setAudits] = useState<Audit[]>([]);
   const [keys, setKeys] = useState<ProductKey[]>([]);
-  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [rates, setRates] = useState<Rate[]>([]);
+  const [models, setModels] = useState<LlmModel[]>([]);
   const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(false);
   const [asOf, setAsOf] = useState(0);
@@ -100,10 +111,27 @@ export function AdminPanel({
   });
   const [editProduct, setEditProduct] = useState<AccountProduct | null>(null);
   const [newKey, setNewKey] = useState("");
-  const [inviteLabel, setInviteLabel] = useState("");
-  const [inviteProduct, setInviteProduct] = useState("md-exp");
-  const [inviteDays, setInviteDays] = useState(30);
-  const [newInvitation, setNewInvitation] = useState("");
+  const [rateDraft, setRateDraft] = useState<{
+    scope: Rate["scope"];
+    key: string;
+    pointsPerUnit: string;
+    pointsPerMtokInput: string;
+    pointsPerMtokCached: string;
+    pointsPerMtokOutput: string;
+  }>({
+    scope: "product-unit",
+    key: "",
+    pointsPerUnit: "0",
+    pointsPerMtokInput: "100000",
+    pointsPerMtokCached: "100000",
+    pointsPerMtokOutput: "100000",
+  });
+  const [modelDraft, setModelDraft] = useState({
+    model: "",
+    provider: "",
+    upstreamModel: "",
+    enabled: true,
+  });
   const [confirmRevoke, setConfirmRevoke] = useState<{
     type: "batches" | "keys";
     id: string;
@@ -148,9 +176,12 @@ export function AdminPanel({
         } else if (section === "products" && owner) {
           const r = await accountApi<{ items: ProductKey[] }>("/admin/keys");
           if (active) setKeys(r.items);
-        } else if (section === "invitations" && owner) {
-          const r = await accountApi<{ items: Invitation[] }>("/api/v1/community/admin/invitations");
-          if (active) setInvitations(r.items);
+        } else if (section === "rates" && owner) {
+          const r = await accountApi<{ items: Rate[] }>("/admin/rates");
+          if (active) setRates(r.items);
+        } else if (section === "models" && owner) {
+          const r = await accountApi<{ items: LlmModel[] }>("/admin/models");
+          if (active) setModels(r.items);
         }
       } catch (e) {
         if (active) setError(e instanceof Error ? e.message : String(e));
@@ -278,16 +309,46 @@ export function AdminPanel({
       t("产品配置已保存。", "Product settings saved."),
     );
   }
-  function createInvitation(e: FormEvent) {
+  function saveRate(e: FormEvent) {
     e.preventDefault();
-    void run(async () => {
-      const r = await accountApi<{ code: string }>("/api/v1/community/admin/invitations", {
-        method: "POST",
-        body: JSON.stringify({ label: inviteLabel, productId: inviteProduct, validDays: inviteDays }),
-      });
-      setNewInvitation(r.code);
-      setInviteLabel("");
-    }, t("产品邀请码已生成。请立即复制保存。", "Product invitation created. Copy it now."));
+    if (!rateDraft.key.trim()) return;
+    void run(
+      async () => {
+        await accountApi("/admin/rates", {
+          method: "PUT",
+          body: JSON.stringify({
+            scope: rateDraft.scope,
+            key: rateDraft.key.trim(),
+            pointsPerUnit: Number(rateDraft.pointsPerUnit) || 0,
+            pointsPerMtokInput: Number(rateDraft.pointsPerMtokInput) || 0,
+            pointsPerMtokCached: Number(rateDraft.pointsPerMtokCached) || 0,
+            pointsPerMtokOutput: Number(rateDraft.pointsPerMtokOutput) || 0,
+          }),
+        });
+        setRateDraft({ ...rateDraft, key: "" });
+      },
+      t("费率已保存。", "Rate saved."),
+    );
+  }
+
+  function saveModel(e: FormEvent) {
+    e.preventDefault();
+    if (!modelDraft.model.trim() || !modelDraft.provider.trim() || !modelDraft.upstreamModel.trim()) return;
+    void run(
+      async () => {
+        await accountApi("/admin/models", {
+          method: "PUT",
+          body: JSON.stringify({
+            model: modelDraft.model.trim(),
+            provider: modelDraft.provider.trim(),
+            upstreamModel: modelDraft.upstreamModel.trim(),
+            enabled: modelDraft.enabled,
+          }),
+        });
+        setModelDraft({ model: "", provider: "", upstreamModel: "", enabled: true });
+      },
+      t("模型配置已保存。", "Model configuration saved."),
+    );
   }
 
   return (
@@ -323,8 +384,9 @@ export function AdminPanel({
         {[
           ["users", t("用户管理", "Users")],
           ["codes", t("激活码", "Activation codes")],
-          ...(owner ? [["invitations", t("产品邀请码", "Product invites")]] : []),
           ...(owner ? [["products", t("产品配置", "Product settings")]] : []),
+          ...(owner ? [["models", t("模型配置", "Model routing")]] : []),
+          ...(owner ? [["rates", t("计费费率", "Usage rates")]] : []),
           ["audit", t("操作记录", "Audit log")],
         ].map(([value, name]) => (
           <button
@@ -875,20 +937,85 @@ export function AdminPanel({
           </section>
         </>
       )}
-      {section === "invitations" && owner && (
-        <>
-          <section className="dash-panel">
-            <div className="dash-panel-title"><h3>{t("生成产品邀请码", "Generate product invites")}</h3><span>{t("登录时解锁产品资格", "Unlock product qualification at sign-in")}</span></div>
-            <form className="dash-admin-form" onSubmit={createInvitation}>
-              <label>{t("用途说明", "Label")}<input required maxLength={80} value={inviteLabel} onChange={(e) => setInviteLabel(e.target.value)} placeholder={t("例如：MD EXP 首批用户", "e.g. MD EXP early users")} /></label>
-              <label>{t("产品", "Product")}<select value={inviteProduct} onChange={(e) => setInviteProduct(e.target.value)}><option value="md-exp">MD EXP</option><option value="gromacs">GROMACS</option><option value="dft">DFT</option><option value="materials">{t("材料分析智能体", "Materials analysis")}</option></select></label>
-              <label>{t("有效天数", "Valid days")}<input type="number" min={1} max={365} value={inviteDays} onChange={(e) => setInviteDays(Number(e.target.value))} /></label>
-              <button className="dash-primary" disabled={busy}>{t("生成邀请码", "Generate invite")}</button>
-            </form>
-            {newInvitation && <div className="dash-code-result"><strong>{t("新邀请码（仅显示一次）", "New invite (shown once)")}</strong><input readOnly value={newInvitation} onFocus={(e) => e.target.select()} /><button className="dash-quiet-button" onClick={() => setNewInvitation("")}>{t("已保存，关闭", "Saved, close")}</button></div>}
-          </section>
-          <section className="dash-panel"><div className="dash-panel-title"><h3>{t("产品邀请码记录", "Product invitation history")}</h3></div><div className="dash-table-wrap"><table><thead><tr><th>{t("邀请码", "Code")}</th><th>{t("产品", "Product")}</th><th>{t("使用次数", "Uses")}</th><th>{t("截止时间", "Expiry")}</th><th>{t("状态", "Status")}</th></tr></thead><tbody>{invitations.map((item) => <tr key={item.code}><td><strong>{item.code}</strong><small>{item.label}</small></td><td>{item.product_id || "—"}</td><td>{item.uses}</td><td>{date(item.expires_at_ms)}</td><td>{item.revoked_at_ms ? t("已撤销", "Revoked") : t("有效", "Active")}</td></tr>)}</tbody></table>{!invitations.length && <p className="dash-empty-inline">{t("暂无产品邀请码。", "No product invites yet.")}</p>}</div></section>
-        </>
+      {section === "models" && owner && (
+        <section className="dash-panel">
+          <div className="dash-panel-title">
+            <h3>{t("模型路由", "Model routing")}</h3>
+            <span>{t("配置产品服务使用的供应商与上游模型", "Configure providers and upstream model IDs")}</span>
+          </div>
+          <form className="dash-admin-form" onSubmit={saveModel}>
+            <label>
+              {t("内部模型名", "Public model")}
+              <input required maxLength={120} value={modelDraft.model} onChange={(e) => setModelDraft({ ...modelDraft, model: e.target.value })} placeholder="kimi-k2.7" />
+            </label>
+            <label>
+              {t("供应商", "Provider")}
+              <input required maxLength={80} value={modelDraft.provider} onChange={(e) => setModelDraft({ ...modelDraft, provider: e.target.value })} placeholder="kimi" />
+            </label>
+            <label>
+              {t("上游模型 ID", "Upstream model ID")}
+              <input required maxLength={120} value={modelDraft.upstreamModel} onChange={(e) => setModelDraft({ ...modelDraft, upstreamModel: e.target.value })} placeholder="kimi-k2.7-code-highspeed" />
+            </label>
+            <label className="dash-check">
+              <input type="checkbox" checked={modelDraft.enabled} onChange={(e) => setModelDraft({ ...modelDraft, enabled: e.target.checked })} />
+              {t("启用此路由", "Enable route")}
+            </label>
+            <button className="dash-primary" disabled={busy}>{t("保存模型", "Save model")}</button>
+          </form>
+          <div className="dash-table-wrap">
+            <table>
+              <thead><tr><th>{t("模型", "Model")}</th><th>{t("供应商", "Provider")}</th><th>{t("上游模型", "Upstream")}</th><th>{t("状态", "Status")}</th><th>{t("更新时间", "Updated")}</th></tr></thead>
+              <tbody>
+                {models.map((item) => (
+                  <tr key={item.model}>
+                    <td><strong>{item.model}</strong></td><td>{item.provider}</td><td>{item.upstream_model}</td>
+                    <td>{item.enabled ? t("启用", "Enabled") : t("停用", "Disabled")}</td><td>{date(item.updated_at_ms)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!models.length && !loading && <p className="dash-empty-inline">{t("暂无模型路由。", "No model routes configured.")}</p>}
+          </div>
+        </section>
+      )}
+      {section === "rates" && owner && (
+        <section className="dash-panel">
+          <div className="dash-panel-title">
+            <h3>{t("计费费率", "Usage rates")}</h3>
+            <span>{t("LLM 按每 10 token 计 1 分（每笔总量向上取整），HPC 按每 10 核分钟计 1 分；页面按每百万 token 填写", "LLM: 1 credit per 10 tokens (each event rounds up); HPC: 1 credit per 10 core-minutes. Token fields are per million tokens.")}</span>
+          </div>
+          <form className="dash-admin-form" onSubmit={saveRate}>
+            <label>
+              {t("费率范围", "Scope")}
+              <select value={rateDraft.scope} onChange={(e) => setRateDraft({ ...rateDraft, scope: e.target.value as Rate["scope"] })}>
+                <option value="product-unit">product-unit</option><option value="llm-model">llm-model</option><option value="hpc-core-minute">hpc-core-minute</option>
+              </select>
+            </label>
+            <label>
+              {t("计费键", "Key")}
+              <input required maxLength={120} value={rateDraft.key} onChange={(e) => setRateDraft({ ...rateDraft, key: e.target.value })} placeholder={rateDraft.scope === "llm-model" ? "kimi-k2.7" : "md-exp"} />
+            </label>
+            <label>{t("每单位积分", "Points / unit")}<input type="number" min={0} max={1000000000} value={rateDraft.pointsPerUnit} onChange={(e) => setRateDraft({ ...rateDraft, pointsPerUnit: e.target.value })} /></label>
+            <label>{t("输入积分 / 百万 token（默认 100000）", "Input points / MTok (default 100000)")}<input type="number" min={0} max={1000000000} value={rateDraft.pointsPerMtokInput} onChange={(e) => setRateDraft({ ...rateDraft, pointsPerMtokInput: e.target.value })} /></label>
+            <label>{t("缓存积分 / 百万 token（默认 100000）", "Cached points / MTok (default 100000)")}<input type="number" min={0} max={1000000000} value={rateDraft.pointsPerMtokCached} onChange={(e) => setRateDraft({ ...rateDraft, pointsPerMtokCached: e.target.value })} /></label>
+            <label>{t("输出积分 / 百万 token（默认 100000）", "Output points / MTok (default 100000)")}<input type="number" min={0} max={1000000000} value={rateDraft.pointsPerMtokOutput} onChange={(e) => setRateDraft({ ...rateDraft, pointsPerMtokOutput: e.target.value })} /></label>
+            <button className="dash-primary" disabled={busy}>{t("保存费率", "Save rate")}</button>
+          </form>
+          <div className="dash-table-wrap">
+            <table>
+              <thead><tr><th>{t("范围", "Scope")}</th><th>{t("键", "Key")}</th><th>{t("单位（HPC 为每 10 核分钟）", "Unit (HPC = per 10 core-minutes)")}</th><th>{t("输入 / 缓存 / 输出（每百万 token）", "Input / cached / output (per million tokens)")}</th><th>{t("更新时间", "Updated")}</th></tr></thead>
+              <tbody>
+                {rates.map((item) => (
+                  <tr key={`${item.scope}:${item.key}`}>
+                    <td>{item.scope}</td><td><strong>{item.key}</strong></td><td>{item.points_per_unit}</td>
+                    <td>{item.points_per_mtok_input} / {item.points_per_mtok_cached} / {item.points_per_mtok_output}</td><td>{date(item.updated_at_ms)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!rates.length && !loading && <p className="dash-empty-inline">{t("暂无费率。", "No rates configured.")}</p>}
+          </div>
+        </section>
       )}
       {section === "audit" && (
         <section className="dash-panel">

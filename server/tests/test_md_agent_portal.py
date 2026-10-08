@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 from official_api.config import Settings
 from official_api.community.consent import TERMS_VERSION
 from official_api.app import create_app
+from official_api.workspace import BatchCreate, Redeem
 
 
 class Sms:
@@ -36,29 +37,49 @@ def login(client, sms, phone):
     return result.json()
 
 
-def test_product_invitation_grants_qualification_without_fake_entry(tmp_path, monkeypatch):
+def test_community_invitation_is_not_a_product_grant_and_act_is_canonical(tmp_path):
     client, sms = build(tmp_path)
     owner = login(client, sms, "13900000001")
-    monkeypatch.setenv("COMMUNITY_ADMIN_USER_IDS", owner["profile"]["userId"])
+    client.app.state.workspace.bootstrap_owner("13900000001")
     admin_headers = {"Authorization": "Bearer " + owner["accessToken"]}
     created = client.post("/api/v1/community/admin/invitations", headers=admin_headers, json={
         "label": "MD EXP 首批用户", "validDays": 30, "productId": "md-exp",
     })
+    assert created.status_code == 400
+    assert created.json()["error"]["code"] == "COMMUNITY_INVITE_PRODUCT_FORBIDDEN"
+    created = client.post("/api/v1/community/admin/invitations", headers=admin_headers, json={
+        "label": "社区测试组", "validDays": 30,
+    })
     assert created.status_code == 201
-    code = created.json()["code"]
+    assert "productId" not in created.json()
+    community_code = created.json()["code"]
     phone = "13900000002"
     assert client.post("/api/v1/auth/sms/request", json={"phone": phone}).status_code == 204
     result = client.post("/api/v1/community/auth/sms/verify", json={
-        "phone": phone, "code": "123456", "inviteCode": code,
+        "phone": phone, "code": "123456", "inviteCode": community_code,
         "acceptedTerms": True, "termsVersion": TERMS_VERSION,
     })
     assert result.status_code == 200
     headers = {"Authorization": "Bearer " + result.json()["accessToken"]}
     state = client.get("/api/v1/console/md-agent/profile", headers=headers)
     assert state.status_code == 200
-    assert state.json()["qualifications"][0]["product_id"] == "md-exp"
+    assert state.json()["qualifications"] == []
     assert state.json()["accountBinding"] == "unbound"
     assert client.post("/api/v1/console/md-agent/enter", headers=headers).status_code == 409
+
+    batch = client.app.state.workspace.create_batch(
+        owner["profile"]["userId"],
+        BatchCreate(label="MD EXP ACT", quantity=1, productId="md-exp", units=1),
+    )
+    redeem = client.post("/api/v1/console/redeem", headers=headers, json={"code": batch["codes"][0]})
+    assert redeem.status_code == 200
+    state = client.get("/api/v1/console/md-agent/profile", headers=headers)
+    assert state.status_code == 200
+    assert [item["product_id"] for item in state.json()["qualifications"]] == ["md-exp"]
+    with client.app.state.workspace.db.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM official_md_agent_qualifications WHERE user_id=?", (result.json()["profile"]["userId"],)).fetchone()[0] == 0
+        entitlement = db.execute("SELECT units,expires_at_ms FROM official_entitlements WHERE user_id=? AND product_id='md-exp'", (result.json()["profile"]["userId"],)).fetchone()
+        assert entitlement["units"] == 1
 
 
 def test_md_agent_profile_requires_official_session(tmp_path):
@@ -70,15 +91,12 @@ def test_binding_creates_private_account_and_rewrites_entry_url(tmp_path, monkey
     client, sms = build(tmp_path)
     owner = login(client, sms, "13900000001")
     uid = owner["profile"]["userId"]
-    with client.app.state.workspace.db.connect() as db:
-        db.execute(
-            "INSERT INTO community_invitations(code,label,created_at_ms,expires_at_ms,product_id) VALUES(?,?,?,?,?)",
-            ("ABCDEF123456", "test", client.app.state.workspace.now(), client.app.state.workspace.now() + 100000, "md-exp"),
-        )
-        db.execute(
-            "INSERT INTO official_md_agent_qualifications VALUES(?,?,?,?)",
-            (uid, "md-exp", "ABCDEF123456", client.app.state.workspace.now()),
-        )
+    client.app.state.workspace.bootstrap_owner("13900000001")
+    batch = client.app.state.workspace.create_batch(
+        uid,
+        BatchCreate(label="MD EXP ACT", quantity=1, productId="md-exp", units=1),
+    )
+    assert client.app.state.workspace.redeem(uid, Redeem(code=batch["codes"][0]))["productId"] == "md-exp"
     monkeypatch.setenv("MDAGENT_ADMIN_TOKEN", "server-only-test-token")
     calls = []
 
@@ -114,3 +132,23 @@ def test_binding_creates_private_account_and_rewrites_entry_url(tmp_path, monkey
     with client.app.state.workspace.db.connect() as db:
         stored = db.execute("SELECT token_ciphertext FROM official_md_agent_bindings WHERE user_id=?", (uid,)).fetchone()[0]
         assert "mda_private_test_token" not in stored
+
+
+def test_existing_md_agent_binding_is_rejected_after_entitlement_expiry(tmp_path, monkeypatch):
+    client, sms = build(tmp_path)
+    owner = login(client, sms, "13900000001")
+    uid = owner["profile"]["userId"]
+    client.app.state.workspace.bootstrap_owner("13900000001")
+    batch = client.app.state.workspace.create_batch(
+        uid,
+        BatchCreate(label="MD EXP ACT", quantity=1, productId="md-exp", units=1),
+    )
+    client.app.state.workspace.redeem(uid, Redeem(code=batch["codes"][0]))
+    with client.app.state.workspace.db.connect() as db:
+        db.execute("INSERT INTO official_md_agent_bindings VALUES(?,?,?,?)", (uid, "bound-user", "ciphertext", client.app.state.workspace.now()))
+        db.execute("UPDATE official_entitlements SET units=0, expires_at_ms=NULL WHERE user_id=? AND product_id='md-exp'", (uid,))
+    monkeypatch.setenv("MDAGENT_ADMIN_TOKEN", "server-only-test-token")
+    headers = {"Authorization": "Bearer " + owner["accessToken"]}
+    assert client.post("/api/v1/console/md-agent/bind", headers=headers).status_code == 409
+    entry = client.post("/api/v1/console/md-agent/enter", headers=headers)
+    assert entry.status_code == 409

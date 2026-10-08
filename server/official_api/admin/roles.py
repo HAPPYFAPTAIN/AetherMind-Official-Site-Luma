@@ -52,7 +52,6 @@ def bootstrap_owner(w, phone):
             raise ValueError('A different owner already exists; refusing replacement.')
         if not existing:
             c.execute('INSERT INTO official_roles VALUES(?,?,?) ON CONFLICT(user_id) DO UPDATE SET role=excluded.role,updated_at_ms=excluded.updated_at_ms', (uid, 'OWNER', w.now()))
-            c.execute("INSERT OR REPLACE INTO community_admins VALUES(?,'ADMIN',?)", (uid, w.now()))
             audit(w, c, uid, uid, 'OWNER_BOOTSTRAP', {'source': 'operator-authorized'})
         return uid
 

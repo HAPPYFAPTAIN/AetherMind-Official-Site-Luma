@@ -35,7 +35,7 @@ def batch_codes(w, actor, request_id, quantity):
 
 def create_batch(w, actor, data):
     from ..admin.roles import require, role, audit
-    if not (data.credits or data.units or data.days or data.productId == 'md-exp') or ((data.units or data.days) and not data.productId):
+    if not (data.credits or data.units or data.days) or ((data.units or data.days) and not data.productId):
         raise ApiError(400, 'INVALID_GRANT', '填写积分或指定产品权益')
     with w.db.connect() as c:
         c.execute('BEGIN IMMEDIATE')
@@ -96,16 +96,6 @@ def redeem(w, actor, data):
         credit(w, c, target, row['credits'], 'ACTIVATION', '激活码兑换 · ' + row['label'], actor,
                'redeem:' + code_hash, code_hash, row['product_id'])
         grant(w, c, target, row['product_id'], row['units'], row['days'])
-        if row['product_id'] == 'md-exp':
-            source = 'activation:' + code_hash
-            c.execute(
-                'INSERT OR IGNORE INTO community_invitations(code,label,created_by,created_at_ms,expires_at_ms,product_id) VALUES(?,?,?,?,?,?)',
-                (source, row['label'], actor, now, now + 3650 * DAY, 'md-exp'),
-            )
-            c.execute(
-                'INSERT OR IGNORE INTO official_md_agent_qualifications VALUES(?,?,?,?)',
-                (target, 'md-exp', source, now),
-            )
         c.execute('UPDATE official_codes SET redeemed_by=?,redeemed_for=?,redeemed_at_ms=? WHERE code_hash=?', (actor, target, now, code_hash))
         audit(w, c, actor, target, 'CODE_REDEEMED', {'batchId': row['id'], 'credits': row['credits'], 'productId': row['product_id'], 'units': row['units'], 'days': row['days']})
         return {'balance': balance(c, target), 'credits': row['credits'], 'units': row['units'], 'days': row['days'], 'productId': row['product_id']}

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import math
 import sqlite3
+import time
+import fcntl
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -9,7 +11,11 @@ from ..branding import DEFAULT_PROFILE_DISPLAY_NAME
 from ..errors import ApiError
 
 
+# Keep SQLite's legacy user_version at the highest value understood by the
+# older production binary.  New migration progress is tracked exclusively in
+# schema_migrations so a rollback to that binary remains possible.
 SCHEMA_VERSION = 3
+MIGRATIONS_DIR = Path(__file__).with_name('migrations')
 
 class ClosingConnection(sqlite3.Connection):
     def __exit__(self, exc_type, exc_value, traceback):
@@ -32,134 +38,108 @@ class Database:
 
     def initialize(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.connect() as connection:
-            current_version = connection.execute("PRAGMA user_version").fetchone()[0]
-            if current_version not in (0, 1, 2, SCHEMA_VERSION):
-                raise RuntimeError(f"unsupported database schema {current_version}")
-            connection.execute("PRAGMA journal_mode = WAL")
-            connection.execute("PRAGMA synchronous = NORMAL")
-            connection.executescript(
+        # journal_mode changes require exclusive access too: acquiring the
+        # process lock only inside migrate leaves two fresh startups racing on
+        # PRAGMA journal_mode before they reach the migration lock.
+        lock_path = self.path.with_name(self.path.name + '.migrate.lock')
+        with lock_path.open('a+') as lock:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            try:
+                with self.connect() as connection:
+                    connection.execute("PRAGMA journal_mode = WAL")
+                    connection.execute("PRAGMA synchronous = NORMAL")
+                    # Each migration commits separately so a later failure
+                    # cannot undo already committed history.
+                    connection.execute("BEGIN IMMEDIATE")
+                    try:
+                        current_version = connection.execute("PRAGMA user_version").fetchone()[0]
+                        if current_version < 0 or current_version > SCHEMA_VERSION:
+                            raise RuntimeError(f"unsupported database schema {current_version}")
+                        connection.commit()
+                        self._migrate_locked(connection)
+                        connection.execute("BEGIN IMMEDIATE")
+                        connection.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+                        connection.commit()
+                    except Exception:
+                        connection.rollback()
+                        raise
+            finally:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
+    def migrate(self, connection: sqlite3.Connection) -> None:
+        """按编号执行 migrations/ 下的 SQL 迁移；单个迁移与其记录同事务提交。"""
+        # The auth and gateway processes share this SQLite database and may
+        # start together. Serialize the migration runner outside SQLite so
+        # both processes cannot observe the same unapplied version.
+        lock_path = self.path.with_name(self.path.name + '.migrate.lock')
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with lock_path.open('a+') as lock:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            self._migrate_locked(connection)
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
+    def _migrate_locked(self, connection: sqlite3.Connection) -> None:
+        files = sorted(
+            (int(path.name.split('_', 1)[0]), path)
+            for path in MIGRATIONS_DIR.glob('[0-9][0-9][0-9][0-9]_*.sql')
+        )
+        if not files:
+            raise RuntimeError(f"no migrations found in {MIGRATIONS_DIR}")
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            connection.execute(
                 """
-                CREATE TABLE IF NOT EXISTS users (
-                    id TEXT PRIMARY KEY,
-                    phone_hash TEXT NOT NULL UNIQUE,
-                    phone_last4 TEXT NOT NULL CHECK(length(phone_last4) = 4),
-                    created_at_ms INTEGER NOT NULL,
-                    updated_at_ms INTEGER NOT NULL
-                );
-
-                CREATE TABLE IF NOT EXISTS profiles (
-                    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                    display_name TEXT NOT NULL,
-                    birth_date TEXT,
-                    city TEXT,
-                    occupation TEXT,
-                    bio TEXT,
-                    avatar_filename TEXT,
-                    github_url TEXT,
-                    twitter_url TEXT,
-                    updated_at_ms INTEGER NOT NULL
-                );
-
-                CREATE TABLE IF NOT EXISTS community_profiles (
-                    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                    city TEXT, bio TEXT, github_url TEXT, twitter_url TEXT,
-                    updated_at_ms INTEGER NOT NULL
-                );
-                CREATE TABLE IF NOT EXISTS community_posts (
-                    id TEXT PRIMARY KEY,
-                    author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                    title TEXT NOT NULL,
-                    body TEXT NOT NULL,
-                    category TEXT NOT NULL DEFAULT 'discussion',
-                    status TEXT NOT NULL CHECK(status IN ('OPEN', 'CLOSED', 'HIDDEN')),
-                    pinned INTEGER NOT NULL DEFAULT 0 CHECK(pinned IN (0, 1)),
-                    created_at_ms INTEGER NOT NULL,
-                    updated_at_ms INTEGER NOT NULL,
-                    closed_at_ms INTEGER,
-                    closed_by TEXT REFERENCES users(id) ON DELETE SET NULL,
-                    close_reason TEXT,
-                    accepted_reply_id TEXT
-                );
-                CREATE INDEX IF NOT EXISTS community_posts_feed_idx
-                    ON community_posts(status, pinned, updated_at_ms);
-
-                CREATE TABLE IF NOT EXISTS community_replies (
-                    id TEXT PRIMARY KEY,
-                    post_id TEXT NOT NULL REFERENCES community_posts(id) ON DELETE CASCADE,
-                    author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                    body TEXT NOT NULL,
-                    status TEXT NOT NULL CHECK(status IN ('VISIBLE', 'HIDDEN')),
-                    created_at_ms INTEGER NOT NULL,
-                    updated_at_ms INTEGER NOT NULL
-                );
-                CREATE INDEX IF NOT EXISTS community_replies_post_idx
-                    ON community_replies(post_id, status, created_at_ms);
-
-                CREATE TABLE IF NOT EXISTS community_admins (
-                    user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-                    role TEXT NOT NULL CHECK(role IN ('ADMIN', 'MODERATOR')),
-                    created_at_ms INTEGER NOT NULL
-                );
-
-                CREATE TABLE IF NOT EXISTS community_moderation_events (
-                    id TEXT PRIMARY KEY,
-                    actor_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                    post_id TEXT REFERENCES community_posts(id) ON DELETE CASCADE,
-                    reply_id TEXT REFERENCES community_replies(id) ON DELETE CASCADE,
-                    action TEXT NOT NULL,
-                    reason TEXT,
-                    created_at_ms INTEGER NOT NULL
-                );
-
-                CREATE TABLE IF NOT EXISTS sessions (
-                    id TEXT PRIMARY KEY,
-                    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                    access_hash TEXT NOT NULL UNIQUE,
-                    refresh_hash TEXT NOT NULL UNIQUE,
-                    access_expires_at_ms INTEGER NOT NULL,
-                    refresh_expires_at_ms INTEGER NOT NULL,
-                    revoked_at_ms INTEGER,
-                    created_at_ms INTEGER NOT NULL,
-                    last_used_at_ms INTEGER NOT NULL
-                );
-
-                CREATE INDEX IF NOT EXISTS sessions_user_idx ON sessions(user_id);
-                CREATE INDEX IF NOT EXISTS sessions_access_idx ON sessions(access_hash);
-                CREATE INDEX IF NOT EXISTS sessions_refresh_idx ON sessions(refresh_hash);
-
-                CREATE TABLE IF NOT EXISTS sms_events (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    phone_hash TEXT NOT NULL,
-                    ip_hash TEXT NOT NULL,
-                    kind TEXT NOT NULL CHECK(kind IN ('SEND', 'VERIFY')),
-                    created_at_ms INTEGER NOT NULL
-                );
-
-                CREATE INDEX IF NOT EXISTS sms_events_phone_idx
-                    ON sms_events(phone_hash, kind, created_at_ms);
-                CREATE INDEX IF NOT EXISTS sms_events_ip_idx
-                    ON sms_events(ip_hash, kind, created_at_ms);
-
-                CREATE TABLE IF NOT EXISTS sms_challenges (
-                    phone_hash TEXT PRIMARY KEY,
-                    created_at_ms INTEGER NOT NULL,
-                    expires_at_ms INTEGER NOT NULL
-                );
+                CREATE TABLE IF NOT EXISTS schema_migrations (
+                    version INTEGER PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    applied_at_ms INTEGER NOT NULL
+                )
                 """
             )
-            current_version = connection.execute("PRAGMA user_version").fetchone()[0]
-            if current_version not in (0, 1, 2, SCHEMA_VERSION):
-                raise RuntimeError(f"unsupported database schema {current_version}")
-            columns = {row[1] for row in connection.execute("PRAGMA table_info(profiles)").fetchall()}
-            if "github_url" not in columns:
-                connection.execute("ALTER TABLE profiles ADD COLUMN github_url TEXT")
-            if "twitter_url" not in columns:
-                connection.execute("ALTER TABLE profiles ADD COLUMN twitter_url TEXT")
-            post_columns = {row[1] for row in connection.execute("PRAGMA table_info(community_posts)").fetchall()}
-            if "accepted_reply_id" not in post_columns:
-                connection.execute("ALTER TABLE community_posts ADD COLUMN accepted_reply_id TEXT")
-            connection.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+            applied = {row[0] for row in connection.execute("SELECT version FROM schema_migrations").fetchall()}
+            if not applied:
+                # 基线同化：users 已存在说明是迁移机制落地前的既有库，直接登记 0001。
+                legacy = connection.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='users'"
+                ).fetchone()
+                if legacy is not None:
+                    connection.execute(
+                        "INSERT INTO schema_migrations VALUES(?,?,?)",
+                        (files[0][0], files[0][1].name, int(time.time() * 1000)),
+                    )
+            connection.commit()
+        except Exception:
+            connection.rollback()
+            raise
+        for version, path in files:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                if connection.execute("SELECT 1 FROM schema_migrations WHERE version=?", (version,)).fetchone():
+                    connection.commit()
+                    continue
+                # The lock is reacquired for every version. If another service
+                # startup committed it after the previous version, this read
+                # observes that record and skips without duplicating DDL.
+                body = path.read_text(encoding='utf-8').replace('{now_ms}', str(int(time.time() * 1000)))
+                statement = ''
+                for line in body.splitlines(keepends=True):
+                    statement += line
+                    if sqlite3.complete_statement(statement):
+                        if statement.strip():
+                            connection.execute(statement)
+                        statement = ''
+                if statement.strip():
+                    connection.execute(statement)
+                connection.execute(
+                    "INSERT INTO schema_migrations VALUES(?,?,?)",
+                    (version, path.name, int(time.time() * 1000)),
+                )
+                connection.commit()
+            except Exception:
+                connection.rollback()
+                raise
+        if connection.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+            raise RuntimeError("database integrity check failed after migrations")
 
     def reserve_sms_send(self, phone_hash: str, ip_hash: str, now_ms: int, interval_seconds: int) -> None:
         one_hour_ago = now_ms - 3_600_000

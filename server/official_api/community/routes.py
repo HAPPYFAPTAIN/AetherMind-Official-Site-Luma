@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import base64
-import os
 import re
 import time
 from typing import Any, Callable, Dict, Optional
@@ -61,12 +60,11 @@ def mount_community_routes(app: Any, database: Database, current_user: Callable[
         return clean(value, "操作说明", 240)
 
     def role_for(user_id: str) -> Optional[str]:
-        configured = {value.strip() for value in os.getenv("COMMUNITY_ADMIN_USER_IDS", "").split(",") if value.strip()}
-        if user_id in configured:
-            return "ADMIN"
         with database.connect() as connection:
-            row = connection.execute("SELECT role FROM community_admins WHERE user_id = ?", (user_id,)).fetchone()
-            return row["role"] if row else None
+            row = connection.execute("SELECT role FROM official_roles WHERE user_id = ?", (user_id,)).fetchone()
+            if not row or row["role"] not in {"OWNER", "ADMIN"}:
+                return None
+            return row["role"]
 
     def require_moderator(user_id: str) -> str:
         role = role_for(user_id)

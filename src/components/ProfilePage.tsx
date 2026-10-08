@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PasswordSettings } from "./PasswordSettings";
 import { useLanguage } from "./LanguageProvider";
-import { accountApi, hasAccountSession, type AccountProfile } from "@/lib/account-client";
+import { useAccount } from "@/lib/use-account";
 import { assetUrl } from "@/lib/asset-url";
 import { BRAND } from "@/lib/site";
 import { Mark } from "./Nav";
@@ -12,11 +12,8 @@ import "./profile.css";
 export function ProfilePage() {
   const { language } = useLanguage();
   const zh = language === "zh";
-  const [account, setAccount] = useState<AccountProfile | null>(null);
+  const { account } = useAccount();
   const [passwordOpen, setPasswordOpen] = useState(false);
-  useEffect(() => {
-    if (hasAccountSession()) accountApi<AccountProfile>("/me").then(setAccount).catch(() => setAccount(null));
-  }, []);
   if (!account) return <main className="profile-page"><a className="profile-back" href={assetUrl("/console/")}>← {zh ? "返回控制台" : "Back to console"}</a><section className="profile-auth"><h1>{zh ? "请先登录" : "Sign in first"}</h1><a href={assetUrl("/login/?returnTo=/official/profile/")}>{zh ? "登录" : "Sign in"}</a></section></main>;
   return <main className="profile-page">
     <header className="profile-topbar"><a className="profile-brand" href={assetUrl("/")}><Mark />{zh ? BRAND.zh : BRAND.en}<span />{zh ? "个人中心" : "Personal center"}</a><a className="profile-back" href={assetUrl("/console/")}>← {zh ? "返回控制台" : "Back to console"}</a></header>

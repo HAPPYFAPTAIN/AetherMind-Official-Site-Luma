@@ -8,9 +8,9 @@ import {
   COMMUNITY_TERMS_VERSION,
   communityReturnPath,
 } from "@/lib/community-login";
+import { AccountError, publicPost, setSession } from "@/lib/account-client";
 import "./login.css";
 
-const apiBase = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/official-api";
 const subscribeLocation = (notify: () => void) => {
   window.addEventListener("popstate", notify);
   return () => window.removeEventListener("popstate", notify);
@@ -57,25 +57,20 @@ export function LoginPage({ overlay = false, onClose, returnTo: returnToProp }: 
       document.body.classList.remove("login-open");
     };
   }, [overlay]);
-  const request = async (path: string, body: object) => {
-    const response = await fetch(apiBase + path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data =
-      response.status === 204 ? null : await response.json().catch(() => null);
-    if (!response.ok) {
-      if (response.status === 429)
-        setCooldown(
-          Math.min(3600, Number(data?.error?.retryAfterSeconds) || 60),
-        );
-      throw new Error(
-        data?.error?.message ||
-          (zh ? "操作未完成，请稍后重试。" : "Please try again later."),
-      );
+  const request = async <T,>(path: string, body: object): Promise<T> => {
+    try {
+      return await publicPost<T>(path, body);
+    } catch (error) {
+      if (error instanceof AccountError) {
+        if (error.status === 429)
+          setCooldown(Math.min(3600, Number(error.retryAfterSeconds) || 60));
+        if (error.message === "操作未完成，请稍后重试")
+          throw new Error(
+            zh ? "操作未完成，请稍后重试。" : "Please try again later.",
+          );
+      }
+      throw error;
     }
-    return data;
   };
   const validatePhone = () => {
     if (!/^1[3-9][0-9]{9}$/.test(phone.trim())) {
@@ -127,24 +122,21 @@ export function LoginPage({ overlay = false, onClose, returnTo: returnToProp }: 
             : "Please read and agree to the terms and privacy policy.",
         );
       setBusy("verify");
-      const data = await request(mode === "sms" ? "/api/v1/community/auth/sms/verify" : "/api/v1/community/auth/password", {
+      const data = await request<{
+        accessToken: string;
+        refreshToken: string;
+        accessTokenExpiresAtEpochMs: number;
+      }>(mode === "sms" ? "/api/v1/community/auth/sms/verify" : "/api/v1/community/auth/password", {
         phone: phone.trim(),
         ...(mode === "sms" ? { code: code.trim(), inviteCode: inviteCode.trim() || null } : { password }),
         acceptedTerms: true,
         termsVersion: COMMUNITY_TERMS_VERSION,
       });
-      window.localStorage.setItem(
-        "aethericai-community-access-token",
-        data.accessToken,
-      );
-      window.localStorage.setItem(
-        "aethericai-community-refresh-token",
-        data.refreshToken,
-      );
-      window.localStorage.setItem(
-        "aethericai-community-access-expires",
-        String(data.accessTokenExpiresAtEpochMs),
-      );
+      setSession({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        accessTokenExpiresAtEpochMs: data.accessTokenExpiresAtEpochMs,
+      });
       const returnTo = returnToProp || new URLSearchParams(window.location.search).get("returnTo");
       window.location.replace(communityReturnPath(returnTo));
     } catch (error) {

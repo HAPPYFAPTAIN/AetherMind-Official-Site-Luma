@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { LoginPage } from "./LoginPage";
 import { Mark } from "./Nav";
 import { useLanguage } from "./LanguageProvider";
-import { accountApi, hasAccountSession, signOut, type AccountProfile } from "@/lib/account-client";
+import { accountApi, hasAccountSession, signOut } from "@/lib/account-client";
+import { useAccount } from "@/lib/use-account";
 import { assetUrl } from "@/lib/asset-url";
 import { BRAND } from "@/lib/site";
 import "./console.css";
@@ -61,14 +62,13 @@ export function ConsolePage() {
   const zh = language === "zh";
   const [section, setSection] = useState<Section>("agents");
   const [loginOpen, setLoginOpen] = useState(false);
-  const [account, setAccount] = useState<AccountProfile | null>(null);
+  const { account } = useAccount();
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [mdState, setMdState] = useState<MdAgentState | null>(null);
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
     if (!hasAccountSession()) return;
-    accountApi<AccountProfile>("/me").then(setAccount).catch(() => setAccount(null));
     accountApi<MdAgentState>("/md-agent/profile").then(setMdState).catch(() => setMdState(null));
   }, []);
 

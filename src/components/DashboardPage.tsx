@@ -8,12 +8,14 @@ import { useLanguage } from "./LanguageProvider";
 import { AdminPanel } from "./admin/AdminPanel";
 import {
   AccountError,
-  accountApi,
+  fetchDashboard,
   hasAccountSession,
   signOut,
   type DashboardData,
   type UsagePoint,
 } from "@/lib/account-client";
+import { redeemActivationCode } from "@/lib/activate";
+import { useAccount } from "@/lib/use-account";
 import { assetUrl } from "@/lib/asset-url";
 import { BRAND } from "@/lib/site";
 import { useDialogFocus } from "@/lib/use-dialog-focus";
@@ -264,6 +266,7 @@ export function DashboardPage() {
   const [code, setCode] = useState("");
   const [redeeming, setRedeeming] = useState(false);
   const [revision, setRevision] = useState(0);
+  const { refresh: refreshAccount } = useAccount();
   const closeRedeem = useCallback(() => {
     setRedeemOpen(false);
   }, []);
@@ -280,9 +283,7 @@ export function DashboardPage() {
         return;
       }
       try {
-        const next = await accountApi<DashboardData>(
-          `/dashboard?days=${days}&product=${encodeURIComponent(product)}`,
-        );
+        const next = await fetchDashboard(days, product);
         if (active) {
           setData(next);
           setUnauthorized(false);
@@ -310,10 +311,7 @@ export function DashboardPage() {
     setRedeeming(true);
     setError("");
     try {
-      await accountApi("/redeem", {
-        method: "POST",
-        body: JSON.stringify({ code: code.trim() }),
-      });
+      await redeemActivationCode(code.trim());
       setNotice(
         zh
           ? "兑换成功，积分与产品权益已更新。"
@@ -321,6 +319,7 @@ export function DashboardPage() {
       );
       setCode("");
       setRedeemOpen(false);
+      refreshAccount();
       refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

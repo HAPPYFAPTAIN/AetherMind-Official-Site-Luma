@@ -7,12 +7,12 @@ import { tr } from "@/lib/i18n";
 import Image from "next/image";
 import { LoginPage } from "@/components/LoginPage";
 import "./community.css";
-import { accountApi } from "@/lib/account-client";
-
-const API_BASE = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/official-api";
-const ACCESS_KEY = "aethericai-community-access-token";
-const REFRESH_KEY = "aethericai-community-refresh-token";
-const EXPIRES_KEY = "aethericai-community-access-expires";
+import {
+  accountApi,
+  accountUrl,
+  clearAccountSession,
+  hasAccountSession,
+} from "@/lib/account-client";
 
 type Profile = {
   userId: string;
@@ -192,12 +192,7 @@ function formatTime(epoch: number, language: "en" | "zh") {
 }
 
 function avatarSrc(path?: string | null) {
-  return path ? `${API_BASE}${path}` : null;
-}
-
-function readStored(key: string) {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(key);
+  return path ? accountUrl(path) : null;
 }
 
 export function CommunityPage() {
@@ -244,7 +239,7 @@ export function CommunityPage() {
   );
 
   const loadProfile = useCallback(async () => {
-    if (!readStored(ACCESS_KEY)) {
+    if (!hasAccountSession()) {
       setProfile(null);
       return;
     }
@@ -386,9 +381,7 @@ export function CommunityPage() {
     } catch {
       /* local session is still cleared */
     }
-    window.localStorage.removeItem(ACCESS_KEY);
-    window.localStorage.removeItem(REFRESH_KEY);
-    window.localStorage.removeItem(EXPIRES_KEY);
+    clearAccountSession();
     setProfile(null);
     setNotice(zh ? "已退出登录" : "Signed out");
   };

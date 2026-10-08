@@ -5,20 +5,56 @@ const REFRESH = "aethericai-community-refresh-token";
 const EXPIRES = "aethericai-community-access-expires";
 let refreshing: Promise<void> | null = null;
 
+// Absolute URL for API-served resources such as avatar images.
+export function accountUrl(path: string) {
+  return `${ACCOUNT_API}${path}`;
+}
+
 export class AccountError extends Error {
   constructor(
     message: string,
     public status: number,
+    public retryAfterSeconds?: number,
   ) {
     super(message);
   }
 }
 
-export function hasAccountSession() {
-  if (typeof window === "undefined") return false;
-  return !!(
-    window.localStorage.getItem(ACCESS) || window.localStorage.getItem(REFRESH)
+export type AccountSession = {
+  accessToken: string | null;
+  refreshToken: string | null;
+  accessTokenExpiresAtEpochMs: number;
+};
+
+export function getSession(): AccountSession | null {
+  if (typeof window === "undefined") return null;
+  const accessToken = window.localStorage.getItem(ACCESS);
+  const refreshToken = window.localStorage.getItem(REFRESH);
+  if (!accessToken && !refreshToken) return null;
+  return {
+    accessToken,
+    refreshToken,
+    accessTokenExpiresAtEpochMs:
+      Number(window.localStorage.getItem(EXPIRES)) || 0,
+  };
+}
+
+export function setSession(tokens: {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresAtEpochMs: number;
+}) {
+  window.localStorage.setItem(ACCESS, tokens.accessToken);
+  window.localStorage.setItem(REFRESH, tokens.refreshToken);
+  window.localStorage.setItem(
+    EXPIRES,
+    String(tokens.accessTokenExpiresAtEpochMs),
   );
+  window.dispatchEvent(new Event("account-session-changed"));
+}
+
+export function hasAccountSession() {
+  return getSession() !== null;
 }
 
 export function clearAccountSession() {
@@ -79,6 +115,29 @@ export async function accountApi<T>(
     throw new AccountError(
       data?.error?.message || "操作未完成，请稍后重试",
       response.status,
+      data?.error?.retryAfterSeconds,
+    );
+  return data as T;
+}
+
+// Unauthenticated JSON POST (login, SMS request). Shares the base URL and the
+// error shape with accountApi but never attaches tokens or refreshes them.
+export async function publicPost<T = Record<string, unknown>>(
+  path: string,
+  body: object,
+): Promise<T> {
+  const response = await fetch(`${ACCOUNT_API}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data =
+    response.status === 204 ? null : await response.json().catch(() => null);
+  if (!response.ok)
+    throw new AccountError(
+      data?.error?.message || "操作未完成，请稍后重试",
+      response.status,
+      data?.error?.retryAfterSeconds,
     );
   return data as T;
 }
@@ -86,6 +145,31 @@ export async function accountApi<T>(
 export async function signOut() {
   await accountApi("/api/v1/auth/logout", { method: "POST" });
   clearAccountSession();
+}
+
+export function fetchAccount() {
+  return accountApi<AccountProfile>("/me");
+}
+
+export function fetchDashboard(days = 7, product = "all") {
+  return accountApi<DashboardData>(
+    `/dashboard?days=${days}&product=${encodeURIComponent(product)}`,
+  );
+}
+
+export type RedeemResult = {
+  balance: number;
+  credits: number;
+  units: number;
+  days: number;
+  productId: string | null;
+};
+
+export function redeemActivationCode(code: string, targetUserId?: string) {
+  return accountApi<RedeemResult>("/redeem", {
+    method: "POST",
+    body: JSON.stringify(targetUserId ? { code, targetUserId } : { code }),
+  });
 }
 
 export type AccountProfile = {

@@ -6,6 +6,7 @@ import {
   type AccountProduct,
   type AccountProfile,
 } from "@/lib/account-client";
+import { redeemActivationCode } from "@/lib/activate";
 import { useLanguage } from "../LanguageProvider";
 import { useDialogFocus } from "@/lib/use-dialog-focus";
 
@@ -210,10 +211,7 @@ export function AdminPanel({
             }),
           });
         if (action === "redeem")
-          await accountApi("/redeem", {
-            method: "POST",
-            body: JSON.stringify({ code, targetUserId: target.userId }),
-          });
+          await redeemActivationCode(code, target.userId);
         setTarget(null);
       },
       t("用户信息已更新。", "Account updated."),

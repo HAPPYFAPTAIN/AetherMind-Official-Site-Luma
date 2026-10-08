@@ -6,7 +6,8 @@ import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
 import { assetUrl } from "@/lib/asset-url";
 import { LoginPage } from "@/components/LoginPage";
-import { accountApi, hasAccountSession, type AccountProfile } from "@/lib/account-client";
+import { hasAccountSession } from "@/lib/account-client";
+import { useAccount } from "@/lib/use-account";
 
 export function Mark() {
   return (
@@ -47,16 +48,8 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
-  const [account, setAccount] = useState<AccountProfile | null>(null);
+  const { account } = useAccount();
   const { language, setLanguage } = useLanguage();
-
-  useEffect(() => {
-    let active = true;
-    if (hasAccountSession()) accountApi<AccountProfile>("/me").then(profile => {
-      if (active) setAccount(profile);
-    }).catch(() => {});
-    return () => { active = false; };
-  }, []);
 
   const enterAccount = () => {
     if (account || hasAccountSession()) window.location.assign(assetUrl("/dashboard/"));

@@ -5,9 +5,10 @@ import { Nav } from "./Nav";
 import { useLanguage } from "./LanguageProvider";
 import {
   accountApi,
+  fetchDashboard,
   hasAccountSession,
-  type DashboardData,
 } from "@/lib/account-client";
+import { hasActiveEntitlement, redeemAndReload } from "@/lib/activate";
 import { assetUrl } from "@/lib/asset-url";
 import "./learn-everything.css";
 
@@ -68,12 +69,10 @@ export function LearnEverythingPage() {
 
   useEffect(() => {
     if (!hasAccountSession()) return;
-    accountApi<DashboardData>("/dashboard?days=7&product=learn-everything")
+    fetchDashboard(7, "learn-everything")
       .then((data) => {
         setAccess(
-          data.entitlements.some(
-            (item) => item.product_id === "learn-everything" && item.active,
-          )
+          hasActiveEntitlement(data, "learn-everything")
             ? "active"
             : "inactive",
         );
@@ -117,17 +116,12 @@ export function LearnEverythingPage() {
     setBusy(true);
     setError("");
     try {
-      await accountApi("/redeem", {
-        method: "POST",
-        body: JSON.stringify({ code: activationCode.trim() }),
+      const data = await redeemAndReload({
+        code: activationCode.trim(),
+        days: 7,
+        product: "learn-everything",
       });
-      const data = await accountApi<DashboardData>(
-        "/dashboard?days=7&product=learn-everything",
-      );
-      const hasAccess = data.entitlements.some(
-        (item) => item.product_id === "learn-everything" && item.active,
-      );
-      if (!hasAccess)
+      if (!hasActiveEntitlement(data, "learn-everything"))
         throw new Error(
           t(
             "激活码未包含 Learn Everything 权益。",

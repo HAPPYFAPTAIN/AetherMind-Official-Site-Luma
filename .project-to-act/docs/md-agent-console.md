@@ -24,7 +24,7 @@
 
 ## 当前已部署
 
-- 前端：`/opt/aethericai-official/releases/20261007-model-kimi-cn`
+- 前端：`/opt/aethericai-official/releases/20261009-md-browser`
 - 后端：`/srv/aethericai-auth/releases/20261006-md-entry`
 - 数据表：`official_md_agent_qualifications`；邀请码表新增 `product_id`
 - BFF：`GET /api/v1/console/md-agent/profile` 返回本人资格、模型未配置和超算未连接状态
@@ -32,7 +32,14 @@
 - BFF：`POST /api/v1/console/md-agent/enter` 申请短票并改写为 `/official/md-agent/open?ticket=...`
 - 同域 dsh：`/official/md-agent/`，根级 dsh 资源和 API 由 Nginx 兼容转发
 - dsh 根级插件：`/plugins/` 映射到 `/opt/mdagent/web-preview/plugins/`；dsh 前端使用根绝对路径，缺少该映射会出现 `Failed to load plugins`。
-- 备份：`/var/backups/aethericai-official/20261006-md-binding/`
+- 备份：`/var/backups/aethericai-official/20261009-153921-md-rpc/`
+
+## 2026-10-09 点击故障修复
+
+- dsh 的 `settings.describe`、工作区列表和两个事件 WebSocket 要求回环 Host；官网同域代理现在先校验 Host/Origin/Fetch-Site，再把请求转换到用户自己的回环实例，不再把公网 Host 直接传给 dsh。
+- `/plugins/`、`/api/`、`/assets/` 和 `/official/md-agent/` 统一走同一租户代理；未登录仍回到 `/official/console/`，跨站 RPC 返回403。
+- 控制台进入按钮预留新标签页时不再使用会返回 `null` 的 `noopener` 空窗口；票据返回后通过已保留窗口跳转，重复点击会被锁定。
+- 生产只读验收：四类 RPC 经官网路径均返回200；`events.mux` 与 `events.host` 均完成101握手；匿名 shell 302到控制台；跨站 RPC和错误 Origin均403。浏览器设置按钮可打开模型配置；完整带资格的入口需使用有效官网登录会话验收。
 
 ## 待密钥和后端契约后完成
 

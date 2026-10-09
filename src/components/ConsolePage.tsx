@@ -66,6 +66,7 @@ export function ConsolePage() {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [mdState, setMdState] = useState<MdAgentState | null>(null);
   const [notice, setNotice] = useState("");
+  const [enteringMdExp, setEnteringMdExp] = useState(false);
 
   useEffect(() => {
     if (!hasAccountSession()) return;
@@ -73,6 +74,7 @@ export function ConsolePage() {
   }, []);
 
   const enterMdExp = async () => {
+    if (enteringMdExp) return;
     if (!account) {
       window.location.assign(assetUrl("/login/?returnTo=/official/console/"));
       return;
@@ -83,21 +85,27 @@ export function ConsolePage() {
       : "Use the matching invite code to unlock MD EXP first.");
       return;
     }
-    const popup = window.open("about:blank", "_blank", "noopener,noreferrer");
-    setNotice(zh
-      ? (zh ? "你已获得 MD EXP 产品资格；个人 MD-Agent 账户绑定完成后，会在这里新标签页打开 dsh。" : "You have MD EXP qualification. dsh will open in a new tab after your personal MD-Agent account is bound.")
-      : "Preparing your MD-Agent workspace…");
+    // Reserve the new tab during the user gesture.  `noopener` makes Chrome
+    // return null for this blank window, which left the tab blank when the
+    // ticket request completed asynchronously.
+    const popup = window.open("about:blank", "_blank");
+    if (popup) popup.opener = null;
+    setEnteringMdExp(true);
+    setNotice(zh ? "正在打开 MD EXP…" : "Opening MD EXP…");
     try {
       const nextState = mdState.accountBinding === "bound"
         ? mdState
         : await accountApi<MdAgentState>("/md-agent/bind", { method: "POST" });
       const entry = await accountApi<{ url: string }>("/md-agent/enter", { method: "POST" });
-      if (popup) popup.location.href = entry.url;
-      else window.open(entry.url, "_blank", "noopener,noreferrer");
+      if (popup && !popup.closed) popup.location.replace(entry.url);
+      else window.location.assign(entry.url);
       setMdState(nextState);
+      setNotice("");
     } catch (error) {
       popup?.close();
       setNotice(error instanceof Error ? error.message : String(error));
+    } finally {
+      setEnteringMdExp(false);
     }
   };
 
@@ -176,7 +184,7 @@ export function ConsolePage() {
                   <img src={assetUrl(agent.image)} alt="" />
                   <div className="agent-copy"><h2>{agent.title}</h2><p className="agent-subtitle">{agent.subtitle}</p><p className="agent-description">{agent.description}</p><div className="agent-tags">{agent.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
                   <div className="agent-status"><span className={agent.status}>{agent.status === "available" ? (zh ? "可用" : "Available") : (zh ? "下个月上架" : "Coming next month")}</span><small>{agent.status === "available" ? (mdState?.qualifications.some((item) => item.product_id === agent.id) ? (zh ? "已获得产品资格" : "Qualified") : (zh ? "需要绑定邀请码" : "Invite binding required")) : ""}</small></div>
-                  <button className="agent-action" disabled={agent.status !== "available"} onClick={() => void enterMdExp()}>{agent.status === "available" ? (zh ? "进入智能体  →" : "Open agent  →") : (zh ? "敬请期待" : "Stay tuned")}</button>
+                  <button className="agent-action" disabled={agent.status !== "available" || enteringMdExp} onClick={() => void enterMdExp()}>{agent.status === "available" ? (enteringMdExp ? (zh ? "正在打开…" : "Opening…") : (zh ? "进入智能体  →" : "Open agent  →")) : (zh ? "敬请期待" : "Stay tuned")}</button>
                 </article>
               ))}
             </div>

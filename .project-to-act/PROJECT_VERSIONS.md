@@ -4,8 +4,8 @@
 
 ## 当前版本
 
-- 版本号：`20261008-modular`
-- 发布状态：乌兰察布前端 `/opt/aethericai-official/releases/20261008-modular`，独立后台 `/srv/aethericai-auth/releases/20261008-modular`，LLM 网关由 `aethericai-gateway.service` 提供，学习服务由 `aethericai-learn.service` 提供
+- 版本号：`20261009-md-browser`
+- 发布状态：乌兰察布前端 `/opt/aethericai-official/releases/20261009-md-browser`，独立后台 `/srv/aethericai-auth/releases/20261008-modular`，LLM 网关由 `aethericai-gateway.service` 提供，学习服务由 `aethericai-learn.service` 提供
 - 兼容性说明：Next.js 静态导出，生产使用 `/official/` 前缀
 - 最后更新：2026-10-08
 
@@ -48,3 +48,4 @@
 | `20261007-md-exp-activation` | 2026-10-07 | 已发布 | 新增 MD EXP / dsh 产品激活码类型；兑换后写入 MD-Agent 资格并进入自动绑定链路 | 前后端、官网产品目录与管理员生成器同步 | E-025 | 阶段通过 |
 | `20261007-console-profile` | 2026-10-07 | 已发布 | 控制台移除底部路径和 Hero 说明；顶栏账号菜单增加个人中心、暗色模式和退出；新增个人中心页 | 个人中心沿用官网认证和密码设置流程 | E-029 | 通过 |
 | `20261008-modular` | 2026-10-08 | 已发布 | 后端模块化与迁移、ACT 统一激活码、token/HPC 计费、独立 LLM 网关、Learn Everything UID 隔离、dsh/HPC 回调、费率管理和新版产品页 | SQLite 生产快照已保留；Learn Everything 资料库按确认范围共享 | E-031 | 通过 |
+| `20261009-md-browser` | 2026-10-09 | 已发布 | 修复 dsh 同域代理的回环信任转换、根级插件和 WebSocket 路径；修复控制台进入按钮的异步新标签页跳转 | 保留 `/official/` 静态导出；回滚到 `20261008-modular` 与 `/var/backups/aethericai-official/20261009-153921-md-rpc/` | E-032 | 通过 |

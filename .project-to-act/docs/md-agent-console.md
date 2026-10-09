@@ -14,13 +14,13 @@
 
 | provider | model_id | 当前状态 |
 |---|---|---|
-| `kimi` | `kimi-k3` | Key 验证失败，待重新提供 |
+| `kimi` | `kimi-k3` | 已列入 dsh 目录 |
 | `kimi` | `kimi-k2.7-code-highspeed` | 国内版 API 代理短请求返回200 |
-| `kimi` | `kimi-k2.6` | 待密钥、待验证 |
+| `kimi` | `kimi-k2.6` | 已列入 dsh 目录 |
 | `deepseek` | `deepseek-v4-pro` | 已配置，代理短请求返回200 |
-| `deepseek` | `deepseek-flash` | 共用 DeepSeek Key，待独立验证 |
+| `deepseek` | `deepseek-flash` | 已配置，使用当前 Flash 路由 |
 
-模型 Key 只由受保护后端保存，不进入源码、前端环境变量、URL、localStorage 或日志。DeepSeek Key 已写入 MD-Agent 服务端受保护环境并通过真实代理短请求；Kimi 按国内版 `https://api.moonshot.cn/v1` 和 `kimi-k2.7-code-highspeed` 接入，代理短请求返回200。Kimi 当前官方 quickstart 推荐 `kimi-k3`，并列出 K2.7 Code 和 K2.6；DeepSeek 当前官方模型列表为 `deepseek-v4-pro` 与 `deepseek-flash`。
+模型 Key 只由受保护后端保存，不进入源码、前端环境变量、URL、localStorage 或日志。dsh 只显示项目代理目录中的 Kimi `kimi-k3`、`kimi-k2.7-code-highspeed`、`kimi-k2.6` 和 DeepSeek `deepseek-v4-pro`、`deepseek-flash`；内置 `deepseek-official` 默认目录通过 `llm-deepseek.models: []` 隐藏，避免重复和旧模型名混入。
 
 ## 当前已部署
 
@@ -47,6 +47,11 @@
 - 初始化路径拒绝符号链接和越出账号 `projects` 根目录的工作区；每个租户实例有独立初始化锁，实例替换或初始化失败不会复用旧状态。
 - 旧的 `data/memory` 共享链接已移除，改为账号私有目录；共享进化目录不再作为用户记忆或工作区来源。
 - 两个生产绑定账号分别只能看到自己的 `default` 工作区；跨账号读写测试均被 UID 权限拒绝。回滚材料：`/var/backups/aethericai-official/20261009-233037-private-workspace/`。
+
+## 2026-10-10 模型目录修复
+
+- dsh 原先同时展示内置 `deepseek-official` 和代理 `deepseek`，造成重复目录；当前只保留代理目录。
+- 代理目录固定为 Kimi 三个模型和 DeepSeek 两个模型，现有账号配置与新账号模板一致。备份：`/var/backups/aethericai-official/20261010-002146-model-catalog/`、`/var/backups/aethericai-official/20261010-002146-model-catalog-template/`。
 
 ## 待密钥和后端契约后完成
 

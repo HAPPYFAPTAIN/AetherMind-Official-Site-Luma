@@ -49,3 +49,4 @@
 | `20261007-console-profile` | 2026-10-07 | 已发布 | 控制台移除底部路径和 Hero 说明；顶栏账号菜单增加个人中心、暗色模式和退出；新增个人中心页 | 个人中心沿用官网认证和密码设置流程 | E-029 | 通过 |
 | `20261008-modular` | 2026-10-08 | 已发布 | 后端模块化与迁移、ACT 统一激活码、token/HPC 计费、独立 LLM 网关、Learn Everything UID 隔离、dsh/HPC 回调、费率管理和新版产品页 | SQLite 生产快照已保留；Learn Everything 资料库按确认范围共享 | E-031 | 通过 |
 | `20261009-md-browser` | 2026-10-09 | 已发布 | 修复 dsh 同域代理的回环信任转换、根级插件和 WebSocket 路径；修复控制台进入按钮的异步新标签页跳转 | 保留 `/official/` 静态导出；回滚到 `20261008-modular` 与 `/var/backups/aethericai-official/20261009-153921-md-rpc/` | E-032 | 通过 |
+| `20261009-private-workspace` | 2026-10-09 | 已发布 | 为每个绑定账号初始化 UID 隔离的默认工作区和私有存储，拒绝跨租户工作区路径、符号链接和文件读写 | mdagent 后端滚动重启；前端静态发布不变；回滚到 `/var/backups/aethericai-official/20261009-233037-private-workspace/` | E-033 | 通过 |

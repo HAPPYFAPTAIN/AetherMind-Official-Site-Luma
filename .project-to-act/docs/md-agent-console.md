@@ -32,7 +32,7 @@
 - BFF：`POST /api/v1/console/md-agent/enter` 申请短票并改写为 `/official/md-agent/open?ticket=...`
 - 同域 dsh：`/official/md-agent/`，根级 dsh 资源和 API 由 Nginx 兼容转发
 - dsh 根级插件：`/plugins/` 映射到 `/opt/mdagent/web-preview/plugins/`；dsh 前端使用根绝对路径，缺少该映射会出现 `Failed to load plugins`。
-- 备份：`/var/backups/aethericai-official/20261009-153921-md-rpc/`
+- 备份：`/var/backups/aethericai-official/20261009-233037-private-workspace/`
 
 ## 2026-10-09 点击故障修复
 
@@ -40,6 +40,13 @@
 - `/plugins/`、`/api/`、`/assets/` 和 `/official/md-agent/` 统一走同一租户代理；未登录仍回到 `/official/console/`，跨站 RPC 返回403。
 - 控制台进入按钮预留新标签页时不再使用会返回 `null` 的 `noopener` 空窗口；票据返回后通过已保留窗口跳转，重复点击会被锁定。
 - 生产验收：四类 RPC 经官网路径均返回200；`events.mux` 与 `events.host` 均完成101握手；插件脚本200、`/plugins/events` 为SSE 200；匿名 shell 302到控制台；跨站 RPC和错误 Origin均403。带资格的真实入口已在浏览器打开，内测提示、侧栏收起、设置面板、工作区选择按钮均可操作，控制台异步入口实际跳转到 `/official/md-agent/`。
+
+## 2026-10-09 工作区与存储隔离
+
+- 每个绑定账号使用独立的 `mu_<username>` UID、`dsh-home`、`projects`、`conversations`、`data/memory` 和默认 `projects/default`；工作区状态只通过该账号自己的 dsh RPC 写入。
+- 初始化路径拒绝符号链接和越出账号 `projects` 根目录的工作区；每个租户实例有独立初始化锁，实例替换或初始化失败不会复用旧状态。
+- 旧的 `data/memory` 共享链接已移除，改为账号私有目录；共享进化目录不再作为用户记忆或工作区来源。
+- 两个生产绑定账号分别只能看到自己的 `default` 工作区；跨账号读写测试均被 UID 权限拒绝。回滚材料：`/var/backups/aethericai-official/20261009-233037-private-workspace/`。
 
 ## 待密钥和后端契约后完成
 

@@ -51,3 +51,4 @@
 | `20261009-md-browser` | 2026-10-09 | 已发布 | 修复 dsh 同域代理的回环信任转换、根级插件和 WebSocket 路径；修复控制台进入按钮的异步新标签页跳转 | 保留 `/official/` 静态导出；回滚到 `20261008-modular` 与 `/var/backups/aethericai-official/20261009-153921-md-rpc/` | E-032 | 通过 |
 | `20261009-private-workspace` | 2026-10-09 | 已发布 | 为每个绑定账号初始化 UID 隔离的默认工作区和私有存储，拒绝跨租户工作区路径、符号链接和文件读写 | mdagent 后端滚动重启；前端静态发布不变；回滚到 `/var/backups/aethericai-official/20261009-233037-private-workspace/` | E-033 | 通过 |
 | `20261010-model-catalog` | 2026-10-10 | 已发布 | dsh 模型选择器只展示 Kimi `kimi-k3`/`kimi-k2.7-code-highspeed`/`kimi-k2.6` 与 DeepSeek `deepseek-v4-pro`/`deepseek-flash`，隐藏内置重复目录 | 现有绑定账号配置、未来账号模板和 dsh 实例均已同步；回滚到 `20261010-001531-model-catalog` | E-034 | 通过 |
+| `20261010-model-gateway-smoke` | 2026-10-10 | 已发布 | 补齐官方数据库映射、md-exp 产品凭据和 Kimi/DeepSeek 模型路由；真实 Kimi K3 消息返回并记录积分 | mdagent-api 使用独立产品凭据；回滚到 `20261010-012403-mdexp-product-key` 与 `20261010-012822-model-routes` | E-035 | 通过 |

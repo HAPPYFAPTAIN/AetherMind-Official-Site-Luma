@@ -14,7 +14,7 @@
 | T-006 | 手机号密码登录与自助短信验证改密 | 已完成 | Codex | 前后端接入、认证回归、浏览器表单与公网发布核验 | E-013 | 2026-10-06 |
 | T-007 | MD-Agent 卡片控制台与邀请码产品资格阶段接入 | 进行中 | Codex | 卡片页、后续卡片禁用、资格表、模型/超算状态页和公网阶段发布 | E-014 | 2026-10-06 |
 | T-008 | MD-Agent 自动绑定与官网同域 dsh 入口 | 进行中 | Codex | official-bff、个人 Token 加密、短票转发、RPC/WebSocket 同域代理、可选工作区和用户存储隔离已验证；真实入口页面和设置/工作区交互已浏览器复验 | E-033 | 2026-10-09 |
-| T-009 | DeepSeek/Kimi 模型 Key 接入 | 进行中 | Codex | dsh 目录已收敛为 Kimi 三个模型和 DeepSeek 两个模型；Kimi `kimi-k2.7-code-highspeed` 与 DeepSeek 代理路径已验证 | E-034 | 2026-10-10 |
+| T-009 | DeepSeek/Kimi 模型 Key 接入 | 进行中 | Codex | dsh 目录已收敛为 Kimi 三个模型和 DeepSeek 两个模型；Kimi K3 已真实返回 agent 首轮消息并完成积分扣费 | E-035 | 2026-10-10 |
 | T-010 | Learn Everything 产品页与服务器预览接入 | 已完成 | Codex | 产品详情、ACT 激活门禁、UID 隔离、网关计量、服务器 Gradio 服务和公网验收完成；资料库按确认范围共享 | E-031 | 2026-10-08 |
 
 ## 阻塞项
@@ -41,3 +41,4 @@
 | 2026-10-09 | md-browser-rpc 修复 | 修复 dsh 同域请求的回环信任转换、插件/事件流路径和控制台异步新标签页跳转；生产发布到 `20261009-md-browser` | RPC、WebSocket、匿名与跨站保护通过；真实入口页面、设置和工作区按钮已浏览器复验 | E-032 | 继续接入工作区目录后才会出现可选工作区 |
 | 2026-10-09 | private-workspace 隔离 | 为每个租户创建 UID 隔离的 `projects/default` 和私有 `data/memory`；工作区路径越界、符号链接和跨账号读写均拒绝 | E-033 | 保留 `20261009-233037-private-workspace` 回滚备份；生产两账号路径联验通过 | 继续接入节点目录时沿用同一租户根校验 |
 | 2026-10-10 | model-catalog 修复 | 去掉 dsh 内置 DeepSeek 目录与代理目录的重复展示，加入 Kimi 目录，并同步新账号模板 | E-034 | 生产模型 RPC 与浏览器选择器均显示两家供应商的目标模型 | 继续对各模型分别做真实短请求验证 |
+| 2026-10-10 | model-gateway smoke | 修复 mdagent 官方数据库映射和 `md-exp` 产品凭据，补齐 Kimi K3/K2.6 与 DeepSeek Flash 网关路由；新会话用 Kimi K3 返回 agent 首轮介绍并扣费 | E-035 | 继续验证其他模型 |

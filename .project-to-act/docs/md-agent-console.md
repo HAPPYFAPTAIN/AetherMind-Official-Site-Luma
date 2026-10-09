@@ -52,6 +52,7 @@
 
 - dsh 原先同时展示内置 `deepseek-official` 和代理 `deepseek`，造成重复目录；当前只保留代理目录。
 - 代理目录固定为 Kimi 三个模型和 DeepSeek 两个模型，现有账号配置与新账号模板一致。备份：`/var/backups/aethericai-official/20261010-002146-model-catalog/`、`/var/backups/aethericai-official/20261010-002146-model-catalog-template/`。
+- Kimi 首次真实发送的 503 根因是 mdagent 缺少官方认证数据库路径和 `md-exp` 产品凭据；已补齐网关凭据与三条模型路由。新会话用 Kimi K3 返回了 MD Exp 首轮介绍，流水登记输入 14,450、输出 458、扣 1,491 积分。备份：`/var/backups/aethericai-official/20261010-011152-kimi-503/`、`/var/backups/aethericai-official/20261010-012403-mdexp-product-key/`、`/var/backups/aethericai-official/20261010-012822-model-routes/`。
 
 ## 待密钥和后端契约后完成
 

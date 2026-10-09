@@ -39,7 +39,7 @@
 - dsh 的 `settings.describe`、工作区列表和两个事件 WebSocket 要求回环 Host；官网同域代理现在先校验 Host/Origin/Fetch-Site，再把请求转换到用户自己的回环实例，不再把公网 Host 直接传给 dsh。
 - `/plugins/`、`/api/`、`/assets/` 和 `/official/md-agent/` 统一走同一租户代理；未登录仍回到 `/official/console/`，跨站 RPC 返回403。
 - 控制台进入按钮预留新标签页时不再使用会返回 `null` 的 `noopener` 空窗口；票据返回后通过已保留窗口跳转，重复点击会被锁定。
-- 生产只读验收：四类 RPC 经官网路径均返回200；`events.mux` 与 `events.host` 均完成101握手；匿名 shell 302到控制台；跨站 RPC和错误 Origin均403。浏览器设置按钮可打开模型配置；完整带资格的入口需使用有效官网登录会话验收。
+- 生产验收：四类 RPC 经官网路径均返回200；`events.mux` 与 `events.host` 均完成101握手；插件脚本200、`/plugins/events` 为SSE 200；匿名 shell 302到控制台；跨站 RPC和错误 Origin均403。带资格的真实入口已在浏览器打开，内测提示、侧栏收起、设置面板、工作区选择按钮均可操作，控制台异步入口实际跳转到 `/official/md-agent/`。
 
 ## 待密钥和后端契约后完成
 

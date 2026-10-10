@@ -129,8 +129,6 @@ export function ConsolePage() {
             <span className="console-mark" aria-hidden="true"><Mark /></span>
             {zh ? BRAND.zh : BRAND.en}
           </a>
-          <span className="console-divider" />
-          <strong>{zh ? "控制台" : "Console"}</strong>
         </div>
         <div className="console-top-actions">
           <a href={assetUrl("/")} className="console-return">↗ {zh ? "返回官网" : "Back to website"}</a>

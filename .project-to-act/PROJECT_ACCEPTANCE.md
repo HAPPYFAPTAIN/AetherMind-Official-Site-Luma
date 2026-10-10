@@ -22,6 +22,7 @@
 ## 证据索引
 
 E-036（2026-10-10）：产品改按自定义期限授权，OWNER 的 MD EXP 按明确确认恢复30天。隔离 SQLite 回归验证三次调用只扣积分不减少期限、到期拒绝、普通用户不能改期限、管理员设置期限、按天激活码和 MD EXP 入口；1项综合测试通过，build:ip通过，lint无错误。生产只读核验 active=true、期限约30天、gateway授权通过。浏览器匿名页正常；登录后的完整管理页面点击仍未验收。备份 `/var/backups/aethericai-official/20261010-duration-access/`，静态发布 `20261010-duration`，细节见 `docs/md-agent-console.md`。
+E-037（2026-10-10）：控制台用户下拉菜单新增「仪表盘」入口，指向 `/official/dashboard/`。本地静态浏览器验证菜单出现、点击后到达 dashboard 且无控制台错误；生产软链切换后 `/official/console/` 与 `/official/dashboard/` 均 HTTP 200。备份 `/var/backups/aethericai-official/20261010-dashboard-menu/`，发布 `20261010-dashboard-menu`。
 
 | 证据 ID | 时间 | 方法摘要 | 退出状态 | 版本或文件哈希 | 结果摘要 | 证据位置 | 有效期 |
 |---|---|---|---|---|---|---|---|

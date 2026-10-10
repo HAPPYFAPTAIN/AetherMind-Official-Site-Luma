@@ -147,6 +147,7 @@ export function ConsolePage() {
             {accountMenuOpen && <div className="console-account-menu" role="menu">
               <strong>{account.phoneMasked}</strong>
               <small>{account.userId}</small>
+              <a href={assetUrl("/dashboard/")} role="menuitem"><span aria-hidden="true">▦</span> {zh ? "仪表盘" : "Dashboard"}</a>
               <a href={assetUrl("/profile/")} role="menuitem">♙ {zh ? "个人中心" : "Personal center"}</a>
               <button role="menuitem">☼ {zh ? "暗色模式" : "Dark mode"}</button>
               <button role="menuitem" onClick={() => void logout()}>⇥ {zh ? "退出登录" : "Sign out"}</button>

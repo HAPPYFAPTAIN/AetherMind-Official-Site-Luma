@@ -14,7 +14,7 @@ def active(c, uid: str, product: str, now: int) -> bool:
         'SELECT units, expires_at_ms FROM official_entitlements WHERE user_id=? AND product_id=?',
         (uid, product),
     ).fetchone()
-    return bool(row and (row['units'] > 0 or (row['expires_at_ms'] or 0) > now))
+    return bool(row and (row['expires_at_ms'] or 0) > now)
 
 
 class Purchase(Strict):
@@ -27,7 +27,9 @@ def grant(w, c, uid, product, units, days):
     if not product:
         return
     old = c.execute('SELECT * FROM official_entitlements WHERE user_id=? AND product_id=?', (uid, product)).fetchone()
-    total = (old['units'] if old else 0) + units
+    if units or days <= 0:
+        raise ApiError(400, 'DURATION_REQUIRED', '产品授权须填写有效天数，不支持次数授权')
+    total = 0
     expiry = old['expires_at_ms'] if old else None
     if days:
         expiry = max(expiry or 0, w.now()) + days * DAY
@@ -47,7 +49,7 @@ def purchase(w, uid, data):
                 raise ApiError(409, 'IDEMPOTENCY_CONFLICT', '购买请求已用于另一产品')
             return dict(prior)
         p = c.execute("SELECT * FROM official_products WHERE id=? AND status='AVAILABLE'", (data.productId,)).fetchone()
-        if not p or not (p['package_units'] or p['package_days']):
+        if not p or not p['package_days']:
             raise ApiError(409, 'NOT_FOR_SALE', '该产品尚未开放购买')
         if p['price'] != data.expectedPrice:
             raise ApiError(409, 'PRICE_CHANGED', '产品价格已更新，请重新打开产品详情后购买')

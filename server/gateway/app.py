@@ -191,13 +191,8 @@ class Gateway:
     def _entitled(self, c, principal: Principal, *, reserve: bool = False) -> None:
         row = c.execute("SELECT units,expires_at_ms FROM official_entitlements WHERE user_id=? AND product_id=?",
                         (principal.user_id, principal.product_id)).fetchone()
-        if not row or (row["units"] <= 0 and (row["expires_at_ms"] or 0) <= self.workspace.now()):
-            raise _error("ENTITLEMENT_REQUIRED", "用户尚未激活该产品或次数已用完", 403)
-        if reserve and (row["expires_at_ms"] or 0) <= self.workspace.now():
-            pending = c.execute("SELECT COUNT(*) FROM gateway_events WHERE user_id=? AND product_id=? AND status='PENDING'",
-                                (principal.user_id, principal.product_id)).fetchone()[0]
-            if row["units"] <= pending:
-                raise _error("ENTITLEMENT_BUSY", "可用次数已被进行中的请求占用", 409)
+        if not row or (row["expires_at_ms"] or 0) <= self.workspace.now():
+            raise _error("ENTITLEMENT_REQUIRED", "产品未激活或已到期", 403)
 
     def route(self, model: str) -> Route:
         with self.workspace.db.connect() as c:
@@ -236,7 +231,7 @@ class Gateway:
             if self.closing or len(self.tasks) >= MAX_ACTIVE:
                 raise _error("GATEWAY_BUSY", "网关繁忙，请稍后重试", 503)
             self._entitled(c, principal, reserve=True)
-            minimum = max(self.min_balance, price(c, product_id=principal.product_id, model=model, units=1))
+            minimum = max(self.min_balance, price(c, product_id=principal.product_id, model=model, units=0))
             if balance(c, principal.user_id) < minimum:
                 raise _error("INSUFFICIENT_CREDITS", "积分余额不足，请先充值", 402)
             c.execute("""INSERT INTO gateway_events(product_id,event_id,fingerprint,user_id,model,kind,status,

@@ -91,11 +91,13 @@ export function AdminPanel({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [target, setTarget] = useState<AccountProfile | null>(null);
-  const [action, setAction] = useState<"role" | "credits" | "redeem">("role");
+  const [action, setAction] = useState<"role" | "credits" | "redeem" | "duration">("role");
   const [role, setRole] = useState<"USER" | "ADMIN">("USER");
   const [scopes, setScopes] = useState<string[]>([]);
   const [delta, setDelta] = useState("");
   const [reason, setReason] = useState("");
+  const [accessDays, setAccessDays] = useState(30);
+  const [accessProduct, setAccessProduct] = useState("md-exp");
   const [code, setCode] = useState("");
   const [codes, setCodes] = useState<string[]>([]);
   const batchRequest = useRef({ value: "", id: "" });
@@ -241,6 +243,8 @@ export function AdminPanel({
               requestId: actionRequestId,
             }),
           });
+        if (action === "duration")
+          await accountApi(`/admin/users/${target.userId}/products/${accessProduct}/duration`, {method: "PUT", body: JSON.stringify({days: accessDays})});
         if (action === "redeem")
           await redeemActivationCode(code, target.userId);
         setTarget(null);
@@ -299,9 +303,9 @@ export function AdminPanel({
             entryUrl: p.entry_url,
             status: p.status,
             price: p.price,
-            packageUnits: p.package_units,
+            packageUnits: 0,
             packageDays: p.package_days,
-            unitPointCost: p.unit_point_cost,
+            unitPointCost: 0,
           }),
         });
         setEditProduct(null);
@@ -495,6 +499,7 @@ export function AdminPanel({
                             {t("调整积分", "Adjust credits")}
                           </button>
                         )}
+                        {owner && <button onClick={() => openUser(u, "duration")}>{t("设置产品期限", "Set product duration")}</button>}
                         <button onClick={() => openUser(u, "redeem")}>
                           {t("激活码授权", "Grant with code")}
                         </button>
@@ -610,23 +615,7 @@ export function AdminPanel({
                   </select>
                 </label>
                 <label>
-                  {t("每码使用次数", "Uses per code")}
-                  <input
-                    disabled={!batchForm.productId}
-                    type="number"
-                    min={0}
-                    max={1000000}
-                    value={batchForm.units}
-                    onChange={(e) =>
-                      setBatchForm({
-                        ...batchForm,
-                        units: Number(e.target.value),
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  {t("每码有效天数", "Access days per code")}
+                  {t("产品有效天数（自定义）", "Custom product access days")}
                   <input
                     disabled={!batchForm.productId}
                     type="number"
@@ -687,8 +676,8 @@ export function AdminPanel({
                 </label>
                 <p className="dash-form-note">
                   {t(
-                    `本批总额：${batchForm.quantity * batchForm.credits} 积分 · ${batchForm.quantity * batchForm.units} 次。产品按天授权在有效期内不限次数，按次授权按调用扣减。`,
-                    `Batch total: ${batchForm.quantity * batchForm.credits} credits · ${batchForm.quantity * batchForm.units} uses. Time access covers calls until expiry; use-based access is metered.`,
+                    `本批总额：${batchForm.quantity * batchForm.credits} 积分 · 每码 ${batchForm.days} 天。产品按自定义天数授权，有效期内不限次数；模型调用单独扣积分。`,
+                    `Batch total: ${batchForm.quantity * batchForm.credits} credits · ${batchForm.days} days per code. Access lasts until expiry; model calls cost credits.`,
                   )}
                 </p>
                 <button
@@ -764,7 +753,7 @@ export function AdminPanel({
                       <td>
                         {b.credits} {t("积分", "credits")}
                         <small>
-                          {b.product_id || "—"} · {b.units} {t("次", "uses")} ·{" "}
+                          {b.product_id || "—"} ·{" "}
                           {b.days} {t("天", "days")}
                         </small>
                       </td>
@@ -824,7 +813,7 @@ export function AdminPanel({
                   <tr>
                     <th>{t("产品", "Product")}</th>
                     <th>{t("状态", "Status")}</th>
-                    <th>{t("售价 / 次数 / 天数", "Price / uses / days")}</th>
+                    <th>{t("售价 / 有效天数", "Price / access days")}</th>
                     <th>{t("操作", "Actions")}</th>
                   </tr>
                 </thead>
@@ -841,7 +830,7 @@ export function AdminPanel({
                           : t("未上架", "Not for sale")}
                       </td>
                       <td>
-                        {p.price} / {p.package_units} / {p.package_days}
+                        {p.price} / {p.package_days}
                       </td>
                       <td>
                         <div className="dash-row-actions">
@@ -1093,7 +1082,7 @@ export function AdminPanel({
                 ? t("设置用户身份", "Set user role")
                 : action === "credits"
                   ? t("调整积分", "Adjust credits")
-                  : t("使用激活码授权", "Grant with a code")}
+                  : action === "duration" ? t("设置产品期限", "Set product duration") : t("使用激活码授权", "Grant with a code")}
             </h2>
             <p>
               {target.displayName} · {target.phoneMasked}
@@ -1101,6 +1090,11 @@ export function AdminPanel({
               <small>{target.userId}</small>
             </p>
             <form onSubmit={saveUser}>
+              {action === "duration" && <>
+                <label>{t("产品", "Product")}<select value={accessProduct} onChange={e=>setAccessProduct(e.target.value)}>{products.map(p=><option key={p.id} value={p.id}>{zh?p.name:p.name_en}</option>)}</select></label>
+                <label>{t("自定义有效天数", "Custom access days")}<input required type="number" min={1} max={3650} step={1} value={accessDays} onChange={e=>setAccessDays(Number(e.target.value))}/></label>
+                <p>{t("从保存时起计算；有效期内不限次数，模型调用单独扣积分。", "Starts when saved. Unlimited access until expiry; model calls cost credits.")}</p>
+              </>}
               {action === "role" && (
                 <>
                   <label>
@@ -1300,9 +1294,7 @@ export function AdminPanel({
               {(
                 [
                   ["price", t("套餐售价（积分）", "Package price (credits)")],
-                  ["package_units", t("套餐次数", "Package uses")],
-                  ["package_days", t("套餐有效天数", "Package days")],
-                  ["unit_point_cost", t("每次调用消耗积分", "Credits per use")],
+                  ["package_days", t("产品有效天数（自定义）", "Custom access days")],
                 ] as const
               ).map(([key, label]) => (
                 <label key={key}>

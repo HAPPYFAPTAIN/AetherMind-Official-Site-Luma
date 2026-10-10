@@ -543,8 +543,8 @@ export function DashboardPage() {
                         <h2>{t("产品权益", "Product access")}</h2>
                         <p>
                           {t(
-                            "已激活的产品与剩余次数",
-                            "Active products and remaining uses",
+                            "已激活的产品与使用期限",
+                            "Active products and access duration",
                           )}
                         </p>
                       </div>
@@ -679,12 +679,12 @@ export function DashboardPage() {
                         >
                           {p.active
                             ? t("已激活", "Active")
-                            : t("已到期 / 已用完", "Expired / depleted")}
+                            : t("未激活 / 已到期", "Inactive / expired")}
                         </span>
                         <h3>{zh ? p.name : p.name_en}</h3>
                         <strong>
-                          {formatCount(p.units)}{" "}
-                          <small>{t("剩余次数", "uses left")}</small>
+                          {p.active ? Math.max(1, Math.ceil(((p.expires_at_ms || 0) - data.asOf) / 86400000)) : 0}{" "}
+                          <small>{t("剩余天数", "days remaining")}</small>
                         </strong>
                         <p>
                           {t("有效期至", "Access until")}{" "}
@@ -778,7 +778,7 @@ export function DashboardPage() {
                         <tr>
                           <th>{t("产品", "Product")}</th>
                           <th>{t("积分", "Credits")}</th>
-                          <th>{t("次数 / 天数", "Uses / days")}</th>
+                          <th>{t("授权天数", "Access days")}</th>
                           <th>{t("时间", "Time")}</th>
                         </tr>
                       </thead>
@@ -788,7 +788,7 @@ export function DashboardPage() {
                             <td>{o.name}</td>
                             <td>{o.price}</td>
                             <td>
-                              {o.units} / {o.days}
+                              {o.days}
                             </td>
                             <td>{formatDate(o.created_at_ms, true)}</td>
                           </tr>

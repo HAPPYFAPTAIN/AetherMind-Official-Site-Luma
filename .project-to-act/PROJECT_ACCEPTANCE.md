@@ -21,6 +21,8 @@
 
 ## 证据索引
 
+E-036（2026-10-10）：产品改按自定义期限授权，OWNER 的 MD EXP 按明确确认恢复30天。隔离 SQLite 回归验证三次调用只扣积分不减少期限、到期拒绝、普通用户不能改期限、管理员设置期限、按天激活码和 MD EXP 入口；1项综合测试通过，build:ip通过，lint无错误。生产只读核验 active=true、期限约30天、gateway授权通过。浏览器匿名页正常；登录后的完整管理页面点击仍未验收。备份 `/var/backups/aethericai-official/20261010-duration-access/`，静态发布 `20261010-duration`，细节见 `docs/md-agent-console.md`。
+
 | 证据 ID | 时间 | 方法摘要 | 退出状态 | 版本或文件哈希 | 结果摘要 | 证据位置 | 有效期 |
 |---|---|---|---|---|---|---|---|
 | E-001 | 2026-09-29 | 初始化、validate、audit | 0 | `.project-to-act/` 当前文件 | managed 文档、索引和仓库说明已创建 | 本地命令输出 | 当前 |

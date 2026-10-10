@@ -91,10 +91,10 @@ def charge(w, c, *, user_id, product_id, event_id, usage: UsageEvent,
                             replayed=True, balance_after=balance(c, user_id))
     e = c.execute('SELECT * FROM official_entitlements WHERE user_id=? AND product_id=?', (user_id, product_id)).fetchone()
     timed = e and (e['expires_at_ms'] or 0) > now
-    if not e or (not timed and (usage.units <= 0 or e['units'] < usage.units)):
-        raise ApiError(403, 'ENTITLEMENT_REQUIRED', '产品权益或剩余次数不足')
+    if not timed:
+        raise ApiError(403, 'ENTITLEMENT_REQUIRED', '产品未激活或已到期')
     name = c.execute('SELECT name FROM official_products WHERE id=?', (product_id,)).fetchone()['name']
-    points = price(c, product_id=product_id, model=usage.model, units=usage.units,
+    points = price(c, product_id=product_id, model=usage.model, units=0,
                    input_tokens=usage.input_tokens, cached_tokens=usage.cached_tokens,
                    output_tokens=usage.output_tokens, core_minutes=usage.core_minutes)
     shortfall = 0
@@ -103,8 +103,6 @@ def charge(w, c, *, user_id, product_id, event_id, usage: UsageEvent,
         points -= shortfall
     credit(w, c, user_id, -points, 'USAGE', reason or ('使用 · ' + name), actor,
            'usage:' + product_id + ':' + event_id, fp, product_id)
-    if not timed:
-        c.execute('UPDATE official_entitlements SET units=units-? WHERE user_id=? AND product_id=?', (usage.units, user_id, product_id))
     eid = random_id()
     c.execute('INSERT INTO official_usage(id,user_id,product_id,event_id,fingerprint,units,points,'
               'input_tokens,cached_tokens,output_tokens,model,core_minutes,shortfall,created_at_ms) '

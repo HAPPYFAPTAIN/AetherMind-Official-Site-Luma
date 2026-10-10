@@ -35,6 +35,8 @@ def batch_codes(w, actor, request_id, quantity):
 
 def create_batch(w, actor, data):
     from ..admin.roles import require, role, audit
+    if data.units or (data.productId and data.days <= 0):
+        raise ApiError(400, 'DURATION_REQUIRED', '产品激活码须填写自定义有效天数，不支持次数授权')
     if not (data.credits or data.units or data.days) or ((data.units or data.days) and not data.productId):
         raise ApiError(400, 'INVALID_GRANT', '填写积分或指定产品权益')
     with w.db.connect() as c:

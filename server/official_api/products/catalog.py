@@ -43,8 +43,8 @@ def edit_product(w, actor, pid, data):
     url = urlsplit(data.entryUrl)
     if data.entryUrl and not ((data.entryUrl.startswith('/official/') and not url.netloc and not url.scheme) or (url.scheme == 'https' and url.hostname and not url.username and not url.password)):
         raise ApiError(400, 'INVALID_ENTRY_URL', '入口须为 HTTPS 网址或本站 /official/ 路径')
-    if data.status == 'AVAILABLE' and not (data.packageDays or data.packageUnits):
-        raise ApiError(400, 'EMPTY_PACKAGE', '上架前需配置权益次数或有效天数')
+    if data.packageUnits or data.unitPointCost or (data.status == 'AVAILABLE' and not data.packageDays):
+        raise ApiError(400, 'EMPTY_PACKAGE', '请配置自定义有效天数，次数与按次积分须为零')
     with w.db.connect() as c:
         c.execute('BEGIN IMMEDIATE')
         require(c, actor, owner=True)

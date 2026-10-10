@@ -149,7 +149,9 @@ class Workspace:
             ranking = [dict(r) for r in c.execute(f'SELECT product_id,{sums} FROM official_usage WHERE {where} AND created_at_ms>=? GROUP BY product_id ORDER BY calls DESC', (*params, start - (days - 1) * DAY))]
             grants = [dict(r) for r in c.execute('SELECT e.*,p.name,p.name_en,p.entry_url,p.image FROM official_entitlements e JOIN official_products p ON p.id=e.product_id WHERE e.user_id=?', (uid,))]
             for e in grants:
-                e['active'] = bool(e['units'] > 0 or (e['expires_at_ms'] or 0) > now)
+                e['active'] = bool((e['expires_at_ms'] or 0) > now)
+                if e['product_id'] == 'md-exp':
+                    e['entry_url'] = '/official/console/'
             ledger = [dict(r) for r in c.execute('SELECT id,delta,balance_after,kind,reason,created_at_ms FROM official_ledger WHERE user_id=? ORDER BY created_at_ms DESC,rowid DESC LIMIT 100', (uid,))]
             totals = c.execute('SELECT COALESCE(SUM(CASE WHEN delta>0 THEN delta ELSE 0 END),0) credited,COALESCE(SUM(CASE WHEN delta<0 THEN -delta ELSE 0 END),0) spent FROM official_ledger WHERE user_id=?', (uid,)).fetchone()
             orders = [dict(r) for r in c.execute('SELECT o.*,p.name FROM official_purchases o JOIN official_products p ON p.id=o.product_id WHERE user_id=? ORDER BY created_at_ms DESC LIMIT 100', (uid,))]

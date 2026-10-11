@@ -608,8 +608,8 @@
   border-radius: 16px;
   padding: 19px 22px;
   display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
+  grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.3fr);
+  align-items: start;
   gap: 12px;
   background: #223c4c44;
 }
@@ -622,32 +622,40 @@
   color: var(--dash-muted);
   margin-top: 5px;
 }
-.dash-access-strip strong {
-  font-size: 24px;
-  font-weight: 600;
+.dash-access-list {
+  display: grid;
+  gap: 8px;
 }
-.dash-access-strip strong small {
-  font-size: 13px;
-  color: var(--dash-muted);
-  font-weight: 400;
-}
-.dash-access-progress {
+.dash-access-product {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--dash-line);
+}
+.dash-access-product:last-child {
+  border-bottom: 0;
+}
+.dash-access-product > div {
+  display: grid;
   gap: 5px;
-  height: 5px;
+  min-width: 0;
 }
-.dash-access-progress i {
-  flex: 1;
-  background: #304856;
-  border-radius: 3px;
+.dash-access-product strong {
+  font-size: 14px;
+  font-weight: 550;
 }
-.dash-access-progress i.active {
-  background: #84cfe8;
-}
-.dash-access-strip button {
+.dash-access-product span,
+.dash-access-empty {
+  color: var(--dash-muted);
   font-size: 11px;
-  color: var(--dash-cyan);
-  text-align: right;
+}
+.dash-access-product .dash-primary {
+  flex: 0 0 auto;
+  padding: 8px 13px;
+  font-size: 11px;
 }
 .dash-filters {
   display: flex;
@@ -693,7 +701,8 @@
 .dashboard-page.dash-theme-light .dash-panel,
 .dashboard-page.dash-theme-light .dash-overview,
 .dashboard-page.dash-theme-light .dash-stat,
-.dashboard-page.dash-theme-light .dash-product-card { background: #fff; }
+.dashboard-page.dash-theme-light .dash-product-card,
+.dashboard-page.dash-theme-light .dash-access-strip { background: #fff; }
 .dashboard-page.dash-theme-light .dash-heading h1,
 .dashboard-page.dash-theme-light .dash-panel-title h2,
 .dashboard-page.dash-theme-light .dash-panel-title h3,
@@ -717,7 +726,8 @@
   .dashboard-page.dash-theme-system .dash-panel,
   .dashboard-page.dash-theme-system .dash-overview,
   .dashboard-page.dash-theme-system .dash-stat,
-  .dashboard-page.dash-theme-system .dash-product-card { background: #fff; }
+  .dashboard-page.dash-theme-system .dash-product-card,
+  .dashboard-page.dash-theme-system .dash-access-strip { background: #fff; }
 }
 .dash-filters select,
 .dash-search input {
@@ -1481,6 +1491,7 @@
   }
   .dash-access-strip {
     padding: 16px;
+    grid-template-columns: 1fr;
   }
   .dash-panel {
     padding: 20px 16px;

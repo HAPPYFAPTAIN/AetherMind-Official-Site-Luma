@@ -37,6 +37,8 @@
   border: 1px solid var(--dash-line);
   border-radius: 18px;
   background: #0b151f;
+  display: flex;
+  flex-direction: column;
   transition: width 0.2s ease, padding 0.2s ease;
 }
 .dash-sidebar-head {
@@ -105,6 +107,50 @@
   margin-top: 22px;
   padding-top: 16px;
   border-top: 1px solid var(--dash-line);
+}
+.dash-theme-switcher {
+  position: relative;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--dash-line);
+}
+.dash-theme-trigger,
+.dash-theme-menu button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  color: #9eb3c1;
+  font-size: 13px;
+  text-align: left;
+}
+.dash-theme-trigger:hover,
+.dash-theme-menu button:hover,
+.dash-theme-menu button.active {
+  color: #e8f7ff;
+  background: #1b3648;
+}
+.dash-theme-menu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  z-index: 8;
+  width: 180px;
+  padding: 8px;
+  border: 1px solid #dfe8ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(8, 21, 32, 0.22);
+}
+.dash-theme-menu button {
+  color: #263744;
+}
+.dash-theme-menu button.active {
+  color: #16344a;
+  background: #e3f2fc;
 }
 .dash-tab-view {
   animation: dash-tab-enter 0.28s ease both;
@@ -246,13 +292,14 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  border-radius: 14px;
-  border: 1px solid #4a708a;
-  color: #bce8ff;
+  border-radius: 50%;
+  border: 0;
+  color: #fff;
   display: grid;
   place-items: center;
-  background: #193344;
+  background: #3f86ed;
 }
+.dash-user-glyph { width: 22px; height: 22px; }
 .dash-avatar-button {
   display: flex;
   align-items: center;
@@ -625,6 +672,52 @@
 }
 .dashboard-page select {
   color-scheme: dark;
+}
+.dashboard-page.dash-theme-light {
+  --dash-cyan: #167ca8;
+  --dash-blue: #3479d5;
+  --dash-mint: #258c72;
+  --dash-muted: #647688;
+  --dash-line: rgba(30, 62, 82, 0.14);
+  color: #17232d;
+  background: #f4f7fa;
+}
+.dashboard-page.dash-theme-light .dash-topbar { background: rgba(255, 255, 255, 0.94); }
+.dashboard-page.dash-theme-light .dash-sidebar { background: #fff; }
+.dashboard-page.dash-theme-light .dash-sidebar nav button,
+.dashboard-page.dash-theme-light .dash-theme-trigger { color: #5a6f80; }
+.dashboard-page.dash-theme-light .dash-sidebar nav button:hover,
+.dashboard-page.dash-theme-light .dash-sidebar nav button.active,
+.dashboard-page.dash-theme-light .dash-theme-trigger:hover { color: #17445f; background: #e5f3fb; }
+.dashboard-page.dash-theme-light .dash-sidebar-section-label { color: #8493a0; }
+.dashboard-page.dash-theme-light .dash-panel,
+.dashboard-page.dash-theme-light .dash-overview,
+.dashboard-page.dash-theme-light .dash-stat,
+.dashboard-page.dash-theme-light .dash-product-card { background: #fff; }
+.dashboard-page.dash-theme-light .dash-heading h1,
+.dashboard-page.dash-theme-light .dash-panel-title h2,
+.dashboard-page.dash-theme-light .dash-panel-title h3,
+.dashboard-page.dash-theme-light .dash-panel > h3,
+.dashboard-page.dash-theme-light .dash-stat > strong,
+.dashboard-page.dash-theme-light .dash-product-card h3 { color: #17232d; }
+.dashboard-page.dash-theme-light .dash-heading p:not(.dash-eyebrow),
+.dashboard-page.dash-theme-light .dash-panel-title span,
+.dashboard-page.dash-theme-light .dash-panel-title small,
+.dashboard-page.dash-theme-light .dash-stat-top small,
+.dashboard-page.dash-theme-light .dash-product-card p { color: #647688; }
+.dashboard-page.dash-theme-light .dash-filters select,
+.dashboard-page.dash-theme-light .dash-search input { color-scheme: light; background: #fff; color: #263744; }
+.dashboard-page.dash-theme-light .dash-account-menu { background: #fff; border-color: #dfe8ef; }
+.dashboard-page.dash-theme-light .dash-account-menu strong { color: #17232d; }
+.dashboard-page.dash-theme-light .dash-account-menu button { color: #526879; }
+@media (prefers-color-scheme: light) {
+  .dashboard-page.dash-theme-system { color: #17232d; background: #f4f7fa; }
+  .dashboard-page.dash-theme-system .dash-topbar { background: rgba(255, 255, 255, 0.94); }
+  .dashboard-page.dash-theme-system .dash-sidebar { background: #fff; }
+  .dashboard-page.dash-theme-system .dash-panel,
+  .dashboard-page.dash-theme-system .dash-overview,
+  .dashboard-page.dash-theme-system .dash-stat,
+  .dashboard-page.dash-theme-system .dash-product-card { background: #fff; }
 }
 .dash-filters select,
 .dash-search input {

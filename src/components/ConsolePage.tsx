@@ -58,7 +58,7 @@ const agents = [
 ];
 
 export function ConsolePage() {
-  const { language, setLanguage } = useLanguage();
+  const { language } = useLanguage();
   const zh = language === "zh";
   const [section, setSection] = useState<Section>("agents");
   const [loginOpen, setLoginOpen] = useState(false);
@@ -125,21 +125,17 @@ export function ConsolePage() {
     <main className="console-page">
       <header className="console-topbar">
         <div className="console-brand">
-          <a href={assetUrl("/")} aria-label={zh ? "返回官网" : "Back to website"}>
+          <a href={assetUrl("/")} aria-label={zh ? "以太智元" : "AethericAI"}>
             <span className="console-mark" aria-hidden="true"><Mark /></span>
             {zh ? BRAND.zh : BRAND.en}
           </a>
         </div>
         <div className="console-top-actions">
-          <a href={assetUrl("/")} className="console-return">↗ {zh ? "返回官网" : "Back to website"}</a>
-          <button className="console-language" onClick={() => setLanguage(zh ? "en" : "zh")}>
-            {zh ? "EN" : "中"}
-          </button>
           {account ? (
             <div className="console-account-wrap">
             <button className="console-account console-account-compact" onClick={() => setAccountMenuOpen((open) => !open)} aria-expanded={accountMenuOpen}
               aria-label={zh ? "打开个人中心菜单" : "Open account menu"}>
-              <span>{account.displayName.slice(0, 1)}</span>
+              <span><UserGlyph /></span>
               <i>⌄</i>
             </button>
             {accountMenuOpen && <div className="console-account-menu" role="menu">
@@ -196,6 +192,15 @@ export function ConsolePage() {
       </div>
       {loginOpen && <LoginPage overlay onClose={() => setLoginOpen(false)} />}
     </main>
+  );
+}
+
+function UserGlyph() {
+  return (
+    <svg className="console-user-glyph" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M5.5 19c0-3.2 2.9-5.4 6.5-5.4s6.5 2.2 6.5 5.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
   );
 }
 

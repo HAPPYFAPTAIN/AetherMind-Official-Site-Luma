@@ -21,6 +21,9 @@ import { BRAND } from "@/lib/site";
 import { useDialogFocus } from "@/lib/use-dialog-focus";
 import "./dashboard.css";
 
+type DashboardTheme = "light" | "dark" | "system";
+const DASHBOARD_THEME_KEY = "aethericai-dashboard-theme";
+
 export function formatCount(value: number) {
   return new Intl.NumberFormat("en-US", {
     notation: value >= 1e6 ? "compact" : "standard",
@@ -261,6 +264,8 @@ export function DashboardPage() {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState<DashboardTheme>("system");
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const closePassword = useCallback(() => setPasswordOpen(false), []);
   const [redeemOpen, setRedeemOpen] = useState(false);
   const [code, setCode] = useState("");
@@ -271,6 +276,20 @@ export function DashboardPage() {
     setRedeemOpen(false);
   }, []);
   useDialogFocus(redeemOpen, closeRedeem);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(DASHBOARD_THEME_KEY);
+    if (stored === "light" || stored === "dark" || stored === "system") {
+      const timer = window.setTimeout(() => setTheme(stored), 0);
+      return () => window.clearTimeout(timer);
+    }
+  }, []);
+
+  const chooseTheme = (nextTheme: DashboardTheme) => {
+    setTheme(nextTheme);
+    setThemeMenuOpen(false);
+    window.localStorage.setItem(DASHBOARD_THEME_KEY, nextTheme);
+  };
 
   useEffect(() => {
     let active = true;
@@ -354,11 +373,11 @@ export function DashboardPage() {
     ...(data?.profile.role !== "USER" ? [["admin", t("管理中心", "Administration"), "⚙"]] : []),
   ];
   return (
-    <main className="dashboard-page">
+    <main className={`dashboard-page dash-theme-${theme}`}>
       <header className="dash-topbar" aria-label={t("工作台顶栏", "Workspace header")}>
         <div className="dash-topbar-inner">
           <div className="dash-topbar-brand">
-            <a href={assetUrl("/")} aria-label={t("返回以太智元官网", "Back to AethericAI home")}>
+            <a href={assetUrl("/")} aria-label={t("以太智元", "AethericAI")}>
               <Mark />
               {zh ? BRAND.zh : BRAND.en}
             </a>
@@ -389,7 +408,7 @@ export function DashboardPage() {
                 aria-expanded={accountMenuOpen}
                 aria-label={t("账户安全：设置或修改密码", "Account security: set or change password")}
                 title={t("设置或修改密码", "Set or change password")}>
-                <span className="dash-avatar">{data.profile.displayName.slice(0, 1)}</span>
+                <span className="dash-avatar"><UserGlyph /></span>
               </button>
               {accountMenuOpen && (
                 <div className="dash-account-menu" role="menu">
@@ -429,6 +448,33 @@ export function DashboardPage() {
                 </a>
                 <button className="dash-primary" onClick={() => { setError(""); setRedeemOpen(true); setSidebarOpen(false); }}>
                   <span className="dash-sidebar-icon" aria-hidden="true">◇</span><span className="dash-sidebar-label">{t("兑换激活码", "Redeem code")}</span>
+                </button>
+              </div>
+              <div className="dash-theme-switcher">
+                {themeMenuOpen && (
+                  <div className="dash-theme-menu" role="menu" aria-label={t("显示模式", "Display mode")}>
+                    {(["light", "dark", "system"] as DashboardTheme[]).map((option) => (
+                      <button
+                        key={option}
+                        className={theme === option ? "active" : ""}
+                        role="menuitemradio"
+                        aria-checked={theme === option}
+                        onClick={() => chooseTheme(option)}
+                      >
+                        <span aria-hidden="true">{option === "light" ? "☼" : option === "dark" ? "☾" : "◐"}</span>
+                        {option === "light" ? t("浅色", "Light") : option === "dark" ? t("深色", "Dark") : t("跟随系统", "System")}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <button
+                  className="dash-theme-trigger"
+                  aria-expanded={themeMenuOpen}
+                  aria-haspopup="menu"
+                  onClick={() => setThemeMenuOpen((open) => !open)}
+                >
+                  <span className="dash-sidebar-icon" aria-hidden="true">{theme === "light" ? "☼" : theme === "dark" ? "☾" : "◐"}</span>
+                  <span className="dash-sidebar-label">{theme === "light" ? t("浅色", "Light") : theme === "dark" ? t("深色", "Dark") : t("跟随系统", "System")}</span>
                 </button>
               </div>
             </aside>
@@ -876,4 +922,13 @@ export function DashboardPage() {
 
 function MenuGlyph() {
   return <span className="dash-menu-glyph" aria-hidden="true"><i /><i /><i /></span>;
+}
+
+function UserGlyph() {
+  return (
+    <svg className="dash-user-glyph" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M5.5 19c0-3.2 2.9-5.4 6.5-5.4s6.5 2.2 6.5 5.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
 }

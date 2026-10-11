@@ -18,3 +18,5 @@
 .console-model-list em { font-style:normal; color:#8196a3; font-size:11px; }
 .console-model-list em.verified { color:#8cf0c1; }
 @media (max-width:620px) { .console-model-list > div { grid-template-columns:1fr auto; } .console-model-list small { grid-column:1/-1; } }
+.console-account > span { width:40px; height:40px; border:0; border-radius:50%; background:#3f86ed; color:#fff; }
+.console-user-glyph { width:22px; height:22px; }

@@ -135,4 +135,13 @@ def set_model(w, c, data):
                updated_at_ms=excluded.updated_at_ms""",
         (data.model, data.provider, data.upstreamModel, int(data.enabled), now),
     )
+    # New routes follow the confirmed default billing rule (10 tokens = 1
+    # point) until the owner chooses a model-specific rate in Usage rates.
+    c.execute(
+        """INSERT OR IGNORE INTO official_rates(
+             id,scope,key,points_per_unit,points_per_mtok_input,
+             points_per_mtok_cached,points_per_mtok_output,updated_at_ms,updated_by)
+           VALUES(?,?,?,?,?,?,?,?,?)""",
+        (random_id(), "llm-model", data.model, 0, 100000, 100000, 100000, now, "SYSTEM_DEFAULT"),
+    )
     return dict(c.execute('SELECT * FROM official_llm_models WHERE model=?', (data.model,)).fetchone())

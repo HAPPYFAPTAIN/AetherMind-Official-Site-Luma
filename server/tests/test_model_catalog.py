@@ -28,3 +28,14 @@ def test_project_model_catalog_requires_gateway_key_for_both_providers():
     providers = load_catalog().MODEL_CONFIG["llm-pi-ai"]["providers"]
     assert providers["kimi"]["apiKeyEnv"] == "MDEXP_PROXY_KEY"
     assert providers["deepseek"]["apiKeyEnv"] == "MDEXP_PROXY_KEY"
+
+
+def test_provision_template_patch_adds_gateway_key_env_idempotently():
+    catalog = load_catalog()
+    source = (
+        '    "kimi": """      displayName: "Kimi"\n'
+        '    "deepseek": """      displayName: "DeepSeek"\n'
+    )
+    patched = catalog.ensure_proxy_key_env(source)
+    assert patched.count("apiKeyEnv: MDEXP_PROXY_KEY") == 2
+    assert catalog.ensure_proxy_key_env(patched) == patched

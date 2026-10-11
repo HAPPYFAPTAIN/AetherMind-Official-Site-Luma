@@ -1,0 +1,8 @@
+fastapi==0.128.8
+uvicorn==0.39.0
+python-multipart==0.0.20
+alibabacloud-dypnsapi20170525==2.0.0
+alibabacloud-credentials==1.0.12
+httpx==0.28.1
+Pillow==12.1.1
+cryptography==50.0.2

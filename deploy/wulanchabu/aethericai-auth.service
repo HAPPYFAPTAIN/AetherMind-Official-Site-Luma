@@ -1,0 +1,42 @@
+[Unit]
+Description=AethericAI official-site auth and community API
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=aethericai-auth
+Group=aethericai-auth
+WorkingDirectory=/srv/aethericai-auth/current
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/etc/aethericai-auth/auth.env
+ExecStart=/srv/aethericai-auth/current/.venv/bin/python -m official_api
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+UMask=0077
+StateDirectory=aethericai-auth
+StateDirectoryMode=0700
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+LimitNOFILE=4096
+TasksMax=64
+MemoryMax=768M
+
+[Install]
+WantedBy=multi-user.target

@@ -1,21 +1,33 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { useLanguage } from "./LanguageProvider";
 import { assetUrl } from "@/lib/asset-url";
 import {
   COMMUNITY_TERMS_VERSION,
   communityReturnPath,
 } from "@/lib/community-login";
+import { AccountError, publicPost, setSession } from "@/lib/account-client";
 import "./login.css";
 
-const apiBase = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/llmer-api";
+const subscribeLocation = (notify: () => void) => {
+  window.addEventListener("popstate", notify);
+  return () => window.removeEventListener("popstate", notify);
+};
+const locationSearch = () => window.location.search;
+const serverSearch = () => "";
 
-export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onClose?: () => void }) {
+export function LoginPage({ overlay = false, onClose, returnTo: returnToProp }: { overlay?: boolean; onClose?: () => void; returnTo?: string }) {
   const { language, setLanguage } = useLanguage();
   const zh = language === "zh";
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
+  const [selectedMode, setMode] = useState<"sms" | "password" | null>(null);
+  const search = useSyncExternalStore(subscribeLocation, locationSearch, serverSearch);
+  const params = new URLSearchParams(search);
+  const mode = selectedMode ?? (params.get("mode") === "password" ? "password" : "sms");
+  const [password, setPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState<"send" | "verify" | null>(null);
@@ -25,6 +37,8 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
   const [error, setError] = useState("");
   const phoneRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
+  const statusMessage = message || (params.get("passwordChanged") === "1"
+    ? (zh ? "密码已更新，请使用新密码登录。" : "Password updated. Sign in with your new password.") : "");
   useEffect(() => {
     if (!cooldown) return;
     const timer = window.setTimeout(
@@ -33,25 +47,30 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
     );
     return () => window.clearTimeout(timer);
   }, [cooldown]);
-  const request = async (path: string, body: object) => {
-    const response = await fetch(apiBase + path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const data =
-      response.status === 204 ? null : await response.json().catch(() => null);
-    if (!response.ok) {
-      if (response.status === 429)
-        setCooldown(
-          Math.min(3600, Number(data?.error?.retryAfterSeconds) || 60),
-        );
-      throw new Error(
-        data?.error?.message ||
-          (zh ? "操作未完成，请稍后重试。" : "Please try again later."),
-      );
+  useEffect(() => {
+    if (!overlay) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.body.classList.add("login-open");
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.classList.remove("login-open");
+    };
+  }, [overlay]);
+  const request = async <T,>(path: string, body: object): Promise<T> => {
+    try {
+      return await publicPost<T>(path, body);
+    } catch (error) {
+      if (error instanceof AccountError) {
+        if (error.status === 429)
+          setCooldown(Math.min(3600, Number(error.retryAfterSeconds) || 60));
+        if (error.message === "操作未完成，请稍后重试")
+          throw new Error(
+            zh ? "操作未完成，请稍后重试。" : "Please try again later.",
+          );
+      }
+      throw error;
     }
-    return data;
   };
   const validatePhone = () => {
     if (!/^1[3-9][0-9]{9}$/.test(phone.trim())) {
@@ -90,7 +109,7 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
     setMessage("");
     try {
       validatePhone();
-      if (sentPhone !== phone.trim())
+      if (mode === "sms" && sentPhone !== phone.trim())
         throw new Error(
           zh
             ? "请先获取该手机号的验证码。"
@@ -103,65 +122,66 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
             : "Please read and agree to the terms and privacy policy.",
         );
       setBusy("verify");
-      const data = await request("/api/v1/community/auth/sms/verify", {
+      const data = await request<{
+        accessToken: string;
+        refreshToken: string;
+        accessTokenExpiresAtEpochMs: number;
+      }>(mode === "sms" ? "/api/v1/community/auth/sms/verify" : "/api/v1/community/auth/password", {
         phone: phone.trim(),
-        code: code.trim(),
-        inviteCode: inviteCode.trim() || null,
+        ...(mode === "sms" ? { code: code.trim(), inviteCode: inviteCode.trim() || null } : { password }),
         acceptedTerms: true,
         termsVersion: COMMUNITY_TERMS_VERSION,
       });
-      window.localStorage.setItem(
-        "aethericai-community-access-token",
-        data.accessToken,
-      );
-      window.localStorage.setItem(
-        "aethericai-community-refresh-token",
-        data.refreshToken,
-      );
-      window.localStorage.setItem(
-        "aethericai-community-access-expires",
-        String(data.accessTokenExpiresAtEpochMs),
-      );
-      if (overlay) {
-        onClose?.();
-        window.location.reload();
-      } else {
-        window.location.replace(
-          communityReturnPath(
-            new URLSearchParams(window.location.search).get("returnTo"),
-          ),
-        );
-      }
+      setSession({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        accessTokenExpiresAtEpochMs: data.accessTokenExpiresAtEpochMs,
+      });
+      const returnTo = returnToProp || new URLSearchParams(window.location.search).get("returnTo");
+      window.location.replace(communityReturnPath(returnTo));
     } catch (error) {
       setError(error instanceof Error ? error.message : String(error));
       setBusy(null);
     }
   };
-  return (
+  const page = (
     <main className={`login-page${overlay ? " login-overlay" : ""}`}>
-      <nav
-        className="login-nav"
-        aria-label={zh ? "登录页导航" : "Sign-in navigation"}
-      >
-        <a
-          href={overlay ? "#close-login" : assetUrl("/community/")}
-          onClick={overlay ? (event) => { event.preventDefault(); onClose?.(); } : undefined}
-        aria-label={zh ? "关闭登录页" : "Close sign-in"}
-      >
-        ×
-      </a>
-        <button
-          onClick={() => setLanguage(zh ? "en" : "zh")}
-          aria-label={zh ? "Switch to English" : "切换中文"}
+      <section className="login-card login-panel" aria-labelledby="login-title">
+        <nav
+          className="login-nav"
+          aria-label={zh ? "登录页导航" : "Sign-in navigation"}
         >
-          {zh ? "EN" : "中文"}
-        </button>
-      </nav>
-      <section className="login-card" aria-labelledby="login-title">
+          {overlay ? (
+            <button
+              type="button"
+              className="login-close"
+              onClick={() => onClose?.()}
+              aria-label={zh ? "关闭登录页" : "Close sign-in"}
+            >
+              ×
+            </button>
+          ) : (
+            <a
+              className="login-close"
+              href={assetUrl("/community/")}
+              aria-label={zh ? "关闭登录页" : "Close sign-in"}
+            >
+              ×
+            </a>
+          )}
+          {!overlay && (
+            <button
+              onClick={() => setLanguage(zh ? "en" : "zh")}
+              aria-label={zh ? "Switch to English" : "切换中文"}
+            >
+              {zh ? "EN" : "中文"}
+            </button>
+          )}
+        </nav>
         <a className="login-brand font-display" href={assetUrl("/")}>
           {zh ? "以太智元" : "AethericAI"}
         </a>
-        <h1 id="login-title">{zh ? "登录" : "Sign in"}</h1>
+        <h1 id="login-title">{mode === "password" ? (zh ? "密码登录" : "Password sign-in") : (zh ? "登录" : "Sign in")}</h1>
         <p className="login-description">
           {zh
             ? "未注册的手机号将自动创建账号，资料可稍后填写。"
@@ -177,7 +197,7 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
               ref={phoneRef}
               type="tel"
               inputMode="tel"
-              autoComplete="tel-national"
+              autoComplete="username"
               placeholder={zh ? "请输入手机号" : "Phone number"}
               value={phone}
               onChange={(e) => {
@@ -190,7 +210,7 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
               disabled={busy !== null}
             />
           </label>
-          <div className="login-code-row">
+          {mode === "sms" ? <div className="login-code-row">
             <label>
               <span className="sr-only">
                 {zh ? "验证码" : "Verification code"}
@@ -226,8 +246,13 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
                     ? "获取验证码"
                     : "Send code"}
             </button>
-          </div>
-          <label className="login-invite">
+          </div> : <label className="login-password">
+            <span className="sr-only">{zh ? "密码" : "Password"}</span>
+            <input type="password" autoComplete="current-password" required maxLength={128}
+              value={password} onChange={(e) => setPassword(e.target.value)} disabled={busy !== null}
+              placeholder={zh ? "请输入密码" : "Password"} />
+          </label>}
+          {mode === "sms" && <label className="login-invite">
             <span className="sr-only">
               {zh ? "邀请码（选填）" : "Invitation code (optional)"}
             </span>
@@ -241,7 +266,11 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
               maxLength={32}
               disabled={busy === "verify"}
             />
-          </label>
+          </label>}
+          {mode === "password" && <button type="button" className="login-forgot" disabled={busy !== null}
+            onClick={() => { setMode("sms"); setPassword(""); setError(""); setMessage(zh ? "请先用验证码登录，再点击工作台右上角账号设置或修改密码。" : "Sign in by SMS, then click your account in the workspace header to set or reset your password."); }}>
+            {zh ? "未设置或忘记密码？" : "No password, or forgot it?"}
+          </button>}
           <button
             type="submit"
             className="login-submit"
@@ -279,9 +308,9 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
               {error}
             </p>
           )}
-          {message && (
+          {statusMessage && (
             <p className="login-message" role="status">
-              {message}
+              {statusMessage}
             </p>
           )}
         </form>
@@ -289,12 +318,18 @@ export function LoginPage({ overlay = false, onClose }: { overlay?: boolean; onC
           <span>{zh ? "其他登录方式" : "Other ways to sign in"}</span>
         </div>
         <div className="login-alternative">
-          <button type="button" disabled>
-            {zh ? "密码登录" : "Password sign-in"}
+          <button type="button" disabled={busy !== null} onClick={() => {
+            setMode(mode === "sms" ? "password" : "sms"); setPassword(""); setError(""); setMessage("");
+          }}>
+            {mode === "sms" ? (zh ? "密码登录" : "Password sign-in") : (zh ? "验证码登录" : "SMS sign-in")}
           </button>
-          <span>{zh ? "暂未开通" : "Coming later"}</span>
         </div>
       </section>
     </main>
   );
+
+  if (overlay && typeof document !== "undefined") {
+    return createPortal(page, document.body);
+  }
+  return page;
 }

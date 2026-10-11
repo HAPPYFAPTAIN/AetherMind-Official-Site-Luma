@@ -1,0 +1,267 @@
+.learn-page {
+  min-height: 100dvh;
+  color: #e9f4fb;
+  background: #080e15;
+}
+
+.learn-container {
+  width: min(1180px, calc(100% - 64px));
+  margin: 0 auto;
+}
+
+.learn-hero {
+  padding: 150px 0 96px;
+  background: radial-gradient(circle at 70% 10%, #153244 0, transparent 45%), #0a141e;
+  border-bottom: 1px solid #263b48;
+}
+
+.learn-kicker {
+  color: #78dced;
+  font: 11px var(--font-geist-mono), monospace;
+  letter-spacing: 0.16em;
+}
+
+.learn-hero h1 {
+  max-width: 760px;
+  margin: 18px 0 16px;
+  font-size: 56px;
+  letter-spacing: -0.05em;
+}
+
+.learn-hero > .learn-container > p:not(.learn-kicker) {
+  max-width: 600px;
+  color: #a3bac7;
+  font-size: 19px;
+  line-height: 1.7;
+}
+
+.learn-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 32px;
+}
+
+.learn-primary,
+.learn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  padding: 12px 20px;
+  font-size: 14px;
+}
+
+.learn-primary {
+  background: #8bd5f5;
+  color: #081c29;
+  font-weight: 650;
+}
+
+.learn-primary:disabled {
+  opacity: 0.55;
+}
+
+.learn-secondary {
+  color: #b8d3df;
+  border: 1px solid #466273;
+}
+
+.learn-section {
+  padding: 72px 0;
+}
+
+.learn-section > h2,
+.learn-manual h2 {
+  margin: 0 0 30px;
+  font-size: 30px;
+}
+
+.learn-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.learn-feature-grid article {
+  border: 1px solid #2a414e;
+  border-radius: 12px;
+  padding: 24px;
+  background: #0d1a24;
+}
+
+.learn-feature-grid b {
+  color: #78dced;
+  font: 12px var(--font-geist-mono), monospace;
+}
+
+.learn-feature-grid h3 {
+  margin: 24px 0 10px;
+  font-size: 18px;
+}
+
+.learn-feature-grid p {
+  color: #90a8b6;
+  line-height: 1.7;
+  font-size: 13px;
+}
+
+.learn-manual {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 50px;
+  border-top: 1px solid #243a47;
+}
+
+.learn-manual-intro {
+  color: #90a8b6;
+  line-height: 1.8;
+  font-size: 14px;
+}
+
+.learn-manual-groups {
+  display: grid;
+  gap: 18px;
+}
+
+.learn-manual-group {
+  border: 1px solid #243a47;
+  border-radius: 12px;
+  padding: 22px 24px;
+  background: #0d1a24;
+}
+
+.learn-manual-group h3 {
+  margin: 0 0 13px;
+  font-size: 17px;
+}
+
+.learn-manual-group ol {
+  margin: 0;
+  padding-left: 21px;
+  color: #b7ccd6;
+}
+
+.learn-manual-group li {
+  padding: 5px 0 5px 5px;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.learn-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #02070dcc;
+}
+
+.learn-modal {
+  position: relative;
+  width: min(470px, 100%);
+  padding: 32px;
+  border: 1px solid #6fb6cf;
+  border-radius: 16px;
+  background: #10212d;
+  box-shadow: 0 20px 80px #0008;
+}
+
+.learn-modal h2 {
+  margin: 10px 0;
+}
+
+.learn-modal p:not(.learn-kicker) {
+  color: #9eb5c2;
+  line-height: 1.7;
+}
+
+.learn-modal input {
+  width: 100%;
+  margin: 12px 0;
+  border: 1px solid #4c6b7a;
+  border-radius: 8px;
+  padding: 12px;
+  background: #08141d;
+  color: #edf8fc;
+}
+
+.learn-modal .learn-primary {
+  width: 100%;
+}
+
+.learn-modal-close {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  color: #c5d9e2;
+  font-size: 24px;
+}
+
+.learn-error {
+  color: #f0a69d !important;
+  font-size: 13px;
+}
+
+.learn-page-error {
+  padding-bottom: 40px;
+}
+
+.learn-modal .learn-kicker {
+  margin: 0;
+}
+
+@media (max-width: 800px) {
+  .learn-container {
+    width: min(calc(100% - 36px), 620px);
+  }
+
+  .learn-hero {
+    padding: 118px 0 70px;
+  }
+
+  .learn-hero h1 {
+    font-size: 40px;
+  }
+
+  .learn-feature-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .learn-manual {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+}
+
+@media (max-width: 520px) {
+  .learn-container {
+    width: calc(100% - 32px);
+  }
+
+  .learn-hero h1 {
+    font-size: 32px;
+  }
+
+  .learn-hero > .learn-container > p:not(.learn-kicker) {
+    font-size: 16px;
+  }
+
+  .learn-hero-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .learn-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .learn-section {
+    padding: 52px 0;
+  }
+
+  .learn-modal {
+    padding: 25px 20px;
+  }
+}

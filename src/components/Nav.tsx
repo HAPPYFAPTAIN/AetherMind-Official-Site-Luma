@@ -6,8 +6,10 @@ import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
 import { assetUrl } from "@/lib/asset-url";
 import { LoginPage } from "@/components/LoginPage";
+import { hasAccountSession } from "@/lib/account-client";
+import { useAccount } from "@/lib/use-account";
 
-function Mark() {
+export function Mark() {
   return (
     <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden>
       <circle cx="13" cy="13" r="3.2" fill="var(--accent)" />
@@ -46,7 +48,13 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const { account } = useAccount();
   const { language, setLanguage } = useLanguage();
+
+  const enterAccount = () => {
+    if (account || hasAccountSession()) window.location.assign(assetUrl("/dashboard/"));
+    else setLoginOpen(true);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -70,28 +78,25 @@ export function Nav() {
           : "border-b border-transparent bg-transparent"
       }`}
     >
-      <nav className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6 sm:h-[72px] lg:px-12">
-        <div className="flex items-center gap-5">
-          <a href="#top" className="flex items-center gap-3 text-white">
+      <nav className="mx-auto grid h-16 max-w-[1440px] grid-cols-[1fr_auto] items-center px-6 sm:h-[72px] lg:px-12 xl:grid-cols-[1fr_auto_1fr]">
+        <div className="flex items-center gap-5 justify-self-start">
+          <a href={assetUrl("/")} className="flex items-center gap-3 text-white">
             <Mark />
             <span className="font-display text-[17px] font-semibold tracking-[0.22em]">
               {tr(language, BRAND.en, BRAND.zh)}
             </span>
           </a>
-          <button data-showcase={ENTERPRISE_NAV.key} className="hidden whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium text-text-secondary hover:text-white xl:block">
+        </div>
+
+        <div data-primary-nav className="hidden items-center justify-self-center gap-[7.6px] xl:flex">
+          <button data-showcase={ENTERPRISE_NAV.key} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">
             {tr(language, ENTERPRISE_NAV.label.en, ENTERPRISE_NAV.label.zh)}
           </button>
-        </div>
-
-        <div className="hidden items-center gap-[7.6px] xl:flex">
           {NAV_LINKS.map((l) => <a key={l.href} href={"externalPath" in l && l.externalPath ? assetUrl(l.href) : l.href} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">{tr(language, l.label.en, l.label.zh)}</a>)}
-        </div>
-
-        <div className="hidden items-center gap-[7.6px] xl:flex">
           {AUX_NAV_LINKS.map((l) => <a key={l.href} href={l.href} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">{tr(language, l.label.en, l.label.zh)}</a>)}
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center justify-self-end gap-2 sm:gap-3">
           <div
             className="flex h-9 items-center rounded-full border border-line-strong bg-white/[0.03] p-0.5"
             role="group"
@@ -153,10 +158,10 @@ export function Nav() {
 
           <button
             type="button"
-            onClick={() => setLoginOpen(true)}
+            onClick={enterAccount}
             className="hidden whitespace-nowrap rounded-full border border-line-strong bg-white/[0.03] px-4 py-2 text-[15.5px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft sm:flex"
           >
-            {tr(language, "Sign in", "登录")}
+            {account ? tr(language, "Dashboard", "控制台") : tr(language, "Sign in", "登录")}
           </button>
         </div>
       </nav>
@@ -174,10 +179,10 @@ export function Nav() {
           {[...NAV_LINKS, ...AUX_NAV_LINKS].map((l) => <a key={l.href} href={"externalPath" in l && l.externalPath ? assetUrl(l.href) : l.href} onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary hover:text-white">{tr(language, l.label.en, l.label.zh)}</a>)}
           <button
             type="button"
-            onClick={() => { setOpen(false); setLoginOpen(true); }}
+            onClick={() => { setOpen(false); enterAccount(); }}
             className="mt-3 flex items-center justify-center gap-2 rounded-full border border-line-strong bg-white/[0.04] px-4 py-3 text-[15px] font-medium text-white"
           >
-            {tr(language, "Sign in", "登录")}
+            {account ? tr(language, "Dashboard", "控制台") : tr(language, "Sign in", "登录")}
           </button>
         </div>
       </div>

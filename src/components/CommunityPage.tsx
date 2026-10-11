@@ -7,11 +7,12 @@ import { tr } from "@/lib/i18n";
 import Image from "next/image";
 import { LoginPage } from "@/components/LoginPage";
 import "./community.css";
-
-const API_BASE = process.env.NEXT_PUBLIC_COMMUNITY_API_BASE || "/llmer-api";
-const ACCESS_KEY = "aethericai-community-access-token";
-const REFRESH_KEY = "aethericai-community-refresh-token";
-const EXPIRES_KEY = "aethericai-community-access-expires";
+import {
+  accountApi,
+  accountUrl,
+  clearAccountSession,
+  hasAccountSession,
+} from "@/lib/account-client";
 
 type Profile = {
   userId: string;
@@ -62,12 +63,7 @@ type Queue = {
     created_at_ms: number;
   }[];
 };
-type AuthResponse = {
-  accessToken: string;
-  refreshToken: string;
-  accessTokenExpiresAtEpochMs: number;
-  profile: Profile;
-};
+
 
 const copy = {
   en: {
@@ -196,12 +192,7 @@ function formatTime(epoch: number, language: "en" | "zh") {
 }
 
 function avatarSrc(path?: string | null) {
-  return path ? `${API_BASE}${path}` : null;
-}
-
-function readStored(key: string) {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(key);
+  return path ? accountUrl(path) : null;
 }
 
 export function CommunityPage() {
@@ -241,66 +232,14 @@ export function CommunityPage() {
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const refreshInFlight = useRef<Promise<AuthResponse> | null>(null);
   const api: Api = useCallback(
-    async <T,>(
-      path: string,
-      init: RequestInit = {},
-      allowRetry = true,
-    ): Promise<T> => {
-      const headers = new Headers(init.headers);
-      headers.set("Accept", "application/json");
-      if (init.body && !(init.body instanceof FormData))
-        headers.set("Content-Type", "application/json");
-      const token = readStored(ACCESS_KEY);
-      if (token) headers.set("Authorization", `Bearer ${token}`);
-      let response = await fetch(`${API_BASE}${path}`, { ...init, headers });
-      if (response.status === 401 && allowRetry && readStored(REFRESH_KEY)) {
-        refreshInFlight.current ??= fetch(`${API_BASE}/api/v1/auth/refresh`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken: readStored(REFRESH_KEY) }),
-        })
-          .then(async (response) => {
-            if (!response.ok) {
-              window.localStorage.removeItem(ACCESS_KEY);
-              window.localStorage.removeItem(REFRESH_KEY);
-              setProfile(null);
-              throw new Error(
-                zh
-                  ? "登录已过期，请重新登录"
-                  : "Your session expired. Please sign in.",
-              );
-            }
-            const next: AuthResponse = await response.json();
-            window.localStorage.setItem(ACCESS_KEY, next.accessToken);
-            window.localStorage.setItem(REFRESH_KEY, next.refreshToken);
-            window.localStorage.setItem(
-              EXPIRES_KEY,
-              String(next.accessTokenExpiresAtEpochMs),
-            );
-            return next;
-          })
-          .finally(() => {
-            refreshInFlight.current = null;
-          });
-        const next = await refreshInFlight.current;
-        headers.set("Authorization", `Bearer ${next.accessToken}`);
-        response = await fetch(`${API_BASE}${path}`, { ...init, headers });
-      }
-      const payload =
-        response.status === 204
-          ? null
-          : await response.json().catch(() => null);
-      if (!response.ok)
-        throw new Error(payload?.error?.message || labels.accountError);
-      return payload as T;
-    },
-    [labels.accountError, zh],
+    <T,>(path: string, init: RequestInit = {}, allowRetry = true): Promise<T> =>
+      accountApi<T>(path, init, allowRetry),
+    [],
   );
 
   const loadProfile = useCallback(async () => {
-    if (!readStored(ACCESS_KEY)) {
+    if (!hasAccountSession()) {
       setProfile(null);
       return;
     }
@@ -442,9 +381,7 @@ export function CommunityPage() {
     } catch {
       /* local session is still cleared */
     }
-    window.localStorage.removeItem(ACCESS_KEY);
-    window.localStorage.removeItem(REFRESH_KEY);
-    window.localStorage.removeItem(EXPIRES_KEY);
+    clearAccountSession();
     setProfile(null);
     setNotice(zh ? "已退出登录" : "Signed out");
   };

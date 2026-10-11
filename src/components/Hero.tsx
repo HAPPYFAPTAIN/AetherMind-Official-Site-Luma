@@ -7,6 +7,8 @@ import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
 import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
+import { ConsoleEntryButton } from "@/components/ConsoleEntryButton";
+import { assetUrl } from "@/lib/asset-url";
 
 /* state content for the pinned scroll narrative */
 const STATES = [
@@ -182,18 +184,17 @@ export function Hero() {
               </p>
               <div className="rise-in pointer-events-auto mt-10 flex flex-wrap items-center gap-4" style={{ animationDelay: "0.55s" }}>
                 <a
-                  href="#platform"
+                  href={assetUrl("/md-agent/")}
                   className="group inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-[14px] font-semibold text-bg-0 transition-colors hover:bg-accent"
                 >
                   {tr(language, "Explore Platform", "探索平台")}
                   <span className="transition-transform group-hover:translate-x-0.5">→</span>
                 </a>
-                <a
-                  href="#console"
+                <ConsoleEntryButton
                   className="inline-flex h-12 items-center gap-2 rounded-full border border-line-strong px-6 text-[14px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft"
                 >
                   {tr(language, "Open Console", "打开控制台")}
-                </a>
+                </ConsoleEntryButton>
               </div>
             </div>
 

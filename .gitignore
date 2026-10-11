@@ -1,0 +1,12 @@
+.next/
+node_modules/
+server/.venv/
+server/.pytest_cache/
+**/__pycache__/
+*.pyc
+.DS_Store
+._*
+server/*.sqlite3*
+output/
+.env*
+!.env.example

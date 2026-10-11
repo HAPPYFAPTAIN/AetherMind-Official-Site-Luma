@@ -1,41 +1,29 @@
-# Product page visual QA
+# MD-Agent 控制台卡片页设计验收
 
-## Source visual truth
+参照图：`/Users/joseph/Downloads/temp04/MD-Agent_前端AI交接_2026-10-05/assets/控制台卡片效果图.png`
 
-- User reference: Autodesk-style product catalog screenshot in the task.
-- Product-page brief: `.codex/attachments/04cef0e6-e43b-412c-8493-1bcc1624ae53/pasted-text.txt`.
-- Local image source set: `/Users/joseph/Downloads/ChatGPT 图像 2026年10月4日 15_37_20-1.png` through `15_37_33-7.png`.
+## 验收范围
 
-## Asset mapping
+- `/official/console/` 卡片目录
+- MD EXP 可用卡片、后续卡片禁用状态
+- 控制台登录入口、模型配置、超算连接、计算任务导航
+- 总管理员“产品邀请码”页面
+- 1280px 桌面和 390px 手机布局
 
-The mapping was made by opening every image and inspecting its visual content. It does not rely on the original download names.
+## 结果
 
-| Semantic role | Source image | Runtime asset |
+| 项目 | 结果 | 证据 |
 |---|---|---|
-| Hero science lab | `15_37_20-1.png` | `public/assets/products/hero-science-lab.png` |
-| Platform ice cube | `15_37_22-2.png` | `public/assets/products/platform.png` |
-| LAMMPS particle chain | `15_37_24-3.png` | `public/assets/products/lammps.png` |
-| Science agent glass wave | `15_37_27-4.png` | `public/assets/products/ai-agent.png` |
-| Materials network | `15_37_29-5.png` | `public/assets/products/materials.png` |
-| Chemistry molecule | `15_37_31-6.png` | `public/assets/products/chemistry.png` |
-| Biology DNA helix | `15_37_33-7.png` | `public/assets/products/biology.png` |
+| 深色官网风格、冰蓝高亮和独立控制台顶栏 | 通过 | 本地浏览器截图与参考图对照 |
+| MD EXP 第一张突出显示 | 通过 | `.agent-card.available`，按钮可操作 |
+| GROMACS / DFT / 材料分析显示“下个月上架”并禁用 | 通过 | 浏览器可访问性树显示 disabled |
+| 登录入口和未登录 MD EXP 行为 | 通过 | 顶栏登录打开弹层；MD EXP 跳转官网登录并保留 `/official/console/` |
+| 模型/超算/任务独立入口 | 通过 | 侧栏切换后显示独立状态页 |
+| 390px 手机宽度 | 通过 | 卡片改为上下结构，页面无横向溢出 |
+| 关闭登录弹层 | 通过 | 改为真正的 button，关闭后仍留在 `/official/console/` |
 
-All seven supplied images are used. No image was omitted.
+## 产品状态边界
 
-## Implementation evidence
+视觉和导航已完成。MD-Agent 用户绑定、短票进入 dsh、同域代理、模型真实验证和 SSH 超算接入仍需生产密钥/后端契约，页面明确显示待接入状态，没有伪造在线或作业结果。
 
-- Route: `https://8.130.144.193/official/products/`
-- Viewports checked in Chrome: desktop 1440px, responsive 390px during the same product-page work.
-- Browser checks: hero image loaded, all seven product image requests completed with their natural dimensions, category buttons filtered cards, product detail opened a modal, and language switch changed visible copy.
-- Console errors: none observed in the product-page tab.
-
-## Comparison findings
-
-- Header keeps the existing AethericAI language and dark navigation while adopting the reference product-center hierarchy.
-- Hero uses a 300px high bright image band with a left readability wash and the science visual preserved on the right.
-- Body uses a white catalog surface, six product cards in three columns, 124px image slots, restrained borders and a 2px hover lift.
-- Mobile collapses to one column and keeps category navigation horizontally scrollable.
-
-## Final result
-
-passed
+**final result: passed**

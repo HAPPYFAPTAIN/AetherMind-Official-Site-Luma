@@ -25,6 +25,7 @@ E-036（2026-10-10）：产品改按自定义期限授权，OWNER 的 MD EXP 按
 E-037（2026-10-10）：控制台用户下拉菜单新增「仪表盘」入口，指向 `/official/dashboard/`。本地静态浏览器验证菜单出现、点击后到达 dashboard 且无控制台错误；生产软链切换后 `/official/console/` 与 `/official/dashboard/` 均 HTTP 200。备份 `/var/backups/aethericai-official/20261010-dashboard-menu/`，发布 `20261010-dashboard-menu`。
 E-038（2026-10-10）：移除控制台和仪表盘顶栏品牌旁的「控制台」文字，只保留以太智元品牌、侧栏/菜单和既有入口功能。`build:ip`、TypeScript、lint（0 errors）和 `git diff --check` 通过；生产发布 `20261010-no-console-label`，公网 dashboard/console HTML 均未出现该顶栏文案，旧版本保存在 `20261010-dashboard-menu`。
 E-039（2026-10-11）：控制台/仪表盘头像改为蓝色圆形用户图标；仪表盘侧栏底部加入浅色、深色、跟随系统切换并持久化本地偏好；控制台移除返回官网和语言切换按钮。隔离浏览器验证三种主题菜单、浅色切换后的背景/顶栏样式、头像和控制台顶栏结构；`build:ip`、TypeScript、`git diff --check` 通过，lint 无新增错误。生产发布 `20261011-dashboard-theme`，dashboard/console 均 HTTP 200，旧版本为 `20261010-no-console-label`。
+E-040（2026-10-11）：按最新界面确认，控制台头像取消右侧箭头，点击头像直接打开账户菜单；控制台账户菜单移除明暗模式，主题入口仅保留在仪表盘侧栏底部。浏览器验证菜单仅含仪表盘、个人中心、退出登录；`build:ip`、TypeScript、`git diff --check` 通过，lint 无新增错误。生产发布 `20261011-menu-cleanup`，dashboard/console 均 HTTP 200，旧版本为 `20261011-dashboard-theme`。
 
 | 证据 ID | 时间 | 方法摘要 | 退出状态 | 版本或文件哈希 | 结果摘要 | 证据位置 | 有效期 |
 |---|---|---|---|---|---|---|---|

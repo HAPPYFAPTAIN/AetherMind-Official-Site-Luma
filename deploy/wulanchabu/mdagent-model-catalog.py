@@ -83,6 +83,22 @@ def replace_once(source, old, new):
         raise ValueError("source anchor count changed")
     return source.replace(old, new, 1)
 
+
+def ensure_proxy_key_env(source):
+    """Keep newly rendered tenant providers pointed at the gateway token."""
+    for provider, display_name in (("kimi", "Kimi"), ("deepseek", "DeepSeek")):
+        anchor = f'    "{provider}": """      displayName: "{display_name}"\n'
+        if anchor not in source:
+            raise ValueError(f"missing provider block: {provider}")
+        if anchor + "      apiKeyEnv: MDEXP_PROXY_KEY\n" not in source:
+            source = replace_once(
+                source,
+                anchor,
+                anchor + "      apiKeyEnv: MDEXP_PROXY_KEY\n",
+            )
+    return source
+
+
 def patch_provision(path):
     text = path.read_text()
     start = text.index("SETTINGS_TEMPLATE = \"\"\"")
@@ -91,6 +107,7 @@ def patch_provision(path):
     start = text.index("def _render_settings(u):")
     end = text.index("\n\ndef refresh_model_settings", start)
     text = text[:start] + RENDER + text[end:]
+    text = ensure_proxy_key_env(text)
     old = """        - id: kimi-k2.7-code
           contextWindow: 262144
           maxTokens: 131072

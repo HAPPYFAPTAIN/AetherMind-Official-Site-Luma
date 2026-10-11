@@ -31,6 +31,10 @@ class ModelEdit(Strict):
     enabled: bool = True
 
 
+class UserModelAccessEdit(Strict):
+    models: list[str] = Field(default_factory=list, max_length=500)
+
+
 def _rate(c, scope, key):
     row = c.execute('SELECT * FROM official_rates WHERE scope=? AND key=?', (scope, key)).fetchone()
     if not row:
@@ -78,6 +82,48 @@ def set_rate(w, c, data, actor):
 
 def get_models(c):
     return [dict(r) for r in c.execute('SELECT * FROM official_llm_models ORDER BY model LIMIT 500')]
+
+
+def effective_models(c, user_id: str | None = None):
+    """Global enabled models plus explicit per-user grants, with revocations winning."""
+    if user_id is None:
+        return [dict(r) for r in c.execute("SELECT * FROM official_llm_models WHERE enabled=1 ORDER BY model LIMIT 500")]
+    rows = c.execute(
+        """SELECT m.*, COALESCE(a.enabled, m.enabled) AS effective_enabled,
+                  CASE WHEN a.user_id IS NULL THEN 0 ELSE 1 END AS user_override
+           FROM official_llm_models m
+           LEFT JOIN official_user_llm_models a ON a.model=m.model AND a.user_id=?
+           WHERE COALESCE(a.enabled, m.enabled)=1
+           ORDER BY m.model LIMIT 500""",
+        (user_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def user_model_access(c, user_id: str):
+    all_models = [dict(r) for r in c.execute("SELECT model,provider,upstream_model,enabled FROM official_llm_models ORDER BY model LIMIT 500")]
+    grants = {row[0] for row in c.execute("SELECT model FROM official_user_llm_models WHERE user_id=? AND enabled=1", (user_id,))}
+    return [
+        {**item, "global_enabled": bool(item["enabled"]), "granted": item["model"] in grants,
+         "effective": bool(item["enabled"]) or item["model"] in grants}
+        for item in all_models
+    ]
+
+
+def set_user_model_access(w, c, user_id: str, models: list[str], actor: str):
+    known = {row[0] for row in c.execute("SELECT model FROM official_llm_models")}
+    requested = sorted(set(models))
+    if not set(requested) <= known:
+        raise ApiError(400, "MODEL_NOT_FOUND", "授权列表包含不存在的模型")
+    if not c.execute("SELECT 1 FROM users WHERE id=?", (user_id,)).fetchone():
+        raise ApiError(404, "USER_NOT_FOUND", "用户不存在")
+    c.execute("DELETE FROM official_user_llm_models WHERE user_id=?", (user_id,))
+    now = w.now()
+    c.executemany(
+        "INSERT INTO official_user_llm_models(user_id,model,enabled,updated_at_ms,updated_by) VALUES(?,?,1,?,?)",
+        [(user_id, model, now, actor) for model in requested],
+    )
+    return user_model_access(c, user_id)
 
 
 def set_model(w, c, data):

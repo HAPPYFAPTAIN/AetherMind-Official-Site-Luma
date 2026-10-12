@@ -21,8 +21,7 @@ type MdAgentState = {
 const agents = [
   {
     id: "md-exp",
-    title: "MD EXP",
-    subtitle: "分子模拟智能体",
+    title: "分子模拟智能体",
     description: "模型对话、任务规划与分子动力学工作流。",
     tags: ["LAMMPS / ReaxFF", "建模 · 分析 · 科研对话"],
     image: "/assets/products/lammps.png",
@@ -30,8 +29,7 @@ const agents = [
   },
   {
     id: "gromacs",
-    title: "GROMACS",
-    subtitle: "分子模拟工作流",
+    title: "分子模拟工作流",
     description: "蛋白质与膜体系的后续智能体。",
     tags: ["蛋白质 · 膜体系"],
     image: "/assets/products/biology.png",
@@ -39,8 +37,7 @@ const agents = [
   },
   {
     id: "dft",
-    title: "DFT 智能体",
-    subtitle: "电子结构与材料计算",
+    title: "电子结构与材料计算",
     description: "结构优化、电子性质与材料计算。",
     tags: ["结构优化 · 电子性质"],
     image: "/assets/products/materials.png",
@@ -48,8 +45,7 @@ const agents = [
   },
   {
     id: "materials",
-    title: "材料分析智能体",
-    subtitle: "轨迹与性质分析",
+    title: "轨迹与性质分析",
     description: "从轨迹中提取结构、能量和科学图表。",
     tags: ["轨迹解析 · 科学图表"],
     image: "/assets/products/platform.png",
@@ -175,7 +171,7 @@ export function ConsolePage() {
               {agents.map((agent) => (
                 <article key={agent.id} className={`agent-card ${agent.status === "available" ? "available" : ""}`}>
                   <img src={assetUrl(agent.image)} alt="" />
-                  <div className="agent-copy"><h2>{agent.title}</h2><p className="agent-subtitle">{agent.subtitle}</p><p className="agent-description">{agent.description}</p><div className="agent-tags">{agent.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
+                  <div className="agent-copy"><h2>{agent.title}</h2><p className="agent-description">{agent.description}</p><div className="agent-tags">{agent.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
                   <div className="agent-status"><span className={agent.status}>{agent.status === "available" ? (zh ? "可用" : "Available") : (zh ? "下个月上架" : "Coming next month")}</span><small>{agent.status === "available" ? (mdState?.qualifications.some((item) => item.product_id === agent.id) ? (zh ? "已获得产品资格" : "Qualified") : (zh ? "需要绑定邀请码" : "Invite binding required")) : ""}</small></div>
                   <button className="agent-action" disabled={agent.status !== "available" || enteringMdExp} onClick={() => void enterMdExp()}>{agent.status === "available" ? (enteringMdExp ? (zh ? "正在打开…" : "Opening…") : (zh ? "进入智能体  →" : "Open agent  →")) : (zh ? "敬请期待" : "Stay tuned")}</button>
                 </article>

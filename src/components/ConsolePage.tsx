@@ -10,7 +10,7 @@ import { assetUrl } from "@/lib/asset-url";
 import { BRAND } from "@/lib/site";
 import "./console.css";
 
-type Section = "agents" | "compute" | "jobs" | "model";
+type Section = "agents" | "compute" | "jobs";
 type MdAgentState = {
   accountBinding: "unbound" | "bound";
   qualifications: { product_id: string }[];
@@ -114,7 +114,6 @@ export function ConsolePage() {
     ["agents", zh ? "智能体目录" : "Agent catalog"],
     ["compute", zh ? "超算连接" : "Compute connection"],
     ["jobs", zh ? "计算任务" : "Compute jobs"],
-    ["model", zh ? "模型配置" : "Model settings"],
   ] as const;
 
   return (
@@ -177,7 +176,6 @@ export function ConsolePage() {
 
           {section === "compute" && <StatusPanel title={zh ? "超算连接" : "Compute connection"} title2={zh ? "待接入" : "Integration pending"} body={zh ? "SSH 连接、工作区和队列适配正在联调。当前不会显示虚假的在线状态，也不会提交计算任务。" : "SSH, workspace and queue support are being integrated. No online state is claimed and no jobs can be submitted yet."} />}
           {section === "jobs" && <StatusPanel title={zh ? "计算任务" : "Compute jobs"} title2={zh ? "尚未开放" : "Not available yet"} body={zh ? "完成超算适配和作业状态契约后，这里会显示本人任务、日志、结果和取消状态。" : "Personal jobs, logs, artifacts and cancellation will appear after the HPC contract is integrated."} />}
-          {section === "model" && <ModelPanel zh={zh} />}
         </section>
       </div>
       {loginOpen && <LoginPage overlay onClose={() => setLoginOpen(false)} />}
@@ -192,17 +190,6 @@ function UserGlyph() {
       <path d="M5.5 19c0-3.2 2.9-5.4 6.5-5.4s6.5 2.2 6.5 5.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
-}
-
-function ModelPanel({ zh }: { zh: boolean }) {
-  const models = [
-    ["Kimi", "kimi-k3", zh ? "旗舰，长上下文与视觉理解" : "Flagship, long context and vision", "pending"],
-    ["Kimi", "kimi-k2.7-code-highspeed", zh ? "高速代码与 Agent 工作流" : "High-speed coding and agent workflows", "verified"],
-    ["Kimi", "kimi-k2.6", zh ? "通用对话、视觉与 Agent" : "General, vision and agent tasks", "pending"],
-    ["DeepSeek", "deepseek-v4-pro", zh ? "旗舰推理与工具调用" : "Flagship reasoning and tools", "verified"],
-    ["DeepSeek", "deepseek-flash", zh ? "高吞吐、多模态 Flash" : "High-throughput multimodal Flash", "pending"],
-  ];
-  return <section className="console-status-panel console-model-panel"><p className="console-kicker">MODEL PROVIDERS</p><h2>{zh ? "模型配置" : "Model settings"}</h2><span>{zh ? "共享代理已接入" : "Shared proxy connected"}</span><p>{zh ? "Kimi 2.7 Highspeed 与 DeepSeek V4 Pro 已完成服务端短请求验证；用户级模型选择和对话状态仍由 dsh 会话读取。" : "Kimi 2.7 Highspeed and DeepSeek V4 Pro passed server-side smoke tests; per-user model selection and chat state are read by the dsh session."}</p><div className="console-model-list">{models.map(([provider,id,desc,status]) => <div key={id}><b>{provider}</b><code>{id}</code><small>{desc}</small><em className={status}>{status === "verified" ? (zh ? "已验证" : "Verified") : (zh ? "可选" : "Available")}</em></div>)}</div></section>;
 }
 
 function StatusPanel({ title, title2, body }: { title: string; title2: string; body: string }) {

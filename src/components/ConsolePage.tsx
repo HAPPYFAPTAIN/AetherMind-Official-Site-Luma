@@ -167,7 +167,6 @@ export function ConsolePage() {
                 <article key={agent.id} className={`agent-card ${agent.status === "available" ? "available" : ""}`}>
                   <img src={assetUrl(agent.image)} alt="" />
                   <div className="agent-copy"><h2>{agent.title}</h2><p className="agent-description">{agent.description}</p><div className="agent-tags">{agent.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
-                  <div className="agent-status"><span className={agent.status}>{agent.status === "available" ? (zh ? "可用" : "Available") : (zh ? "下个月上架" : "Coming next month")}</span><small>{agent.status === "available" ? (mdState?.qualifications.some((item) => item.product_id === agent.id) ? (zh ? "已获得产品资格" : "Qualified") : (zh ? "需要绑定邀请码" : "Invite binding required")) : ""}</small></div>
                   <button className="agent-action" disabled={agent.status !== "available" || enteringMdExp} onClick={() => void enterMdExp()}>{agent.status === "available" ? (enteringMdExp ? (zh ? "正在打开…" : "Opening…") : (zh ? "进入智能体  →" : "Open agent  →")) : (zh ? "敬请期待" : "Stay tuned")}</button>
                 </article>
               ))}

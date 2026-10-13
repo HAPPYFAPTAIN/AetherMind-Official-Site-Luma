@@ -57,7 +57,7 @@
 
 ## 2026-10-13 无节点执行与红色错误
 
-- 用户没有在线 mdshell 节点时，租户 overlay 不再伪造 `n_none` 的 remote-world 地址；dsh 保留本机 `fs/subprocess/sandbox` provider，文件操作走本机 Landlock/bwrap 沙箱。只有用户节点在线时才注入 `remote-fs`、`remote-subprocess` 和 `remote-sandbox`。
+- 用户没有在线 mdshell 节点时，租户 overlay 写入合法的 YAML 空数组 `[]`，不再伪造 `n_none` 的 remote-world 地址；dsh 保留本机 `fs/subprocess/sandbox` provider，文件操作走本机 Landlock/bwrap 沙箱。只有用户节点在线时才注入 `remote-fs`、`remote-subprocess` 和 `remote-sandbox`。
 - `workspace-write no sandbox backend` 的根因是远程 provider 被强制启用但 mdshell 没有连接；`mdshell websocket 403` 是同一条 remote-world 链路的节点/短票问题，不是 HPC 未连接。`INSUFFICIENT_CREDITS 402` 是官方 LLM 网关余额预检，和超算提交无关。
 - 当前没有把 `danger-full-access` 作为修复手段；它会跳过文件限制和确认策略。无节点时本机受限 sandbox 先保证读写边界，科研命令白名单与无确认策略仍待存储配额、沙箱能力和命令范围一起设计。
 

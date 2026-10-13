@@ -24,6 +24,19 @@ OLD = '''    url = "%s/v1/world/%s" % (SELF_WS, node_id or "n_none")
 NEW = '''    # A missing node is a valid local-workspace mode. Do not synthesize
     # n_none: remote-world would then return 403 and disable the local sandbox.
     if node_id is None:
+        # dsh parses every overlay with a strict top-level-array contract.
+        # An empty patch preserves the base local providers and is valid YAML.
+        body = "[]\\n"
+    else:
+        url = "%s/v1/world/%s" % (SELF_WS, node_id)
+        body = ""
+        for pid in ("remote-fs", "remote-subprocess", "remote-sandbox"):
+            body += "- id: %s\\n  config: {url: '%s', token: '%s'}\\n" % (pid, url, world_token)
+'''
+
+CURRENT = '''    # A missing node is a valid local-workspace mode. Do not synthesize
+    # n_none: remote-world would then return 403 and disable the local sandbox.
+    if node_id is None:
         body = "# no remote execution node; retain local fs/subprocess/sandbox providers\\n"
     else:
         url = "%s/v1/world/%s" % (SELF_WS, node_id)
@@ -35,9 +48,12 @@ NEW = '''    # A missing node is a valid local-workspace mode. Do not synthesize
 
 def patch(path: Path) -> str:
     source = path.read_text(encoding="utf-8")
-    if source.count(OLD) != 1:
+    if source.count(OLD) == 1:
+        patched = source.replace(OLD, NEW, 1)
+    elif source.count(CURRENT) == 1:
+        patched = source.replace(CURRENT, NEW, 1)
+    else:
         raise ValueError("unexpected _write_overlay source anchor")
-    patched = source.replace(OLD, NEW, 1)
     compile(patched, str(path), "exec")
     return patched
 

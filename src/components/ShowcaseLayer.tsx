@@ -33,6 +33,8 @@ export function ShowcaseLayer() {
       if (!trigger) return;
       const href = trigger.getAttribute("href") || "";
       const key = (trigger.getAttribute("data-showcase") || href.slice(1) || "home") as ShowcaseKey;
+      // A real page section is a navigation target, not a feature preview.
+      if (!trigger.hasAttribute("data-showcase") && document.getElementById(key)) return;
       if (!(key in CONTENT)) return;
       event.preventDefault(); event.stopPropagation(); setNotice(""); setActive(key);
     };

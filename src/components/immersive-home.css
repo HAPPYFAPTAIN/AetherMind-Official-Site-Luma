@@ -1,0 +1,926 @@
+/* Cinematic scientific matter. Black #000, pearl #f4f2ed, gray #999da3,
+   ice #a9d9ee, blue-black #090e14. Serif display with clear sans text. */
+.luma-home {
+  --luma-white: #f4f2ed;
+  --luma-muted: #999da3;
+  background: #000;
+  color: var(--luma-white);
+  overflow: clip;
+}
+.luma-home > header {
+  --bg-0: #000;
+}
+.luma-home > header > nav {
+  max-width: none;
+  padding-inline: clamp(24px, 4vw, 72px);
+  height: 84px;
+}
+.luma-home :is(a, button) {
+  -webkit-tap-highlight-color: transparent;
+}
+.luma-home :is(a, button, [tabindex]):focus-visible {
+  outline: 2px solid #a9d9ee;
+  outline-offset: 6px;
+}
+.luma-home :is(section, footer) {
+  scroll-margin-top: 84px;
+}
+.luma-home h2 {
+  font-size: clamp(36px, 4.6vw, 72px);
+  line-height: 1.14;
+  font-weight: 550;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+.luma-skip {
+  position: fixed;
+  left: 24px;
+  top: -80px;
+  z-index: 80;
+  background: #fff;
+  color: #000;
+  padding: 16px 24px;
+  border-radius: 30px;
+}
+.luma-skip:focus {
+  top: 90px;
+}
+.luma-button {
+  min-height: 58px;
+  min-width: 168px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+  padding: 16px 28px;
+  font-size: 16px;
+  font-weight: 550;
+  line-height: 1.4;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+  cursor: pointer;
+}
+.luma-button-light {
+  background: var(--luma-white);
+  color: #000;
+  border: 1px solid var(--luma-white);
+}
+.luma-button-light:hover {
+  background: #cce6f1;
+  border-color: #cce6f1;
+}
+.luma-button-outline {
+  border: 1px solid #ffffff48;
+  background: #0002;
+  color: var(--luma-white);
+}
+.luma-button-outline:hover {
+  background: #ffffff12;
+  border-color: #fff9;
+}
+.luma-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+.luma-hero {
+  position: relative;
+  padding-top: clamp(110px, 11svh, 155px);
+  min-height: 100svh;
+  padding-bottom: 28px;
+}
+.luma-hero-heading {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  padding: 0 24px;
+}
+.luma-hero-title {
+  margin: 0;
+}
+.luma-hero-title > span:first-child {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(92px, 10vw, 170px);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: -0.067em;
+}
+.luma-hero-title > span:last-child {
+  display: block;
+  font-size: clamp(44px, 5.8vw, 94px);
+  line-height: 1.15;
+  font-weight: 650;
+  letter-spacing: -0.05em;
+  margin-top: 12px;
+}
+.luma-hero-description {
+  margin: 20px auto 0;
+  max-width: 580px;
+  color: #a7aaae;
+  line-height: 1.7;
+  font-size: 16px;
+  text-wrap: balance;
+}
+.luma-gallery-motion {
+  margin-top: 40px;
+}
+.luma-gallery {
+  position: relative;
+  width: 100%;
+  height: clamp(260px, 33svh, 430px);
+  perspective: 1400px;
+}
+.luma-gallery::before {
+  content: "";
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: -60px;
+  height: 140px;
+  background: radial-gradient(ellipse, #355d7650, transparent 68%);
+  pointer-events: none;
+}
+.luma-frame {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  border-radius: 15px;
+  border: 1px solid #ffffff22;
+  background: #090e14;
+  height: 90%;
+  backface-visibility: hidden;
+}
+.luma-frame > div:not(.luma-model-toolbar):not(.luma-hero-model) {
+  height: 100%;
+}
+.luma-frame-far-left {
+  width: 27%;
+  left: -15%;
+  top: 7%;
+  transform: rotateY(30deg) rotateZ(-7deg);
+  z-index: 0;
+  filter: brightness(0.65);
+}
+.luma-frame-left {
+  width: 32%;
+  left: 4%;
+  top: 4%;
+  transform: rotateY(25deg) rotateZ(-4deg);
+  z-index: 1;
+}
+.luma-frame-center {
+  width: 40%;
+  left: 30%;
+  top: 0;
+  z-index: 3;
+  box-shadow: 0 20px 70px #0008;
+}
+.luma-frame-right {
+  width: 32%;
+  left: 64%;
+  top: 4%;
+  transform: rotateY(-25deg) rotateZ(4deg);
+  z-index: 1;
+}
+.luma-frame-far-right {
+  width: 27%;
+  left: 88%;
+  top: 7%;
+  transform: rotateY(-30deg) rotateZ(7deg);
+  z-index: 0;
+  filter: brightness(0.65);
+}
+.luma-frame-caption {
+  position: absolute;
+  bottom: 20px;
+  left: 24px;
+  z-index: 1;
+  font-size: 14px;
+  text-shadow: 0 2px 8px #000;
+}
+.luma-frame-right .luma-frame-caption {
+  left: auto;
+  right: 24px;
+}
+.luma-home .luma-live {
+  height: 100%;
+  min-height: 0;
+}
+.luma-live-backdrop {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+}
+.luma-home .luma-hero-model {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  mask-image: none;
+}
+.luma-model-toolbar {
+  position: absolute;
+  bottom: 12px;
+  left: 22px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+  font-size: 12px;
+  color: #c9d4dc;
+}
+.luma-model-switch {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 14px;
+  min-height: 44px;
+  border: 1px solid #ffffff28;
+  border-radius: 100px;
+  background: #0008;
+  color: #fff;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.luma-live:not([data-drag-ready="true"]) .luma-model-toolbar {
+  visibility: hidden;
+}
+.luma-scroll-cue {
+  margin: 20px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+  width: fit-content;
+  font-size: 11px;
+  color: #91969d;
+}
+.luma-scroll-cue > span {
+  display: block;
+  width: 1px;
+  height: 22px;
+  background: linear-gradient(transparent, #b5bcc9);
+}
+.luma-statement {
+  text-align: center;
+  padding: clamp(130px, 16vw, 240px) 24px;
+}
+.luma-statement p {
+  font-size: clamp(32px, 4vw, 64px);
+  line-height: 1.45;
+  letter-spacing: -0.04em;
+  font-weight: 450;
+}
+.luma-statement-note {
+  max-width: 510px;
+  margin: 34px auto 0;
+  color: var(--luma-muted);
+  font-size: 16px;
+  line-height: 1.9;
+  text-wrap: balance;
+}
+.luma-chapter {
+  position: relative;
+  min-height: 720px;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 120px 8vw;
+  isolation: isolate;
+  background: #000;
+}
+.luma-chapter-visual {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+}
+.luma-chapter-image {
+  width: 100%;
+  height: 100%;
+}
+.luma-chapter-image img {
+  object-position: center;
+}
+.luma-chapter::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, #000e 0%, #000a 30%, #0001 75%),
+    linear-gradient(0deg, #000b, transparent 30%, transparent 80%, #0004);
+  pointer-events: none;
+}
+.luma-chapter-copy {
+  max-width: 620px;
+}
+.luma-section-name {
+  display: block;
+  color: #c3c9cf;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+.luma-chapter-copy p {
+  max-width: 390px;
+  font-size: 17px;
+  line-height: 1.9;
+  color: #c1c5cb;
+  margin-top: 30px;
+  text-wrap: pretty;
+}
+.luma-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 35px;
+  margin-top: 34px;
+  min-height: 48px;
+  font-size: 15px;
+  border-bottom: 1px solid #fff6;
+}
+.luma-text-link:hover {
+  border-color: #fff;
+}
+.luma-chapter-foot {
+  position: absolute;
+  bottom: 40px;
+  left: 8vw;
+  right: 8vw;
+  display: flex;
+  justify-content: space-between;
+  color: #b7bdc6;
+  font-size: 12px;
+}
+.luma-intelligence {
+  justify-content: flex-end;
+}
+.luma-intelligence::after {
+  background:
+    linear-gradient(270deg, #000e, #000b 35%, #0002 80%),
+    linear-gradient(0deg, #000b, transparent 40%);
+}
+.luma-intelligence .luma-chapter-copy {
+  width: 46%;
+  max-width: 630px;
+}
+.luma-intelligence .luma-chapter-image img {
+  object-position: 35% center;
+}
+.luma-science-path {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #c7dfe9;
+  margin-top: 36px;
+  font-size: 13px;
+}
+.luma-science-path i {
+  display: block;
+  height: 1px;
+  width: 35px;
+  background: #a9d9ee66;
+}
+.luma-research {
+  padding: 160px 6vw 100px;
+  max-width: 1800px;
+  margin: auto;
+}
+.luma-research-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 64px;
+  margin: 0 2vw 50px;
+}
+.luma-research-heading > p {
+  max-width: 310px;
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--luma-muted);
+  padding-bottom: 8px;
+}
+.luma-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 0 2vw 32px;
+  flex-wrap: wrap;
+}
+.luma-tabs button {
+  border: 1px solid #fff3;
+  border-radius: 100px;
+  padding: 12px 24px;
+  min-height: 48px;
+  font-size: 14px;
+  color: #b5b7bc;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.luma-tabs button[aria-selected="true"] {
+  background: var(--luma-white);
+  border-color: var(--luma-white);
+  color: #000;
+}
+.luma-tabs button:hover {
+  border-color: #fff8;
+}
+.luma-research-panel[hidden],
+.luma-workflow-panel[hidden] {
+  display: none;
+}
+.luma-research-image {
+  height: min(58vw, 640px);
+  min-height: 340px;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.luma-research-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 60px;
+  padding: 28px 2vw 0;
+}
+.luma-research-caption h3 {
+  font-size: clamp(22px, 2.1vw, 32px);
+  line-height: 1.5;
+  font-weight: 450;
+}
+.luma-research-caption p {
+  max-width: 420px;
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--luma-muted);
+}
+.luma-workflow {
+  max-width: 1700px;
+  margin: auto;
+  padding: 100px 8vw 180px;
+}
+.luma-workflow-heading {
+  text-align: center;
+}
+.luma-workflow-heading p {
+  color: var(--luma-muted);
+  line-height: 1.8;
+  font-size: 16px;
+  margin: 30px auto 0;
+  max-width: 450px;
+}
+.luma-workflow-body {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  align-items: center;
+  gap: 70px;
+  margin-top: 80px;
+}
+.luma-workflow-steps {
+  min-width: 0;
+}
+.luma-workflow-steps button {
+  display: grid;
+  grid-template-columns: 24px 1fr 18px;
+  gap: 18px;
+  padding: 26px 0;
+  border-top: 1px solid #fff2;
+  text-align: left;
+  width: 100%;
+  color: #878b91;
+  cursor: pointer;
+}
+.luma-workflow-steps button:last-child {
+  border-bottom: 1px solid #fff2;
+}
+.luma-workflow-steps button[aria-selected="true"] {
+  color: var(--luma-white);
+}
+.luma-step-number,
+.luma-step-mark {
+  font-size: 12px;
+  line-height: 32px;
+}
+.luma-workflow-steps strong {
+  font-size: 22px;
+  font-weight: 450;
+  display: block;
+}
+.luma-step-copy {
+  display: block;
+  margin-top: 13px;
+  color: var(--luma-muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.luma-workflow-steps button[aria-selected="false"] .luma-step-copy {
+  display: none;
+}
+.luma-workflow-view {
+  border-radius: 14px;
+  overflow: hidden;
+  height: 510px;
+  background: #090e14;
+}
+.luma-workflow-panel {
+  width: 100%;
+  height: 100%;
+}
+.luma-infrastructure {
+  text-align: center;
+  justify-content: center;
+}
+.luma-infrastructure::after {
+  background:
+    radial-gradient(ellipse at center, #000a 0%, #0005 80%),
+    linear-gradient(0deg, #000, transparent 40%, transparent 60%, #000);
+}
+.luma-infrastructure .luma-chapter-copy {
+  max-width: 850px;
+}
+.luma-infrastructure .luma-chapter-copy p {
+  max-width: 480px;
+  margin: 30px auto 0;
+}
+.luma-infrastructure .luma-button {
+  margin-top: 32px;
+}
+.luma-finale {
+  text-align: center;
+  padding: 180px 24px 120px;
+}
+.luma-finale-kicker {
+  font-size: 16px;
+  color: var(--luma-muted);
+}
+.luma-finale h2 {
+  font-size: clamp(36px, 5vw, 80px);
+  margin-top: 24px;
+}
+.luma-finale .luma-button {
+  margin-top: 44px;
+}
+.luma-footer {
+  padding: 30px 4vw 32px;
+}
+.luma-wordmark {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 65px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(74px, 17.3vw, 310px);
+  line-height: 1;
+  letter-spacing: -0.073em;
+}
+.luma-wordmark > span {
+  font-family: var(--font-inter-tight), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.065em;
+}
+.luma-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  padding-top: 28px;
+  border-top: 1px solid #fff2;
+  color: var(--luma-muted);
+  font-size: 12px;
+}
+.luma-footer-bottom nav {
+  display: flex;
+  gap: 28px;
+}
+.luma-footer-bottom a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.luma-footer-bottom a:hover {
+  color: #fff;
+}
+@media (min-width: 1800px) {
+  .luma-hero {
+    padding-top: 160px;
+  }
+  .luma-gallery-motion {
+    margin-top: 80px;
+  }
+}
+@media (max-width: 1100px) {
+  .luma-home h2 {
+    font-size: clamp(36px, 5vw, 60px);
+  }
+  .luma-hero-title > span:last-child {
+    font-size: 7vw;
+  }
+  .luma-gallery {
+    height: 34vw;
+  }
+  .luma-frame-center {
+    width: 48%;
+    left: 26%;
+  }
+  .luma-frame-left {
+    left: -2%;
+    width: 34%;
+  }
+  .luma-frame-right {
+    left: 68%;
+    width: 34%;
+  }
+  .luma-intelligence .luma-chapter-copy {
+    width: 53%;
+  }
+  .luma-workflow-body {
+    gap: 36px;
+  }
+  .luma-workflow-view {
+    height: 440px;
+  }
+}
+@media (max-width: 767px) {
+  .luma-home > header > nav {
+    height: 72px;
+    padding-inline: 20px;
+  }
+  .luma-home :is(section, footer) {
+    scroll-margin-top: 72px;
+  }
+  .luma-hero {
+    padding-top: 125px;
+    min-height: auto;
+    padding-bottom: 24px;
+  }
+  .luma-hero-title > span:first-child {
+    font-size: clamp(85px, 22vw, 142px);
+  }
+  .luma-hero-title > span:last-child {
+    font-size: clamp(34px, 8.3vw, 57px);
+    margin-top: 16px;
+  }
+  .luma-hero-description {
+    font-size: 14px;
+    max-width: 310px;
+    margin-top: 23px;
+    line-height: 1.8;
+  }
+  .luma-button {
+    font-size: 14px;
+    min-width: 146px;
+    min-height: 54px;
+    padding: 15px 22px;
+  }
+  .luma-actions {
+    gap: 10px;
+    margin-top: 25px;
+  }
+  .luma-actions .luma-button {
+    min-width: 0;
+    flex: 1;
+    max-width: 190px;
+    padding-inline: 14px;
+  }
+  .luma-gallery-motion {
+    margin-top: 50px;
+  }
+  .luma-gallery {
+    height: 65vw;
+    min-height: 255px;
+    max-height: 390px;
+    perspective: 1000px;
+  }
+  .luma-frame {
+    border-radius: 10px;
+  }
+  .luma-frame-center {
+    width: 76%;
+    left: 12%;
+  }
+  .luma-frame-left {
+    width: 42%;
+    left: -30%;
+    transform: rotateY(28deg);
+    top: 8%;
+    height: 85%;
+  }
+  .luma-frame-right {
+    width: 42%;
+    left: 88%;
+    transform: rotateY(-28deg);
+    top: 8%;
+    height: 85%;
+  }
+  .luma-frame-far-left,
+  .luma-frame-far-right,
+  .luma-frame-caption {
+    display: none;
+  }
+  .luma-model-toolbar {
+    bottom: 8px;
+    left: 14px;
+    right: 8px;
+  }
+  .luma-drag-hint {
+    font-size: 10px;
+  }
+  .luma-model-switch {
+    padding: 8px 10px;
+    gap: 6px;
+    font-size: 11px;
+  }
+  .luma-scroll-cue {
+    margin-top: 26px;
+  }
+  .luma-statement {
+    padding: 100px 24px 120px;
+  }
+  .luma-statement p {
+    font-size: clamp(26px, 6.4vw, 44px);
+    line-height: 1.5;
+  }
+  .luma-statement-note {
+    font-size: 14px;
+    max-width: 290px;
+    margin-top: 26px;
+  }
+  .luma-chapter {
+    height: 100svh;
+    min-height: 680px;
+    padding: 100px 28px;
+    align-items: center;
+  }
+  .luma-home h2 {
+    font-size: clamp(34px, 8vw, 52px);
+  }
+  .luma-chapter-copy {
+    max-width: 100%;
+  }
+  .luma-chapter-copy p {
+    font-size: 15px;
+    max-width: 300px;
+    margin-top: 26px;
+  }
+  .luma-chapter::after {
+    background:
+      linear-gradient(90deg, #000d, #0006),
+      linear-gradient(0deg, #000c, transparent 70%);
+  }
+  .luma-section-name {
+    font-size: 13px;
+    margin-bottom: 26px;
+  }
+  .luma-intelligence {
+    justify-content: flex-start;
+  }
+  .luma-intelligence .luma-chapter-copy {
+    width: 100%;
+  }
+  .luma-chapter-foot {
+    left: 28px;
+    right: 28px;
+    bottom: 28px;
+    gap: 20px;
+    font-size: 10px;
+  }
+  .luma-chapter-foot > span:last-child {
+    text-align: right;
+  }
+  .luma-science-path {
+    gap: 10px;
+    font-size: 12px;
+  }
+  .luma-science-path i {
+    width: 25px;
+  }
+  .luma-research {
+    padding: 100px 20px 70px;
+  }
+  .luma-research-heading {
+    display: block;
+    margin: 0 8px 30px;
+  }
+  .luma-research-heading > p {
+    font-size: 14px;
+    margin-top: 26px;
+    padding-bottom: 0;
+  }
+  .luma-tabs {
+    gap: 6px;
+    margin: 0 8px 24px;
+  }
+  .luma-tabs button {
+    padding: 10px 15px;
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .luma-research-image {
+    height: 100vw;
+    min-height: 320px;
+    max-height: 520px;
+    border-radius: 10px;
+  }
+  .luma-research-caption {
+    display: block;
+    padding: 24px 8px 0;
+  }
+  .luma-research-caption h3 {
+    font-size: 23px;
+  }
+  .luma-research-caption p {
+    font-size: 14px;
+    margin-top: 14px;
+  }
+  .luma-workflow {
+    padding: 60px 28px 110px;
+  }
+  .luma-workflow-heading {
+    text-align: left;
+  }
+  .luma-workflow-heading p {
+    font-size: 14px;
+    margin-top: 26px;
+  }
+  .luma-workflow-body {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 36px;
+    align-items: stretch;
+  }
+  .luma-workflow-steps button {
+    padding: 22px 0;
+    gap: 12px;
+  }
+  .luma-workflow-steps strong {
+    font-size: 19px;
+  }
+  .luma-step-copy {
+    font-size: 13px;
+  }
+  .luma-workflow-view {
+    height: 330px;
+  }
+  .luma-infrastructure {
+    text-align: left;
+  }
+  .luma-infrastructure .luma-chapter-copy p {
+    margin-left: 0;
+  }
+  .luma-finale {
+    padding: 100px 24px 70px;
+  }
+  .luma-finale-kicker {
+    font-size: 14px;
+  }
+  .luma-finale h2 {
+    font-size: clamp(30px, 7.3vw, 48px);
+  }
+  .luma-finale .luma-button {
+    margin-top: 32px;
+  }
+  .luma-footer {
+    padding: 30px 24px;
+  }
+  .luma-wordmark {
+    font-size: 17vw;
+    margin-bottom: 46px;
+  }
+  .luma-footer-bottom {
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 11px;
+  }
+  .luma-footer-bottom nav {
+    order: -1;
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}
+@media (hover: none), (pointer: coarse) {
+  .luma-drag-hint {
+    display: none;
+  }
+  .luma-model-toolbar {
+    justify-content: flex-end;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .luma-home *,
+  .luma-home *::before,
+  .luma-home *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .luma-drag-hint,
+  .luma-model-switch {
+    display: none;
+  }
+}

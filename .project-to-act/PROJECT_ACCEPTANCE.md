@@ -21,6 +21,8 @@
 
 ## 证据索引
 
+本地旧版 Luma 风格首页改版（2026-10-13，未发布生产）：经用户确认采用旧版深色沉浸式方向。原版本提交 `3ed49d950af3ddbb801f6fd7cf1f325dafc788b9` 已完整推送至用户授权新建的私有仓库 `HAPPYFAPTAIN/AetherMind-Official-Site-Luma`，备份分支为 `codex/official-scroll-backup-20261013`；本轮在独立分支 `codex/luma-homepage-20261013` 改版。首页采用居中大字、透视科学画廊、三段全幅滚动停留、研究方向切换、工作流步骤切换和品牌收尾。仅一处实时 3D，复用原有质量降级、帧率控制和拖拽；无 WebGL 时显示静态画面，减少动态效果时取消停留和位移动画。修复现有真实锚点被 Showcase 功能预览拦截的问题。原首页组件仍保留，产品、社区与账号页面未重构。构建、修改文件 lint 和 14 项既有单元回归通过；Chromium 实测 320/390/768/1440/1920 宽度、中英文、鼠标拖动与越界捕获、模型切换、控制台登录弹层、移动导航、键盘标签页、三段固定停留及正反向释放、页脚可达、离屏停帧、触屏、减少动画动态切换、无 JavaScript 和无 WebGL 降级通过。测试为本地静态预览，未提交登录、发送短信或验证生产后端。证据：`output/luma-verification.json`、`output/verify-luma.py`、`output/luma-hero-zh-1440.png`、`output/luma-hero-zh-390.png`、`output/luma-intelligence-390.png`。参考旧版页面设计记录：`https://www.landing.love/sites/lumalabs/`；使用本项目科学素材，未复制 Luma 媒体或品牌内容。
+
 本地科学智能文案浮现与居中（2026-10-13，未发布生产）：左侧标签、标题、说明和标签组使用一个整体入场层，随进入行程从下方 72–140px、4% 透明度平滑浮现至完整显示。桌面整组文案以导航下方可视阅读区域为中心，在父模块释放后继续稳定陪伴右侧卡片，移动端保持单列正常阅读；减少动态效果时内容直接可见。保留上轮消除双重固定偏移的处理。构建和修改文件 lint 通过；独立 Chromium 1440×900、2298×1825、390×844 核验透明度渐增、位移渐减、桌面最终中心、释放边界连续、反向滚动、动态减少动画和无横向溢出通过。证据：`output/ai-copy-rise-verification.json`、`output/ai-copy-centered-1440.png`、`output/ai-copy-centered-2298.png`、`output/ai-copy-centered-390.png`。
 
 本地底部四模块停留加长（2026-10-13，未发布生产）：研究场景、结果展示、基础设施、控制台入口的停留距离改为一屏高度，范围 560–1000 CSS px；900px 桌面视口从 585px 增至 900px，844px 手机视口从 549px 增至 844px。其余模块和首屏五节保持原值。构建及 14 项回归通过；独立 Chromium 两种尺寸实测四模块在新增行程内保持、结束后正常释放、页脚可达，核验首屏与其他模块长度保持原值。证据：`output/lower-four-hold-verification.json`。

@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AUX_NAV_LINKS, BRAND, ENTERPRISE_NAV, NAV_LINKS } from "@/lib/site";
+import { BRAND } from "@/lib/site";
+import { navigation } from "@/data/navigation";
+import { usePathname } from "next/navigation";
+import "./navigation.css";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
 import { LoginPage } from "@/components/LoginPage";
@@ -21,8 +24,22 @@ export function Nav() {
   const [open, setOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const [active, setActive] = useState<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const reveal = (id: string) => { clearTimeout(closeTimer.current); setActive(id); };
+  const leave = () => { closeTimer.current = setTimeout(() => setActive(null), 160); };
+  const closeNavigation = () => { clearTimeout(closeTimer.current); setActive(null); setOpen(false); };
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+  useEffect(() => {
+    if (!active) return;
+    const dismiss = (event: KeyboardEvent) => { if (event.key === "Escape") setActive(null); };
+    window.addEventListener("keydown", dismiss);
+    return () => window.removeEventListener("keydown", dismiss);
+  }, [active]);
   const { account } = useAccount();
   const { language, setLanguage } = useLanguage();
+  const t = (pair: readonly [string, string]) => tr(language, pair[0], pair[1]);
 
   const enterAccount = () => {
     if (account || hasAccountSession()) router.push("/dashboard/");
@@ -49,8 +66,8 @@ export function Nav() {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-200 ${
-        scrolled
+      className={`site-navigation fixed inset-x-0 top-0 z-50 transition-colors duration-200 ${
+        scrolled || active || open
           ? "border-b border-line bg-bg-0/70 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
       }`}
@@ -65,12 +82,35 @@ export function Nav() {
           </SiteLink>
         </div>
 
-        <div data-primary-nav className="hidden items-center justify-self-center gap-[7.6px] xl:flex">
-          <button data-showcase={ENTERPRISE_NAV.key} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">
-            {tr(language, ENTERPRISE_NAV.label.en, ENTERPRISE_NAV.label.zh)}
-          </button>
-          {NAV_LINKS.map((l) => <SiteLink key={l.href} href={l.href} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">{tr(language, l.label.en, l.label.zh)}</SiteLink>)}
-          {AUX_NAV_LINKS.map((l) => <a key={l.href} href={l.href} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">{tr(language, l.label.en, l.label.zh)}</a>)}
+        <div data-primary-nav className="hidden items-center justify-self-center xl:flex">
+          {navigation.map(item => <div key={item.id} className="nav-entry"
+            onPointerMove={event => { if (event.pointerType === "mouse") reveal(item.id); }}
+            onPointerLeave={leave}
+            onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setActive(null); }}
+            onKeyDown={event => {
+              if (event.key === "Escape") {
+                event.preventDefault(); event.currentTarget.querySelector<HTMLAnchorElement>(".nav-destination")?.focus(); setActive(null);
+              }
+              if (event.key === "ArrowDown" && event.target === event.currentTarget.querySelector(".nav-destination")) {
+                event.preventDefault(); reveal(item.id);
+                const entry = event.currentTarget;
+                requestAnimationFrame(() => entry.querySelector<HTMLAnchorElement>(".nav-preview a")?.focus());
+              }
+            }}>
+            <SiteLink className="nav-destination" href={item.href} onClick={closeNavigation}
+              onFocus={() => reveal(item.id)} aria-expanded={active === item.id} aria-controls={`nav-${item.id}`}
+              aria-current={pathname?.startsWith(item.href.slice(0,-1)) ? "page" : undefined}>
+              {t(item.title)}<svg aria-hidden="true" width="10" height="6" viewBox="0 0 10 6"><path d="m1 1 4 4 4-4" fill="none" stroke="currentColor" /></svg>
+            </SiteLink>
+            {active === item.id && <div className="nav-preview" id={`nav-${item.id}`}>
+              <div className="nav-preview-inner">
+                <div><p className="nav-preview-title">{t(item.title)}</p><p className="nav-preview-description">{t(item.description)}</p>
+                  <SiteLink className="nav-preview-cta" href={item.href} onClick={closeNavigation}>{tr(language, "Explore", "进入")}{language === "zh" ? item.title[1] : ` ${item.title[0]}`} <span aria-hidden="true">↗</span></SiteLink>
+                </div>
+                <div className="nav-preview-topics">{item.topics.map((topic, index) => <SiteLink key={topic[0]} href={item.href + (item.id === "products" ? `#product-${["platform", "md-exp", "materials"][index]}` : ["enterprise","careers","about"].includes(item.id) ? `#detail-${index}` : "")} onClick={closeNavigation}>{t(topic)}<span aria-hidden="true">↗</span></SiteLink>)}</div>
+              </div>
+            </div>}
+          </div>)}
         </div>
 
         <div className="flex items-center justify-self-end gap-2 sm:gap-3">
@@ -135,7 +175,7 @@ export function Nav() {
 
           <button
             type="button"
-            onClick={enterAccount}
+            onClick={() => { setActive(null); enterAccount(); }}
             className="hidden whitespace-nowrap rounded-full border border-line-strong bg-white/[0.03] px-4 py-2 text-[15.5px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft sm:flex"
           >
             {account ? tr(language, "Dashboard", "控制台") : tr(language, "Sign in", "登录")}
@@ -143,8 +183,9 @@ export function Nav() {
         </div>
       </nav>
 
-      {/* mobile menu */}
+      {/* Touch users receive the same destinations with visible descriptions. */}
       <div
+        hidden={!open}
         className={`overflow-hidden border-b border-line bg-bg-0/95 transition-[max-height,opacity] duration-200 xl:hidden ${
           open
             ? "max-h-[calc(100dvh-72px)] overflow-y-auto opacity-100"
@@ -152,9 +193,10 @@ export function Nav() {
         }`}
       >
         <div className="space-y-1 px-6 py-6">
-          <button data-showcase={ENTERPRISE_NAV.key} onClick={() => setOpen(false)} className="block w-full rounded-lg px-3 py-3 text-left text-lg font-medium text-text-secondary hover:text-white">{tr(language, ENTERPRISE_NAV.label.en, ENTERPRISE_NAV.label.zh)}</button>
-          {NAV_LINKS.map((l) => <SiteLink key={l.href} href={l.href} onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary hover:text-white">{tr(language, l.label.en, l.label.zh)}</SiteLink>)}
-          {AUX_NAV_LINKS.map((l) => <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary hover:text-white">{tr(language, l.label.en, l.label.zh)}</a>)}
+          {navigation.map(item => <SiteLink key={item.id} href={item.href} onClick={closeNavigation} className="nav-mobile-link">
+            <span>{t(item.title)} <span aria-hidden="true">↗</span></span>
+            <small>{t(item.description)}</small>
+          </SiteLink>)}
           <button
             type="button"
             onClick={() => { setOpen(false); enterAccount(); }}

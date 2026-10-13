@@ -25,7 +25,7 @@ type Product = {
 const PRODUCTS: Product[] = [
   { id: "platform", image: productAssets.platform, category: "platform", title: { zh: "以太智元平台", en: "AetherMind Platform" }, body: { zh: "从任务准备到结果理解，一套面向科学研究的计算工作区。", en: "A research workspace for preparing jobs, running compute and understanding results." }, tags: [{ zh: "科研工作区", en: "Research workspace" }, { zh: "HPC", en: "HPC" }], state: { zh: "样板可用", en: "Preview ready" } },
   { id: "lammps", image: productAssets.lammps, category: "simulation", title: { zh: "LAMMPS 计算引擎", en: "LAMMPS Compute Engine" }, body: { zh: "面向分子动力学的 GPU 与 HPC 任务编排、监测和轨迹分析。", en: "GPU and HPC orchestration, monitoring and trajectory analysis for molecular dynamics." }, tags: [{ zh: "分子动力学", en: "Molecular dynamics" }, { zh: "GPU", en: "GPU" }], state: { zh: "持续建设", en: "In development" } },
-  { id: "md-exp", image: productAssets.lammps, category: "simulation", title: { zh: "MD EXP", en: "MD EXP" }, body: { zh: "分子模拟智能体、模型对话与 dsh 科研工作流。", en: "Molecular simulation agent, model conversations and the dsh research workflow." }, tags: [{ zh: "LAMMPS / ReaxFF", en: "LAMMPS / ReaxFF" }, { zh: "dsh", en: "dsh" }], state: { zh: "已接入入口", en: "Entry connected" } },
+  { id: "md-exp", image: productAssets.mdExp, category: "simulation", title: { zh: "MD EXP", en: "MD EXP" }, body: { zh: "分子模拟智能体、模型对话与 dsh 科研工作流。", en: "Molecular simulation agent, model conversations and the dsh research workflow." }, tags: [{ zh: "LAMMPS / ReaxFF", en: "LAMMPS / ReaxFF" }, { zh: "dsh", en: "dsh" }], state: { zh: "已接入入口", en: "Entry connected" } },
   { id: "agent", image: productAssets.aiAgent, category: "agent", title: { zh: "科学智能体", en: "Science Agents" }, body: { zh: "让研究问题转化为可执行的计算步骤，保留参数、证据和结果上下文。", en: "Turn research questions into executable steps while keeping parameters, evidence and context together." }, tags: [{ zh: "AI for Science", en: "AI for Science" }, { zh: "工作流", en: "Workflow" }], state: { zh: "样板可用", en: "Preview ready" } },
   { id: "learn-everything", image: productAssets.learning, category: "agent", title: { zh: "Learn Everything 学习 Agent", en: "Learn Everything Agent" }, body: { zh: "从选题、学习路线到复习、测验和学习看板的一体化学习工作台。", en: "An integrated learning workspace from topic discovery and routes to review, quizzes and progress." }, tags: [{ zh: "学习路线", en: "Learning routes" }, { zh: "FSRS 复习", en: "FSRS review" }, { zh: "知识库问答", en: "RAG Q&A" }], state: { zh: "邀请码激活", en: "Invite activation" } },
   { id: "materials", image: productAssets.materials, category: "research", title: { zh: "材料计算", en: "Materials Computing" }, body: { zh: "围绕结构、缺陷、界面与能量景观组织材料研究过程。", en: "Organize materials research around structures, defects, interfaces and energy landscapes." }, tags: [{ zh: "材料模拟", en: "Materials simulation" }, { zh: "结构计算", en: "Structure compute" }], state: { zh: "即将开放", en: "Coming soon" } },
@@ -49,7 +49,7 @@ function ProductArtwork({
     <picture>
       <source
         type="image/webp"
-        srcSet={(src === productAssets.platform ? [640, 1280, 1536, 2172] : [640, 1280, 1536]).map(width => `${assetUrl(src)}-${width}.webp ${width}w`).join(", ")}
+        srcSet={[640, 1280, 1536].map(width => `${assetUrl(src)}-${width}.webp ${width}w`).join(", ")}
         sizes={sizes}
       />
       <Image
@@ -255,9 +255,7 @@ export function ProductsPage() {
           {filtered.map(product => (
             <article key={product.id} className="product-card" data-product={product.id} aria-labelledby={`product-${product.id}`}>
               <div className="product-image">
-                <ProductArtwork src={product.image} sizes={product.id === "platform"
-                  ? "(max-width: 680px) calc(187.5vw - 75px), (max-width: 1360px) calc(93.75vw - 97.5px), 1140px"
-                  : "(max-width: 680px) calc(100vw - 40px), (max-width: 1360px) calc((100vw - 104px) / 2), 608px"} />
+                <ProductArtwork src={product.image} sizes="(max-width: 680px) calc(100vw - 40px), (max-width: 1100px) 46vw, (max-width: 1360px) 30vw, 403px" />
               </div>
               <div className="product-card-body">
                 <div className="product-meta">

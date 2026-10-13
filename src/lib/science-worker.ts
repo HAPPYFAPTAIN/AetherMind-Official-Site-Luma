@@ -1,17 +1,20 @@
 import { createScienceRenderer, type ScienceSceneMode } from "./science-renderer";
+import type { MolecularQuality } from "./molecular-quality";
+import type { DragRotation } from "./molecular-drag";
 
 type Size = { width: number; height: number; pixelRatio: number };
-type RenderInput = { progress: number; x: number; y: number; strength: number; time?: number };
+type RenderInput = { progress: number; x: number; y: number; strength: number; time?: number; rotation?: DragRotation };
 
 export type ScienceWorkerRequest =
   | ({ type: "init"; canvas: OffscreenCanvas; mode: ScienceSceneMode } & Size)
   | ({ type: "render" } & RenderInput)
   | ({ type: "resize" } & Size)
+  | { type: "quality"; quality: MolecularQuality }
   | { type: "dispose" };
 
 export type ScienceWorkerResponse =
   | { type: "ready" }
-  | { type: "rendered"; phase: string }
+  | { type: "rendered"; phase: string; stats?: {quality: MolecularQuality; triangles: number; drawCalls: number; width: number; height: number; rotation: DragRotation} }
   | { type: "lost" }
   | { type: "error"; message: string };
 
@@ -31,6 +34,7 @@ let disposed = false;
 let contextLost = false;
 let initializing = false;
 let generation = 0;
+let quality: MolecularQuality = "medium";
 let drawTask: ReturnType<typeof setTimeout> | undefined;
 let restoreTask: ReturnType<typeof setTimeout> | undefined;
 
@@ -49,8 +53,8 @@ function reportError(error: unknown) {
 
 function renderLatest() {
   if (!view || disposed || contextLost) return;
-  const phase = view.render(latest.progress, latest.x, latest.y, latest.strength, latest.time || 0);
-  if (typeof phase === "string") scope.postMessage({ type: "rendered", phase });
+  const phase = view.render(latest.progress, latest.x, latest.y, latest.strength, latest.time || 0, latest.rotation);
+  if (typeof phase === "string") scope.postMessage({ type: "rendered", phase, stats: "getStats" in view ? view.getStats() : undefined });
 }
 
 function scheduleDraw() {
@@ -78,6 +82,7 @@ async function initialize() {
       return;
     }
     view = created;
+    if ("setQuality" in view) view.setQuality(quality);
     // Size and input may have changed while shaders compiled. Only the most
     // recent state is painted, including deep links and reversed scroll.
     view.resize(size.width, size.height, size.pixelRatio);
@@ -154,12 +159,17 @@ scope.onmessage = ({ data }) => {
         void initialize();
         break;
       case "render":
-        latest = { progress: data.progress, x: data.x, y: data.y, strength: data.strength, time: data.time };
+        latest = { progress: data.progress, x: data.x, y: data.y, strength: data.strength, time: data.time, rotation: data.rotation };
         scheduleDraw();
         break;
       case "resize":
         size = { width: data.width, height: data.height, pixelRatio: data.pixelRatio };
         if (view && !contextLost) view.resize(size.width, size.height, size.pixelRatio);
+        scheduleDraw();
+        break;
+      case "quality":
+        quality = data.quality;
+        if (view && !contextLost && "setQuality" in view) view.setQuality(quality);
         scheduleDraw();
         break;
       case "dispose":

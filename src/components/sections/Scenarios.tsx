@@ -85,7 +85,7 @@ export function Scenarios() {
         {/* dynamic visual */}
         <div className="lg:col-span-7">
           <Reveal delay={0.1} y={40}>
-            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-line bg-bg-1">
+            <div data-story-panel className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-line bg-bg-1">
               {SCENARIOS.map((s, i) => (
                 <img
                   key={s.id}

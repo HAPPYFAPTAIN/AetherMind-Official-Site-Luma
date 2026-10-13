@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {MOLECULAR_QUALITY, type MolecularQuality} from "./molecular-quality";
 
 function surface(u: number, v: number, shell = 0) {
   const r = 1.44 + Math.cos(u * 3 + .6) * .19 + Math.sin(u * 5) * .075;
@@ -12,7 +13,8 @@ function surface(u: number, v: number, shell = 0) {
   );
 }
 
-export function createMolecularEffects() {
+export function createMolecularEffects(quality: MolecularQuality = "medium") {
+  const profile=MOLECULAR_QUALITY[quality];
   const root = new THREE.Group();
   const geometries: THREE.BufferGeometry[] = [];
   const materials: THREE.Material[] = [];
@@ -50,8 +52,8 @@ export function createMolecularEffects() {
     }
   `;
 
-  for (let shell=0;shell<2;shell++) {
-    const segments=240, sides=48;
+  for (let shell=0;shell<profile.shells;shell++) {
+    const {segments,sides}=profile;
     const positions=[],uvs=[],indices=[];
     for(let i=0;i<=segments;i++)for(let j=0;j<=sides;j++) {
       const p=surface(i/segments*Math.PI*2,j/sides*Math.PI*2,shell);
@@ -75,10 +77,10 @@ export function createMolecularEffects() {
   // Fine, interwoven fibres follow the irregular membrane, rather than
   // straight links between arbitrary points in an ordinary sphere.
   const fiberPoints=[];
-  for(let fiber=0;fiber<44;fiber++)for(let i=0;i<150;i++) {
+  for(let fiber=0;fiber<profile.fibers;fiber++)for(let i=0;i<profile.fiberSteps;i++) {
     for(const step of [i,i+1]) {
-      const u=step/150*Math.PI*2;
-      const v=fiber/44*Math.PI*2+Math.sin(u*3+fiber)*.25+u*(fiber%3-1)*.7;
+      const u=step/profile.fiberSteps*Math.PI*2;
+      const v=fiber/profile.fibers*Math.PI*2+Math.sin(u*3+fiber)*.25+u*(fiber%3-1)*.7;
       const p=surface(u,v,.2+Math.sin(fiber)*.8);
       fiberPoints.push(p.x,p.y,p.z);
     }
@@ -94,7 +96,7 @@ export function createMolecularEffects() {
   geometries.push(fiberGeometry);materials.push(fiberMaterial);
 
   const dustPositions=[];
-  for(let i=0;i<1600;i++) {
+  for(let i=0;i<profile.dust;i++) {
     const u=i*2.399963,v=i*1.71833;
     const p=surface(u,v,Math.sin(i*2.13)*1.5);
     const jitter=.02+Math.sin(i*3.71)*.07;
@@ -114,41 +116,5 @@ export function createMolecularEffects() {
     update(time:number,burst:number) {uniforms.time.value=time;uniforms.burst.value=burst;},
     setPixelRatio(value:number) {uniforms.pixelRatio.value=value;},
     dispose() {geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());},
-  };
-}
-
-/** Preserve sharp structural detail while retaining restrained soft highlights. */
-export function createMolecularOptics(renderer:THREE.WebGLRenderer) {
-  const target=new THREE.WebGLRenderTarget(1,1,{samples:4,resolveDepthBuffer:false,type:renderer.extensions.has("EXT_color_buffer_float")?THREE.HalfFloatType:THREE.UnsignedByteType});
-  const uniforms={color:{value:target.texture},resolution:{value:new THREE.Vector2(1,1)},pixelRatio:{value:1}};
-  const geometry=new THREE.PlaneGeometry(2,2);
-  const material=new THREE.ShaderMaterial({
-    uniforms,depthTest:false,depthWrite:false,transparent:true,blending:THREE.NoBlending,
-    vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`,
-    fragmentShader:`
-      uniform sampler2D color; uniform vec2 resolution; uniform float pixelRatio;
-      varying vec2 vUv;
-      void main(){
-        vec2 pixel=1./resolution;
-        vec4 center=texture2D(color,vUv);
-        vec3 glow=vec3(0.);
-        for(int i=0;i<8;i++){
-          float a=float(i)*.785398;
-          vec2 dir=vec2(cos(a),sin(a));
-          vec3 sampleColor=texture2D(color,clamp(vUv+dir*pixel*3.2*pixelRatio,vec2(0.),vec2(1.))).rgb;
-          glow+=max(sampleColor-vec3(.65),vec3(0.));
-        }
-        gl_FragColor=vec4(center.rgb+glow*.018,center.a);
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
-      }
-    `,
-  });
-  const output=new THREE.Scene();output.add(new THREE.Mesh(geometry,material));
-  const screenCamera=new THREE.Camera();
-  return {
-    render(scene:THREE.Scene,camera:THREE.Camera){renderer.setRenderTarget(target);renderer.render(scene,camera);renderer.setRenderTarget(null);renderer.render(output,screenCamera);},
-    resize(width:number,height:number,pixelRatio:number){target.setSize(width,height);uniforms.resolution.value.set(width,height);uniforms.pixelRatio.value=pixelRatio;},
-    dispose(){target.dispose();geometry.dispose();material.dispose();},
   };
 }

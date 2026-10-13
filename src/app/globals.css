@@ -344,6 +344,36 @@ html[data-language="zh"] :is(.zh-heading, .zh-copy) {
   isolation: isolate;
 }
 
+.story-section {
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 100svh;
+  padding-block: clamp(96px, 12svh, 144px);
+  scroll-margin-top: 72px;
+}
+.story-backdrop { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; background: #050709; }
+.story-backdrop > img { width: 100%; height: 100%; object-fit: cover; object-position: 62% center; transform: scale(1.035); }
+.story-backdrop__shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgb(5 7 9 / .88), rgb(5 7 9 / .65) 35%, rgb(5 7 9 / .18) 76%, rgb(5 7 9 / .3)), linear-gradient(180deg, #050709 0%, transparent 12%, transparent 88%, #050709 100%); }
+.story-backdrop--platform > img { object-position: 72% center; }
+.story-backdrop--engine > img { object-position: 40% center; }
+.story-backdrop--simulation > img { object-position: 70% center; }
+.story-backdrop--workflow .story-backdrop__shade,
+.story-backdrop--results .story-backdrop__shade { background: linear-gradient(180deg, rgb(5 7 9 / .9), rgb(5 7 9 / .76) 42%, rgb(5 7 9 / .5) 75%, #050709); }
+.story-backdrop--research > img { object-position: 30% center; }
+.story-backdrop--infrastructure > img { object-position: 75% center; }
+.story-section .zh-copy { color: #b4bbc4; }
+.story-section .text-text-tertiary { color: #b4bbc4; }
+.story-section .glass { background: rgb(5 9 14 / .78); }
+.story-section h2 { text-shadow: 0 2px 24px rgb(0 0 0 / .22); }
+@media (max-width: 767px) {
+  .story-backdrop__shade { background: linear-gradient(180deg, rgb(5 7 9 / .8), rgb(5 7 9 / .5) 35%, rgb(5 7 9 / .7) 80%, #050709); }
+}
+.story-scale-label { font-size: clamp(8px, 2.1vw, 11px); letter-spacing: .06em; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) {
+  .story-section { min-height: auto; }
+}
+
 .science-scene__canvas,
 .science-scene__fallback {
   position: absolute;
@@ -362,9 +392,25 @@ html[data-language="zh"] :is(.zh-heading, .zh-copy) {
 .science-scene[data-ready="true"] .science-scene__canvas { opacity: 1; }
 .science-scene[data-ready="true"] .science-scene__fallback { opacity: 0; }
 
-.science-hero { height: 440svh; }
+/* Four chapter transitions, each with half a viewport of scroll travel. */
+.science-hero { height: 300svh; }
 .science-hero__stage { height: 100svh; min-height: 560px; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .science-hero__stage[data-drag-ready="true"] { cursor: grab; }
+  .science-hero__stage[data-dragging="true"] { cursor: grabbing; user-select: none; }
+}
 .science-hero__copy .zh-copy { text-wrap: balance; }
+.science-hero__action {
+  min-height: 64px;
+  min-width: 192px;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 32px;
+  font-size: 18px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.science-hero__action:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
 .science-hero__object { inset: 0; width: 100%; height: 100%; }
 .science-hero__object,
 .science-finale__object {
@@ -408,7 +454,6 @@ html[data-language="zh"] :is(.zh-heading, .zh-copy) {
 }
 
 @media (max-width: 900px) {
-  .science-hero { height: 420svh; }
   .science-hero__stage { min-height: 660px; }
   .science-hero__object { inset: 0; width: 100%; height: 100%; mask-image: linear-gradient(to bottom, transparent 28%, #000 47%, #000 87%, transparent 98%); }
   .science-hero__copy { align-items: flex-start; padding-top: max(100px, 13svh); }
@@ -418,7 +463,7 @@ html[data-language="zh"] :is(.zh-heading, .zh-copy) {
   .science-hero__intro { max-width: 600px; }
   .science-hero__intro .zh-copy { margin-top: 18px; max-width: 480px; font-size: 14px; line-height: 1.7; }
   .science-hero__intro .rise-in.flex { margin-top: 22px; gap: 12px; }
-  .science-hero__intro .rise-in.flex > a { height: 42px; padding-inline: 18px; font-size: 13px; }
+  .science-hero__action { min-height: 56px; min-width: 148px; padding: 12px 20px; font-size: 16px; gap: 8px; }
   .science-hero__title { font-size: clamp(2.25rem, 9.5vw, 3.5rem); }
   html[data-language="en"] .science-hero__title { font-size: clamp(2.2rem, 8.8vw, 3.4rem); }
   html[data-language="en"] .science-hero__intro .mono-label { font-size: 9px; letter-spacing: 0.08em; }

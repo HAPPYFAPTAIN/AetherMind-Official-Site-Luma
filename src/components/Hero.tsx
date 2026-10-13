@@ -9,6 +9,7 @@ import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
 import { ConsoleEntryButton } from "@/components/ConsoleEntryButton";
 import { assetUrl } from "@/lib/asset-url";
+import { HERO_CHAPTERS as CHAPTERS, HERO_PROGRESS_EVENT, sampleHeroScroll } from "@/lib/hero-scroll";
 
 /* state content for the pinned scroll narrative */
 const STATES = [
@@ -69,14 +70,6 @@ const STATES = [
   },
 ];
 
-const CHAPTERS = [
-  { at: 0, en: "Structure", zh: "整体结构" },
-  { at: 0.32, en: "Fragments", zh: "分子解构" },
-  { at: 0.58, en: "Explode", zh: "爆炸展开" },
-  { at: 0.82, en: "Rebuild", zh: "旋转重组" },
-  { at: 1, en: "New form", zh: "新的形态" },
-];
-
 function scientificCopy(text: string) {
   return text.split(/(科学计算|分子模拟|材料研究|LAMMPS\u00a0工作流|科学智能探索|每一根化学键|每一条轨迹|每一次微小波动|化学键|物理模拟|一次计算|下一种材料|下一种分子|下一个机理)/).map((part, i) =>
     i % 2 ? <span className="zh-term" key={i}>{part}</span> : part,
@@ -96,37 +89,57 @@ export function Hero() {
 
     const media = gsap.matchMedia();
     media.add("(prefers-reduced-motion: no-preference)", () => {
-      // The geometry and text share the same normalized scroll interval.
-      const tl = gsap.timeline({
+      const scroll = {progress: 0};
+      const paint = () => {
+        const state = sampleHeroScroll(scroll.progress);
+        root.dataset.chapter = String(state.active);
+        root.dataset.sceneProgress = String(state.phase);
+        textStates.current.forEach((element, index) => {
+          if (!element) return;
+          const offset = index - state.position;
+          const opacity = Math.max(0, 1 - Math.abs(offset));
+          gsap.set(element, {autoAlpha: opacity, y: Math.max(-1, Math.min(1, offset)) * 28});
+          element.inert = opacity < .5;
+          element.setAttribute("aria-hidden", String(opacity < .5));
+        });
+        chapterButtons.current.forEach((button, i) => button?.setAttribute("aria-current", String(i === state.active)));
+        gsap.set(progress.current, {scaleY: state.phase});
+        root.dispatchEvent(new CustomEvent(HERO_PROGRESS_EVENT, {detail: state.phase}));
+      };
+      paint();
+      // One clock drives text, chapter indicators and the worker's model phase.
+      const driver = gsap.to(scroll, {
+        progress: 1,
+        ease: "none",
+        onUpdate: paint,
         scrollTrigger: {
           trigger: root,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.25,
-          onUpdate: (self) => {
-            const active = self.progress < 0.2 ? 0 : self.progress < 0.45 ? 1 : self.progress < 0.72 ? 2 : self.progress < 0.9 ? 3 : 4;
-            chapterButtons.current.forEach((button, i) => button?.setAttribute("aria-current", String(i === active)));
+          scrub: .18,
+          invalidateOnRefresh: true,
+          snap: {
+            snapTo: CHAPTERS.map(chapter => chapter.at),
+            directional: true,
+            inertia: false,
+            delay: .14,
+            duration: {min: .28, max: .55},
+            ease: "power2.inOut",
           },
         },
-        defaults: { ease: "none" },
       });
-
-      // text states chained through the sequence
-      const inOut = (el: HTMLDivElement | null, a: number, b: number, c: number, d: number) => {
-        if (!el) return;
-        tl.fromTo(el, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: b - a }, a);
-        if (c < d) tl.to(el, { autoAlpha: 0, y: -40, duration: d - c }, c);
+      return () => {
+        driver.scrollTrigger?.kill();
+        driver.kill();
+        textStates.current.forEach(element => {
+          if (!element) return;
+          element.inert = false;
+          element.removeAttribute("aria-hidden");
+          gsap.set(element, {clearProps: "opacity,visibility,transform"});
+        });
+        delete root.dataset.sceneProgress;
+        delete root.dataset.chapter;
       };
-
-      // state 0 is visible on load — only fades out
-      tl.to(textStates.current[0], { autoAlpha: 0, y: -24, duration: 0.06 }, 0.18);
-      inOut(textStates.current[1], 0.22, 0.28, 0.42, 0.48);
-      inOut(textStates.current[2], 0.48, 0.54, 0.68, 0.74);
-      inOut(textStates.current[3], 0.74, 0.8, 0.86, 0.92);
-      inOut(textStates.current[4], 0.9, 0.96, 1, 1);
-
-      // Progress tracks the same interval as the actual 3D geometry.
-      tl.fromTo(progress.current, { scaleY: 0 }, { scaleY: 1, duration: 1 }, 0);
     }, root);
     return () => media.revert();
   }, []);
@@ -185,13 +198,13 @@ export function Hero() {
               <div className="rise-in pointer-events-auto mt-10 flex flex-wrap items-center gap-4" style={{ animationDelay: "0.55s" }}>
                 <a
                   href={assetUrl("/md-agent/")}
-                  className="group inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-[14px] font-semibold text-bg-0 transition-colors hover:bg-accent"
+                  className="science-hero__action group inline-flex items-center rounded-full bg-white font-semibold text-bg-0 transition-colors hover:bg-accent"
                 >
                   {tr(language, "Explore Platform", "探索平台")}
                   <span className="transition-transform group-hover:translate-x-0.5">→</span>
                 </a>
                 <ConsoleEntryButton
-                  className="inline-flex h-12 items-center gap-2 rounded-full border border-line-strong px-6 text-[14px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft"
+                  className="science-hero__action inline-flex items-center rounded-full border border-white/25 font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft"
                 >
                   {tr(language, "Open Console", "打开控制台")}
                 </ConsoleEntryButton>

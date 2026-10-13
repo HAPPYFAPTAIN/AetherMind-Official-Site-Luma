@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import {createMolecularModel, sampleMolecularPositions, explosionAt} from "./molecular-geometry";
-import {createMolecularEffects, createMolecularOptics} from "./molecular-effects";
+import {createMolecularEffects} from "./molecular-effects";
+import {MOLECULAR_QUALITY, molecularPixelRatio, type MolecularQuality} from "./molecular-quality";
+import type {DragRotation} from "./molecular-drag";
 
 export async function createMolecularRenderer(canvas:HTMLCanvasElement|OffscreenCanvas) {
   const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:"high-performance"});
@@ -22,12 +24,16 @@ export async function createMolecularRenderer(canvas:HTMLCanvasElement|Offscreen
   const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(-3,5,6);scene.add(key);
   const rim=new THREE.DirectionalLight(0x9bdceb,4);rim.position.set(4,1,-3);scene.add(rim);
   const fill=new THREE.DirectionalLight(0x50697f,.8);fill.position.set(-4,-3,2);scene.add(fill);
-  const group=new THREE.Group();scene.add(group);
+  // User rotation lives in camera/screen axes, outside the scroll animation.
+  const interaction=new THREE.Group();scene.add(interaction);
+  const group=new THREE.Group();interaction.add(group);
   const model=createMolecularModel();
   const positions=new Float32Array(model.atoms.length*3);
-  const sphere=new THREE.SphereGeometry(1,24,16);
-  const cylinder=new THREE.CylinderGeometry(1,1,1,12);
-  const material=new THREE.MeshPhysicalMaterial({metalness:.82,roughness:.2,clearcoat:.6,clearcoatRoughness:.15});
+  let quality: MolecularQuality = "medium";
+  const profile=MOLECULAR_QUALITY[quality];
+  let sphere=new THREE.SphereGeometry(1,profile.sphereWidth,profile.sphereHeight);
+  let cylinder=new THREE.CylinderGeometry(1,1,1,profile.bondSides);
+  const material=new THREE.MeshStandardMaterial({metalness:.82,roughness:.2});
   const bondMaterial=new THREE.MeshStandardMaterial({color:0x697980,metalness:.78,roughness:.3});
   const atoms=new THREE.InstancedMesh(sphere,material,model.atoms.length);
   const bonds=new THREE.InstancedMesh(cylinder,bondMaterial,model.bonds.length);
@@ -36,14 +42,13 @@ export async function createMolecularRenderer(canvas:HTMLCanvasElement|Offscreen
   const colors={carbon:0x48555f,silver:0xc4d1d6,cyan:0x458b9f,hydrogen:0xbcc9d2};
   model.atoms.forEach((atom,i)=>atoms.setColorAt(i,new THREE.Color(colors[atom.element])));
   group.add(atoms,bonds);
-  const membrane=createMolecularEffects();group.add(membrane.root);
-  const optics=createMolecularOptics(renderer);
+  let membrane=createMolecularEffects(quality);group.add(membrane.root);
   const dummy=new THREE.Object3D(),a=new THREE.Vector3(),b=new THREE.Vector3(),direction=new THREE.Vector3(),up=new THREE.Vector3(0,1,0);
   const restLengths=model.bonds.map(([first,second])=>new THREE.Vector3(...model.atoms[first].position).distanceTo(new THREE.Vector3(...model.atoms[second].position)));
-  let width=1,height=1,compact=false,disposed=false;
+  let width=1,height=1,requestedDpr=1,compact=false,disposed=false;
   let serial=0;
 
-  const render=(progress:number,pointerX:number,pointerY:number,strength:number,time=0)=>{
+  const render=(progress:number,pointerX:number,pointerY:number,strength:number,time=0,rotation?:DragRotation)=>{
     if(disposed)return;
     const p=Math.max(0,Math.min(1,progress)),burst=explosionAt(p);
     sampleMolecularPositions(model,p,positions,time);
@@ -62,33 +67,44 @@ export async function createMolecularRenderer(canvas:HTMLCanvasElement|Offscreen
       dummy.scale.set(radius,Math.max(.001,length),radius);dummy.updateMatrix();bonds.setMatrixAt(i,dummy.matrix);
     }
     atoms.instanceMatrix.needsUpdate=true;bonds.instanceMatrix.needsUpdate=true;
-    group.rotation.set(.13+p*.44+Math.sin(time*.12)*.04+pointerY*strength*.07,-.35+p*2.2+time*.065+pointerX*strength*.12,-.25+p*.32);
+    interaction.quaternion.fromArray(rotation ?? [0,0,0,1]);
+    group.rotation.set(.13+p*.44+Math.sin(time*.12)*.04+pointerY*strength*.07,-.35+p*2.2+time*.065+pointerX*strength*.07,-.25+p*.32);
     membrane.update(time,burst);
     const focusX=compact?.5:.7-burst*.1,focusY=compact?.68:.51;
     camera.setViewOffset(width,height,(.5-focusX)*width,(.5-focusY)*height,width,height);
-    optics.render(scene,camera);
+    renderer.render(scene,camera);
     if("dataset" in canvas){canvas.dataset.phase=p.toFixed(3);canvas.dataset.frame=String(++serial);canvas.dataset.model="molecular-complex";}
     return p.toFixed(3);
   };
   const resize=(w:number,h:number,dpr=1)=>{
-    width=w;height=h;compact=w<=900;
-    // Match Retina/phone pixels without a one-way quality drop during motion.
-    // Bound the multisampled HDR framebuffer to roughly 4K, including on
-    // oversized/zoomed displays, and respect the GPU's attachment limit.
+    width=Math.max(1,w);height=Math.max(1,h);requestedDpr=dpr;compact=w<=900;
+    // Cap fragment work independently of display density. Text remains DOM.
     const gl=renderer.getContext();
     const maxSide=Math.min(renderer.capabilities.maxTextureSize,gl.getParameter(gl.MAX_RENDERBUFFER_SIZE));
-    const pixelRatio=Math.min(Math.max(1,dpr),3,Math.sqrt(8_294_400/(w*h)),maxSide/w,maxSide/h);
-    renderer.setPixelRatio(pixelRatio);renderer.setSize(w,h,false);
-    const buffer=renderer.getDrawingBufferSize(new THREE.Vector2());
-    optics.resize(buffer.x,buffer.y,pixelRatio);
+    const pixelRatio=molecularPixelRatio(width,height,dpr,maxSide,quality);
+    renderer.setPixelRatio(pixelRatio);renderer.setSize(width,height,false);
     membrane.setPixelRatio(pixelRatio);
-    camera.aspect=w/Math.max(1,h);
+    camera.aspect=width/height;
     camera.position.z=compact?Math.max(12,12.4/camera.aspect):11.7;
     camera.updateProjectionMatrix();
   };
+  const setQuality=(next: MolecularQuality)=>{
+    if(disposed || quality===next)return;
+    quality=next;
+    const profile=MOLECULAR_QUALITY[quality];
+    const oldSphere=sphere,oldCylinder=cylinder;
+    sphere=new THREE.SphereGeometry(1,profile.sphereWidth,profile.sphereHeight);
+    cylinder=new THREE.CylinderGeometry(1,1,1,profile.bondSides);
+    atoms.geometry=sphere;bonds.geometry=cylinder;
+    oldSphere.dispose();oldCylinder.dispose();
+    group.remove(membrane.root);membrane.dispose();
+    membrane=createMolecularEffects(quality);group.add(membrane.root);
+    resize(width,height,requestedDpr);
+  };
+  const getStats=()=>({quality,triangles:renderer.info.render.triangles,drawCalls:renderer.info.render.calls,width:canvas.width,height:canvas.height,rotation:interaction.quaternion.toArray() as DragRotation});
   const dispose=(releaseContext=true)=>{
-    disposed=true;atoms.dispose();bonds.dispose();sphere.dispose();cylinder.dispose();material.dispose();bondMaterial.dispose();membrane.dispose();optics.dispose();environment.dispose();renderer.dispose();if(releaseContext)renderer.forceContextLoss();
+    disposed=true;atoms.dispose();bonds.dispose();sphere.dispose();cylinder.dispose();material.dispose();bondMaterial.dispose();membrane.dispose();environment.dispose();renderer.dispose();if(releaseContext)renderer.forceContextLoss();
   };
   try{await renderer.compileAsync(scene,camera);}catch(error){dispose();throw error;}
-  return {render,resize,dispose};
+  return {render,resize,dispose,setQuality,getStats};
 }

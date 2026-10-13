@@ -1,6 +1,7 @@
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
 import { ScrollRefresher } from "@/components/ScrollRefresher";
+import { StoryScroll } from "@/components/StoryScroll";
 import { PlatformDefinition } from "@/components/sections/PlatformDefinition";
 import { ComputationalEngine } from "@/components/sections/ComputationalEngine";
 import { MolecularDynamics } from "@/components/sections/MolecularDynamics";
@@ -16,6 +17,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen bg-bg-0 text-text-primary">
       <ScrollRefresher />
+      <StoryScroll />
       <Nav />
       <Hero />
       <PlatformDefinition />

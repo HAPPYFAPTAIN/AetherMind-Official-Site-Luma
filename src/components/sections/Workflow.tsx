@@ -1,8 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
 import { Section } from "@/components/primitives/Section";
-import { Reveal, prefersReducedMotion } from "@/components/primitives/Reveal";
+import { Reveal } from "@/components/primitives/Reveal";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
 
@@ -18,25 +17,6 @@ const STEPS = [
 
 export function Workflow() {
   const { language } = useLanguage();
-  const lineRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const el = lineRef.current;
-    if (!el || prefersReducedMotion()) return;
-    if (typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.style.transition = "transform 1.8s cubic-bezier(0.22,1,0.36,1)";
-          el.style.transform = "scaleX(1)";
-          io.disconnect();
-        }
-      },
-      { threshold: 0.5 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
 
   return (
     <Section id="workflow" className="py-32 md:py-44">
@@ -67,9 +47,8 @@ export function Workflow() {
         {/* progress rail */}
         <div className="relative mb-10 hidden h-px w-full bg-line-strong lg:block">
           <div
-            ref={lineRef}
+            data-story-rail
             className="absolute inset-0 origin-left bg-accent/70"
-            style={{ transform: "scaleX(0)" }}
           />
         </div>
 

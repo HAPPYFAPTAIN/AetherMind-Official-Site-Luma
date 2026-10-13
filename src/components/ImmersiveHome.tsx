@@ -7,7 +7,7 @@ import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { SceneImage } from "@/components/primitives/SceneImage";
 import { ImmersiveImage } from "@/components/primitives/ImmersiveImage";
 import { HeroFilm } from "@/components/primitives/HeroFilm";
-import { HomeIntro, type Arrival } from "@/components/primitives/HomeIntro";
+import { HomeIntro, HOME_INTRO_BOOTSTRAP, type Arrival } from "@/components/primitives/HomeIntro";
 import { ScrollRefresher } from "@/components/ScrollRefresher";
 import { useLanguage } from "@/components/LanguageProvider";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
@@ -272,6 +272,7 @@ export function ImmersiveHome() {
 
   return (
     <>
+    <script dangerouslySetInnerHTML={{ __html: HOME_INTRO_BOOTSTRAP }} />
     <noscript><style>{`.luma-intro{display:none!important}.luma-home[data-arrival] .luma-arrival-content,.luma-home[data-arrival] > header,.luma-home[data-arrival] .luma-hero-heading,.luma-home[data-arrival] .luma-hero-links,.luma-home[data-arrival] .luma-model-toolbar,.luma-home[data-arrival] .luma-scroll-cue{opacity:1!important;visibility:visible!important;transform:none!important}`}</style></noscript>
     <main className="luma-home" ref={root} data-arrival={arrival} lang={language === "zh" ? "zh-CN" : "en"}>
       <ScrollRefresher />

@@ -2,9 +2,14 @@
 
 import { useLayoutEffect, useRef, type RefObject } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { ACCOUNT_SESSION_STORAGE_KEYS, hasAccountSession } from "@/lib/account-client";
 import { BrandSilhouette, BRAND_ICON_VIEWBOX } from "./BrandMark";
 
 export type Arrival = "waiting" | "entering" | "ready";
+
+// Run before the static homepage markup is painted. The account client still
+// validates/refreshes the session normally; this hint only skips the artwork.
+export const HOME_INTRO_BOOTSTRAP = `(()=>{let signedIn=false;try{signedIn=${JSON.stringify(ACCOUNT_SESSION_STORAGE_KEYS)}.some(key=>Boolean(localStorage.getItem(key)))}catch{}document.documentElement.dataset.homeSession=String(signedIn)})();`;
 
 /** A cutout of the supplied company artwork opens onto the actual live hero. */
 export function HomeIntro({
@@ -29,11 +34,34 @@ export function HomeIntro({
     const screen = overlay.current;
     if (!main || !screen) return;
 
-    // Native deep links and restored reading positions go straight to content.
-    if (window.location.hash || window.scrollY > 24) {
+    let signedIn = false;
+    try {
+      signedIn = hasAccountSession();
+    } catch {
+      // Storage may be unavailable; visitors can still enter the homepage.
+    }
+    document.documentElement.dataset.homeSession = String(signedIn);
+    if (signedIn) {
       onStateChange("ready");
       return;
     }
+
+    let anchor = window.location.hash.slice(1);
+    try {
+      anchor = decodeURIComponent(anchor);
+    } catch {
+      // An invalid fragment should not prevent the opening from working.
+    }
+    const isTopLink = anchor === "top";
+    const target = anchor ? document.getElementById(anchor) : null;
+    const isContentLink = !isTopLink && target !== null && main.contains(target);
+    // Only content deep links or restored reading positions bypass the opening.
+    // #top is a normal homepage entry, even if the browser restores its scroll.
+    if (isContentLink || (!isTopLink && window.scrollY > 24)) {
+      onStateChange("ready");
+      return;
+    }
+    if (isTopLink) window.scrollTo({ top: 0, behavior: "instant" });
 
     const body = document.body;
     const previousOverflow = body.style.overflow;

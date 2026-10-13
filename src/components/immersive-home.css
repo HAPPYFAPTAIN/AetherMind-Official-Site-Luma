@@ -183,12 +183,15 @@
 .luma-intro-hint > span {
   font-size: 18px;
 }
-.luma-home[data-arrival="waiting"] :is(.luma-hero-heading, .luma-hero-links, .luma-model-toolbar, .luma-scroll-cue, .luma-film-toggle),
-.luma-home[data-arrival="waiting"] > header {
+html[data-home-session="true"] .luma-intro {
+  display: none;
+}
+html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] :is(.luma-hero-heading, .luma-hero-links, .luma-model-toolbar, .luma-scroll-cue, .luma-film-toggle),
+html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] > header {
   opacity: 0;
   visibility: hidden;
 }
-.luma-home[data-arrival="waiting"] .luma-hero-heading {
+html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-hero-heading {
   transform: translateY(28px);
 }
 .luma-home[data-arrival="entering"] .luma-hero-heading {

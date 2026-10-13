@@ -70,6 +70,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${interTight.variable} ${geistMono.variable} ${brandDisplay.variable} ${chineseDisplay.variable}`}
     >
       <body>

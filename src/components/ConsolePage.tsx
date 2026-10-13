@@ -163,10 +163,6 @@ export function ConsolePage() {
           {notice && <div className="console-notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
 
           {section === "agents" && <>
-            <div className="console-toolbar">
-              <div className="console-filters"><button className="active">{zh ? "全部智能体" : "All agents"}</button><button>{zh ? "可用" : "Available"}</button><button>{zh ? "即将上架" : "Coming soon"}</button></div>
-              <label className="console-search"><span>⌕</span><input placeholder={zh ? "搜索智能体" : "Search agents"} /></label>
-            </div>
             <div className="agent-list">
               {agents.map((agent) => (
                 <article key={agent.id} className={`agent-card ${agent.status === "available" ? "available" : ""}`}>

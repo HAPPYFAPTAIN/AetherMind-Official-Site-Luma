@@ -10,7 +10,7 @@ import { HeroFilm } from "@/components/primitives/HeroFilm";
 import { HomeIntro, HOME_INTRO_BOOTSTRAP, type Arrival } from "@/components/primitives/HomeIntro";
 import { ScrollRefresher } from "@/components/ScrollRefresher";
 import { useLanguage } from "@/components/LanguageProvider";
-import { gsap, ScrollTrigger, scheduleScrollRefresh } from "@/lib/gsap";
+import { gsap, scheduleScrollRefresh } from "@/lib/gsap";
 import { HERO_PROGRESS_EVENT } from "@/lib/hero-scroll";
 import { SiteLink } from "./primitives/SiteLink";
 import { getHomeEntry, getServerHomeEntry, subscribeHomeEntry } from "@/lib/home-entry";
@@ -244,8 +244,8 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
             scrollTrigger: {
               trigger: ".luma-finale",
               start: "top bottom",
-              // Finish with a short readable pause before the document ends.
-              end: () => ScrollTrigger.maxScroll(window) - Math.min(window.innerHeight * 0.18, 160),
+              // Complete while the brand finale is visible, before the service footer.
+              end: () => `bottom bottom+=${Math.min(window.innerHeight * 0.18, 160)}`,
               scrub: 0.45,
               invalidateOnRefresh: true,
             },
@@ -717,19 +717,51 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
         >
           <span className="luma-wordmark-aether">Aether</span><span className="luma-wordmark-mind">Mind</span>
         </a>
-        <footer className="luma-footer luma-footer-bottom">
-          <span>
-            © {new Date().getFullYear()} {t("AetherMind", "以太智元")}
-          </span>
-          <nav aria-label={t("Footer", "页脚导航")}>
-            <SiteLink href="/products/">{t("Products", "产品")}</SiteLink>
-            <SiteLink href="/community/">{t("Community", "社区")}</SiteLink>
-            <SiteLink href="/about/">{t("About us", "关于我们")}</SiteLink>
-            <SiteLink href="/careers/">{t("Join us", "加入我们")}</SiteLink>
-          </nav>
-          <span>AI for Science</span>
-        </footer>
       </section>
+      <footer className="luma-service-footer" aria-label={t("Services and company", "服务与公司信息")}>
+        <div className="luma-service-footer-main">
+          <div className="luma-service-footer-intro">
+            <SiteLink href="/" className="luma-service-footer-brand">{t("AetherMind", "以太智元")}</SiteLink>
+            <p>{t("Scientific computing and AI agents for molecular simulation, materials research and connected research workflows.", "连接科学计算与 AI 智能体，为分子模拟、材料研究和科研工作流提供工具与服务。")}</p>
+          </div>
+          {[
+            {title:["Platform & agents","平台与智能体"],links:[
+              ["AetherMind Platform","以太智元平台","/products/#product-platform"],
+              ["MD EXP","MD EXP","/products/#product-md-exp"],
+              ["Science Agents","科学智能体","/products/#product-agent"],
+              ["Learn Everything","学习 Agent","/products/#product-learn-everything"],
+            ]},
+            {title:["Scientific computing","科学计算"],links:[
+              ["LAMMPS Engine","LAMMPS 计算引擎","/products/#product-lammps"],
+              ["Materials Computing","材料计算","/products/#product-materials"],
+              ["Chemistry & Molecules","化学与分子计算","/products/#product-chemistry"],
+              ["Biological Computing","生物计算","/products/#product-biology"],
+            ]},
+            {title:["Enterprise services","企业服务"],links:[
+              ["Private deployment","私有化部署","/enterprise/#detail-0"],
+              ["Compute integration","算力接入","/enterprise/#detail-1"],
+              ["Team workflows","团队工作流","/enterprise/#detail-2"],
+              ["Discuss your needs","需求沟通","/enterprise/#contact"],
+            ]},
+            {title:["Connect with us","了解与联系"],links:[
+              ["About AetherMind","认识以太智元","/about/"],
+              ["Research community","科研交流社区","/community/"],
+              ["Open positions","招聘岗位","/careers/#open-role"],
+              ["Contact the team","联系团队","/about/#contact"],
+            ]},
+          ].map(group => <nav key={group.title[0]} aria-label={t(group.title[0],group.title[1])}>
+            <h3>{t(group.title[0],group.title[1])}</h3>
+            {group.links.map(link => <SiteLink key={link[2]} href={link[2]}>{t(link[0],link[1])}</SiteLink>)}
+          </nav>)}
+        </div>
+        <div className="luma-service-footer-legal">
+          <span>© {new Date().getFullYear()} {t("AetherMind. All rights reserved.", "以太智元。保留所有权利。")}</span>
+          <nav aria-label={t("Legal information", "法律信息")}>
+            <SiteLink href="/legal/#section-3">{t("Privacy", "隐私说明")}</SiteLink>
+            <SiteLink href="/legal/">{t("Terms", "服务条款")}</SiteLink>
+          </nav>
+        </div>
+      </footer>
     </main>
     {arrival !== "ready" && <HomeIntro mainRef={root} restartAtTop={restartAtTop} onStateChange={setArrival} label={t("Enter AetherMind", "进入以太智元")} hint={t("Click or scroll to enter", "点击或滚动，进入")} />}
     </>

@@ -101,6 +101,23 @@ export function ImmersiveHome() {
       "(prefers-reduced-motion: no-preference) and (min-height: 600px)",
       () => {
         const context = gsap.context(() => {
+          // Measure layout rather than animated bounds so refreshing or scrolling
+          // backwards cannot shift the exit threshold. Leave space below the nav.
+          const approachToTop = (copy: HTMLElement | null | undefined) => {
+            const section = copy?.closest<HTMLElement>("section");
+            if (!copy || !section) return 0;
+            const layoutTop = (element: HTMLElement) => {
+              let top = 0;
+              for (let node: HTMLElement | null = element; node; node = node.offsetParent as HTMLElement | null) {
+                top += node.offsetTop;
+              }
+              return top;
+            };
+            const navHeight = root.current?.querySelector("header")?.offsetHeight ?? 84;
+            return Math.max(0, layoutTop(copy) - layoutTop(section) - navHeight - 24);
+          };
+          const heroCopy = root.current?.querySelector<HTMLElement>(".luma-hero-copy");
+          const statementCopy = root.current?.querySelector<HTMLElement>(".luma-statement-copy");
           gsap.to(".luma-hero-environment", {
             y: 24,
             scale: 1.015,
@@ -112,12 +129,12 @@ export function ImmersiveHome() {
               scrub: 0.5,
             },
           });
-          // A linear offset nearly cancels native scrolling, leaving only a gentle
-          // downward drift. Fade separately so easing never accelerates the motion.
+          // Let the copy approach the nav before compensating native scrolling.
+          // Then keep the gentle downward drift and ease into the fade separately.
           const heroExit = gsap.timeline({
             scrollTrigger: {
               trigger: ".luma-hero",
-              start: "top top",
+              start: () => `top -${approachToTop(heroCopy)}px`,
               end: () => `+=${window.innerHeight * 0.56}`,
               scrub: 0.5,
               invalidateOnRefresh: true,
@@ -126,7 +143,7 @@ export function ImmersiveHome() {
           heroExit.fromTo(".luma-hero-copy", { y: 0 }, {
             y: () => window.innerHeight * 0.58, duration: 1, ease: "none",
           }, 0).fromTo(".luma-hero-copy", { opacity: 1 }, {
-            opacity: 0, duration: 1, ease: "power1.out",
+            opacity: 0, duration: 1, ease: "power1.inOut",
           }, 0);
           gsap.fromTo(
             ".luma-statement-copy",
@@ -146,8 +163,8 @@ export function ImmersiveHome() {
           const statementExit = gsap.timeline({
             scrollTrigger: {
               trigger: ".luma-statement",
-              start: "bottom 65%",
-              end: "bottom 9%",
+              start: () => `top -${approachToTop(statementCopy)}px`,
+              end: () => `+=${window.innerHeight * 0.56}`,
               scrub: 0.5,
               invalidateOnRefresh: true,
             },
@@ -155,7 +172,7 @@ export function ImmersiveHome() {
           statementExit.fromTo(".luma-statement-copy", { y: 0 }, {
             y: () => window.innerHeight * 0.58, duration: 1, ease: "none", immediateRender: false,
           }, 0).fromTo(".luma-statement-copy", { opacity: 1 }, {
-            opacity: 0, duration: 1, ease: "power1.out", immediateRender: false,
+            opacity: 0, duration: 1, ease: "power1.inOut", immediateRender: false,
           }, 0);
           root.current
             ?.querySelectorAll<HTMLElement>("[data-luma-chapter]")
@@ -193,20 +210,20 @@ export function ImmersiveHome() {
                 { scale: 1, duration: 1, ease: "none" },
                 0,
               );
+              const copy = section.querySelector<HTMLElement>(".luma-chapter-copy");
               const chapterExit = gsap.timeline({
                 scrollTrigger: {
                   trigger: section,
-                  start: () => timeline.scrollTrigger!.end,
-                  end: () => timeline.scrollTrigger!.end + window.innerHeight * 0.56,
+                  start: () => timeline.scrollTrigger!.end + approachToTop(copy),
+                  end: () => `+=${window.innerHeight * 0.56}`,
                   scrub: 0.5,
                   invalidateOnRefresh: true,
                 },
               });
-              const copy = section.querySelector(".luma-chapter-copy");
               chapterExit.fromTo(copy, { y: 0 }, {
                 y: () => window.innerHeight * 0.58, duration: 1, ease: "none", immediateRender: false,
               }, 0).fromTo(copy, { opacity: 1 }, {
-                opacity: 0, duration: 1, ease: "power1.out", immediateRender: false,
+                opacity: 0, duration: 1, ease: "power1.inOut", immediateRender: false,
               }, 0);
             });
           [".luma-research-heading", ".luma-workflow-heading", ".luma-finale"].forEach(selector => {

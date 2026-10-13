@@ -173,7 +173,7 @@ export function ConsolePage() {
             </div>
           </>}
 
-          {section === "compute" && <StatusPanel title={zh ? "超算连接" : "Compute connection"} title2={zh ? "待接入" : "Integration pending"} body={zh ? "SSH 连接、工作区和队列适配正在联调。当前不会显示虚假的在线状态，也不会提交计算任务。" : "SSH, workspace and queue support are being integrated. No online state is claimed and no jobs can be submitted yet."} />}
+          {section === "compute" && <ComputePanel zh={zh} />}
           {section === "jobs" && <StatusPanel title={zh ? "计算任务" : "Compute jobs"} title2={zh ? "尚未开放" : "Not available yet"} body={zh ? "完成超算适配和作业状态契约后，这里会显示本人任务、日志、结果和取消状态。" : "Personal jobs, logs, artifacts and cancellation will appear after the HPC contract is integrated."} />}
         </section>
       </div>
@@ -193,4 +193,31 @@ function UserGlyph() {
 
 function StatusPanel({ title, title2, body }: { title: string; title2: string; body: string }) {
   return <section className="console-status-panel"><p className="console-kicker">AETHERICAI / STATUS</p><h2>{title}</h2><span>{title2}</span><p>{body}</p></section>;
+}
+
+function ComputePanel({ zh }: { zh: boolean }) {
+  return (
+    <section className="console-status-panel console-compute-panel">
+      <p className="console-kicker">AETHERICAI / COMPUTE</p>
+      <h2>{zh ? "超算连接" : "Compute connection"}</h2>
+      <div className="compute-options">
+        <article className="compute-option compute-option-provided">
+          <div className="compute-option-heading">
+            <div><h3>{zh ? "以太智元超算" : "AethericAI compute"}</h3><span>{zh ? "平台提供的超算资源" : "Compute resources provided by the platform"}</span></div>
+            <strong>{zh ? "可用" : "Available"}</strong>
+          </div>
+          <p>{zh ? "选择规格后提交计算任务。当前默认使用自动调度。" : "Choose a resource profile before submitting a job. Auto scheduling is selected by default."}</p>
+          <label>{zh ? "规格" : "Profile"}<select defaultValue="auto" aria-label={zh ? "超算规格" : "Compute profile"}><option value="auto">auto</option></select></label>
+        </article>
+        <article className="compute-option compute-option-custom">
+          <div className="compute-option-heading">
+            <div><h3>{zh ? "用户自配超算" : "Your own compute"}</h3><span>{zh ? "接入自有 SSH、队列或集群" : "Connect your own SSH, queue or cluster"}</span></div>
+            <strong>{zh ? "联系客服" : "Contact support"}</strong>
+          </div>
+          <p>{zh ? "如需接入自有超算资源，请联系客服完成连接配置。" : "Contact support to configure access to your own compute resources."}</p>
+          <button className="compute-contact" type="button">{zh ? "联系客服" : "Contact support"} →</button>
+        </article>
+      </div>
+    </section>
+  );
 }

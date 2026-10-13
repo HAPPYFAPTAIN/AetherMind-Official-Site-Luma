@@ -1,4 +1,4 @@
-export const BRAND = { en: "AethericAI", zh: "以太智元" } as const;
+export const BRAND = { en: "AetherMind", zh: "以太智元" } as const;
 export const BRAND_DESC = "AI for Science";
 
 export const ENTERPRISE_NAV = { label: { en: "Enterprise", zh: "企业服务" }, key: "enterprise" } as const;

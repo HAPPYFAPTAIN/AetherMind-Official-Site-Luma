@@ -21,6 +21,13 @@
 
 ## 证据索引
 
+本地品牌开场与高清影片验证（2026-10-13，未发布生产）：依据用户提供的透明 PNG，将共享导航图标改为 AetherMind 正式六边形标志，英文品牌统一为 AetherMind，首页显示 AETHERMIND；英文使用 Cormorant Garamond，中文标题使用 Noto Serif SC，正文与按钮保持黑体。导航品牌字号桌面 22px/手机 19px，页脚导航 17px/16px，点击高度至少 44px。开场以矢量轮廓镂空黑幕，点击、滚轮、键盘或触屏后放大进入主页；进入期间控制焦点和滚轮惯性，直接锚点与无 JS 页面可访问。
+
+本机 ComfyUI H3 以原有分子环境图为首尾帧生成 1664×928、124 帧影片；静止镜头与微幅起伏提示词，经过首尾往返拼接形成约 10.2 秒循环，H.264 文件约 4.6 MB。生成工作流及素材来源记录于 public/videos 与 public/images/brand，未修改用户原始工作流。本次临时 ComfyUI 进程已停止释放显存。影片支持暂停，离屏/后台自动停播，减少动态效果、节省流量或 2G 时不请求视频，播放失败回退原图，保留单个交互 3D 画布。
+
+滚动文字新增首屏下移淡出、下一段上浮渐显、三个固定章节结束后的下移淡出，保留既有阅读停留并支持反向滚动；减少动态效果时清除这些动画。构建与修改文件 lint、14 项既有测试通过；本地 Chromium 核验点击/滚轮/键盘/触屏进入、无 JS、自动播放受限、影片失败与节能回退、实际循环、暂停恢复、7 组中英文尺寸、320px 英文导航无重叠、三个章节正反释放通过。证据：output/aethermind-portal-verification.json、output/aethermind-copy-verification.json、output/aethermind-type-verification.json、output/luma-fullscreen-verification.json 及 output/aethermind-*.png。仅本地浏览器验证，非生产部署或真机验收。
+
+
 本地全屏 3D 与原创科学素材升级（2026-10-13，未发布生产）：按用户反馈取消首屏纯黑背景和中部模型卡片，将原有真实 3D 置于全屏底层，文字与按钮悬于上方，整个首屏可拖拽；保留单画布、质量降级、像素预算、离屏停帧和无 WebGL 静态降级。内置 image_gen 生成两张原创科学艺术素材，晶格空间用于首屏，暖金晶体用于材料研究面板。网页使用 640/1024/1672 宽 WebP，全尺寸分别约 266/202 KiB；原始 PNG 已复制至 `output/imagegen/`，素材及完整提示词位于 `public/images/immersive/`。构建、修改文件 lint、Chromium 中英文多尺寸（320–1920）、模型拖动、形态切换、登录弹层、标签页和锚点、手机导航、停留边界、减少动画、触屏、无脚本及无 WebGL 检查通过；无页面异常。证据：`output/luma-fullscreen-verification.json`、`output/luma-fullscreen-desktop.png`、`output/luma-fullscreen-mobile.png`、`output/luma-crystal-material.png`。素材是艺术示意，未作为实验结果或物理验证证据。
 
 本地旧版 Luma 风格首页改版（2026-10-13，未发布生产）：经用户确认采用旧版深色沉浸式方向。原版本提交 `3ed49d950af3ddbb801f6fd7cf1f325dafc788b9` 已完整推送至用户授权新建的私有仓库 `HAPPYFAPTAIN/AetherMind-Official-Site-Luma`，备份分支为 `codex/official-scroll-backup-20261013`；本轮在独立分支 `codex/luma-homepage-20261013` 改版。首页采用居中大字、透视科学画廊、三段全幅滚动停留、研究方向切换、工作流步骤切换和品牌收尾。仅一处实时 3D，复用原有质量降级、帧率控制和拖拽；无 WebGL 时显示静态画面，减少动态效果时取消停留和位移动画。修复现有真实锚点被 Showcase 功能预览拦截的问题。原首页组件仍保留，产品、社区与账号页面未重构。构建、修改文件 lint 和 14 项既有单元回归通过；Chromium 实测 320/390/768/1440/1920 宽度、中英文、鼠标拖动与越界捕获、模型切换、控制台登录弹层、移动导航、键盘标签页、三段固定停留及正反向释放、页脚可达、离屏停帧、触屏、减少动画动态切换、无 JavaScript 和无 WebGL 降级通过。测试为本地静态预览，未提交登录、发送短信或验证生产后端。证据：`output/luma-verification.json`、`output/verify-luma.py`、`output/luma-hero-zh-1440.png`、`output/luma-hero-zh-390.png`、`output/luma-intelligence-390.png`。参考旧版页面设计记录：`https://www.landing.love/sites/lumalabs/`；使用本项目科学素材，未复制 Luma 媒体或品牌内容。

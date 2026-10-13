@@ -8,40 +8,10 @@ import { assetUrl } from "@/lib/asset-url";
 import { LoginPage } from "@/components/LoginPage";
 import { hasAccountSession } from "@/lib/account-client";
 import { useAccount } from "@/lib/use-account";
+import { BrandMark } from "./primitives/BrandMark";
 
 export function Mark() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden>
-      <circle cx="13" cy="13" r="3.2" fill="var(--accent)" />
-      <ellipse
-        cx="13"
-        cy="13"
-        rx="10.5"
-        ry="4.4"
-        stroke="var(--text-secondary)"
-        strokeWidth="1"
-        transform="rotate(30 13 13)"
-      />
-      <ellipse
-        cx="13"
-        cy="13"
-        rx="10.5"
-        ry="4.4"
-        stroke="var(--text-tertiary)"
-        strokeWidth="1"
-        transform="rotate(-30 13 13)"
-      />
-      <ellipse
-        cx="13"
-        cy="13"
-        rx="10.5"
-        ry="4.4"
-        stroke="var(--text-faint)"
-        strokeWidth="1"
-        transform="rotate(90 13 13)"
-      />
-    </svg>
-  );
+  return <BrandMark />;
 }
 
 export function Nav() {
@@ -64,9 +34,11 @@ export function Nav() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previous;
     };
   }, [open]);
 
@@ -82,7 +54,7 @@ export function Nav() {
         <div className="flex items-center gap-5 justify-self-start">
           <a href={assetUrl("/")} className="flex items-center gap-3 text-white">
             <Mark />
-            <span className="font-display text-[17px] font-semibold tracking-[0.22em]">
+            <span className="brand-name font-display text-[19px] font-semibold tracking-[0.04em] sm:text-[22px]">
               {tr(language, BRAND.en, BRAND.zh)}
             </span>
           </a>

@@ -6,6 +6,8 @@ import { ConsoleEntryButton } from "@/components/ConsoleEntryButton";
 import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { SceneImage } from "@/components/primitives/SceneImage";
 import { ImmersiveImage } from "@/components/primitives/ImmersiveImage";
+import { HeroFilm } from "@/components/primitives/HeroFilm";
+import { HomeIntro, type Arrival } from "@/components/primitives/HomeIntro";
 import { ScrollRefresher } from "@/components/ScrollRefresher";
 import { useLanguage } from "@/components/LanguageProvider";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
@@ -87,6 +89,7 @@ export function ImmersiveHome() {
   const [research, setResearch] = useState(0);
   const [workflow, setWorkflow] = useState(0);
   const [model, setModel] = useState(0);
+  const [arrival, setArrival] = useState<Arrival>("waiting");
   const t = (en: string, zh: string) => tr(language, en, zh);
 
   useLayoutEffect(() => {
@@ -98,22 +101,9 @@ export function ImmersiveHome() {
       "(prefers-reduced-motion: no-preference) and (min-height: 600px)",
       () => {
         const context = gsap.context(() => {
-          gsap.from(".luma-hero-heading", {
-            opacity: 0,
-            y: 22,
-            duration: 1.1,
-            ease: "power3.out",
-          });
-          gsap.from(".luma-hero-environment", {
-            opacity: 0,
-            scale: 1.06,
-            duration: 1.3,
-            delay: 0.15,
-            ease: "power3.out",
-          });
           gsap.to(".luma-hero-environment", {
-            y: 70,
-            scale: 1.08,
+            y: 24,
+            scale: 1.015,
             ease: "none",
             scrollTrigger: {
               trigger: ".luma-hero",
@@ -122,35 +112,62 @@ export function ImmersiveHome() {
               scrub: 0.5,
             },
           });
+          // Compensate the native upward page movement, then let the copy dissolve.
+          gsap.fromTo(".luma-hero-copy", { y: 0, opacity: 1 }, {
+            y: () => window.innerHeight * 0.52,
+            opacity: 0,
+            ease: "power1.out",
+            scrollTrigger: {
+              trigger: ".luma-hero",
+              start: "top top",
+              end: () => `+=${window.innerHeight * 0.42}`,
+              scrub: 0.3,
+              invalidateOnRefresh: true,
+            },
+          });
           gsap.fromTo(
-            ".luma-statement p",
-            { opacity: 0.25 },
+            ".luma-statement-copy",
+            { y: 64, opacity: 0 },
             {
+              y: 0,
               opacity: 1,
-              ease: "none",
+              ease: "power1.out",
               scrollTrigger: {
                 trigger: ".luma-statement",
-                start: "top 75%",
-                end: "center 60%",
+                start: "top 90%",
+                end: "top 35%",
                 scrub: 0.4,
               },
             },
           );
+          gsap.fromTo(".luma-statement-copy", { y: 0, opacity: 1 }, {
+            y: () => window.innerHeight * 0.55,
+            opacity: 0,
+            ease: "power1.out",
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: ".luma-statement",
+              start: "bottom 65%",
+              end: "bottom 20%",
+              scrub: 0.4,
+              invalidateOnRefresh: true,
+            },
+          });
           root.current
             ?.querySelectorAll<HTMLElement>("[data-luma-chapter]")
             .forEach((section) => {
               gsap.fromTo(
                 section.querySelector(".luma-chapter-copy"),
-                { y: 55, opacity: 0.12 },
+                { y: 64, opacity: 0 },
                 {
                   y: 0,
                   opacity: 1,
                   ease: "power2.out",
                   scrollTrigger: {
                     trigger: section,
-                    start: "top 75%",
-                    end: "top 10%",
-                    scrub: 0.35,
+                    start: "top 90%",
+                    end: "top 20%",
+                    scrub: 0.4,
                   },
                 },
               );
@@ -172,7 +189,35 @@ export function ImmersiveHome() {
                 { scale: 1, duration: 1, ease: "none" },
                 0,
               );
+              gsap.fromTo(section.querySelector(".luma-chapter-copy"), { y: 0, opacity: 1 }, {
+                y: () => window.innerHeight * 0.55,
+                opacity: 0,
+                ease: "power1.out",
+                immediateRender: false,
+                scrollTrigger: {
+                  trigger: section,
+                  start: () => timeline.scrollTrigger!.end,
+                  end: () => timeline.scrollTrigger!.end + window.innerHeight * 0.45,
+                  scrub: 0.4,
+                  invalidateOnRefresh: true,
+                },
+              });
             });
+          [".luma-research-heading", ".luma-workflow-heading", ".luma-finale"].forEach(selector => {
+            const copy = root.current?.querySelector(selector);
+            if (!copy) return;
+            gsap.fromTo(copy, { y: 52, opacity: 0 }, {
+              y: 0,
+              opacity: 1,
+              ease: "power1.out",
+              scrollTrigger: {
+                trigger: copy.closest("section"),
+                start: "top 90%",
+                end: "top 55%",
+                scrub: 0.4,
+              },
+            });
+          });
         }, root);
         return () => context.revert();
       },
@@ -220,7 +265,9 @@ export function ImmersiveHome() {
   }
 
   return (
-    <main className="luma-home" ref={root}>
+    <>
+    <noscript><style>{`.luma-intro{display:none!important}.luma-home[data-arrival] .luma-arrival-content,.luma-home[data-arrival] > header,.luma-home[data-arrival] .luma-hero-heading,.luma-home[data-arrival] .luma-hero-links,.luma-home[data-arrival] .luma-model-toolbar,.luma-home[data-arrival] .luma-scroll-cue{opacity:1!important;visibility:visible!important;transform:none!important}`}</style></noscript>
+    <main className="luma-home" ref={root} data-arrival={arrival} lang={language === "zh" ? "zh-CN" : "en"}>
       <ScrollRefresher />
       <Nav />
       <a className="luma-skip" href="#explore">
@@ -232,18 +279,13 @@ export function ImmersiveHome() {
         ref={hero}
         aria-labelledby="luma-title"
       >
-        <div className="luma-hero-environment" aria-hidden="true">
-          <ImmersiveImage
-            name="hero-lattice"
-            priority
-            sizes="(max-aspect-ratio: 16/9) 178vh, 100vw"
-          />
-        </div>
+        <HeroFilm pauseLabel={t("Pause background film", "暂停背景影片")} playLabel={t("Play background film", "播放背景影片")} />
         <ScienceScene mode="hero" className="luma-hero-model" />
         <div className="luma-hero-shade" aria-hidden="true" />
         <div className="luma-hero-heading">
-          <h1 id="luma-title" className="luma-hero-title">
-            <span lang="en">Science</span>
+          <div className="luma-hero-copy">
+          <h1 id="luma-title" className="luma-hero-title" tabIndex={-1}>
+            <span lang="en">AETHERMIND</span>
             <span>{t("Beyond imagination", "加速科学发现")}</span>
           </h1>
           <p className="luma-hero-description">
@@ -259,6 +301,7 @@ export function ImmersiveHome() {
             <a className="luma-button luma-button-outline" href="#explore">
               {t("Explore the platform", "探索平台")}
             </a>
+          </div>
           </div>
         </div>
         <nav
@@ -314,6 +357,7 @@ export function ImmersiveHome() {
         id="explore"
         aria-label={t("The platform", "平台介绍")}
       >
+        <div className="luma-statement-copy">
         <p>
           {t("A question. A simulation.", "一个问题，一次模拟。")}
           <br />
@@ -321,9 +365,10 @@ export function ImmersiveHome() {
         </p>
         <div className="luma-statement-note">
           {t(
-            "AethericAI brings molecular simulation, scientific computing and AI into one continuous research workflow.",
+            "AetherMind brings molecular simulation, scientific computing and AI into one continuous research workflow.",
             "以太智元，把分子模拟、科学计算与 AI，连接为连续的研究工作流。",
           )}
+        </div>
         </div>
       </section>
       <section
@@ -609,13 +654,13 @@ export function ImmersiveHome() {
         <a
           href="#top"
           className="luma-wordmark"
-          aria-label={t("AethericAI, back to top", "以太智元，回到顶部")}
+          aria-label={t("AetherMind, back to top", "以太智元，回到顶部")}
         >
-          Aetheric<span>AI</span>
+          Aether<span>Mind</span>
         </a>
         <div className="luma-footer-bottom">
           <span>
-            © {new Date().getFullYear()} {t("AethericAI", "以太智元")}
+            © {new Date().getFullYear()} {t("AetherMind", "以太智元")}
           </span>
           <nav aria-label={t("Footer", "页脚导航")}>
             <a href={assetUrl("/products/")}>{t("Products", "产品")}</a>
@@ -627,5 +672,7 @@ export function ImmersiveHome() {
         </div>
       </footer>
     </main>
+    {arrival !== "ready" && <HomeIntro mainRef={root} onStateChange={setArrival} label={t("Enter AetherMind", "进入以太智元")} hint={t("Click or scroll to enter", "点击或滚动，进入")} />}
+    </>
   );
 }

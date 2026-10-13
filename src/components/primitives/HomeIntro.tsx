@@ -1,0 +1,150 @@
+"use client";
+
+import { useLayoutEffect, useRef, type RefObject } from "react";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { BrandSilhouette, BRAND_ICON_VIEWBOX } from "./BrandMark";
+
+export type Arrival = "waiting" | "entering" | "ready";
+
+/** A cutout of the supplied company artwork opens onto the actual live hero. */
+export function HomeIntro({
+  mainRef,
+  onStateChange,
+  label,
+  hint,
+}: {
+  mainRef: RefObject<HTMLElement | null>;
+  onStateChange: (state: Arrival) => void;
+  label: string;
+  hint: string;
+}) {
+  const overlay = useRef<HTMLDivElement>(null);
+  const aperture = useRef<SVGGElement>(null);
+  const passage = useRef<SVGCircleElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  const enter = useRef<() => void>(() => {});
+
+  useLayoutEffect(() => {
+    const main = mainRef.current;
+    const screen = overlay.current;
+    if (!main || !screen) return;
+
+    // Native deep links and restored reading positions go straight to content.
+    if (window.location.hash || window.scrollY > 24) {
+      onStateChange("ready");
+      return;
+    }
+
+    const body = document.body;
+    const previousOverflow = body.style.overflow;
+    const previousOverscroll = body.style.overscrollBehavior;
+    const previousInert = main.inert;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let started = false;
+    let finished = false;
+    let timeline: gsap.core.Timeline | undefined;
+    let releaseTimer: ReturnType<typeof setTimeout> | undefined;
+    let lastWheel = 0;
+    let startedAt = 0;
+    main.inert = true;
+    body.style.overflow = "hidden";
+    body.style.overscrollBehavior = "none";
+    button.current?.focus({ preventScroll: true });
+
+    const release = () => {
+      // Let the initiating trackpad gesture end before restoring page scrolling.
+      if (performance.now() - lastWheel < 180 && performance.now() - startedAt < 2200) {
+        releaseTimer = setTimeout(release, 180);
+        return;
+      }
+      finished = true;
+      main.inert = previousInert;
+      body.style.overflow = previousOverflow;
+      body.style.overscrollBehavior = previousOverscroll;
+      onStateChange("ready");
+      ScrollTrigger.refresh();
+      const title = main.querySelector<HTMLElement>("#luma-title");
+      title?.focus({ preventScroll: true });
+    };
+
+    enter.current = () => {
+      if (started) return;
+      started = true;
+      startedAt = performance.now();
+      onStateChange("entering");
+      if (motion.matches) {
+        gsap.set(screen, { opacity: 0 });
+        release();
+        return;
+      }
+      const zoom = { progress: 0 };
+      timeline = gsap.timeline({ onComplete: release });
+      timeline.to(screen.querySelector(".luma-intro-hint"), { opacity: 0, duration: 0.18 }, 0);
+      timeline.to(zoom, {
+        progress: 1,
+        duration: 1.5,
+        ease: "power3.inOut",
+        onUpdate: () => {
+          const progress = zoom.progress;
+          aperture.current?.setAttribute("transform", `translate(500 ${545 - 45 * progress}) scale(${3 + 77 * progress})`);
+          // Open the mark's inner hexagon as the camera passes through it.
+          passage.current?.setAttribute("r", String(12 * progress));
+        },
+      }, 0);
+      timeline.to(screen, { opacity: 0, duration: 0.25 }, 1.25);
+    };
+
+    const wheel = (event: WheelEvent) => {
+      if (finished || event.ctrlKey || event.deltaY === 0) return;
+      event.preventDefault();
+      lastWheel = performance.now();
+      enter.current();
+    };
+    const key = (event: KeyboardEvent) => {
+      if (finished || !["Enter", " ", "ArrowDown", "PageDown", "Escape"].includes(event.key)) return;
+      event.preventDefault();
+      enter.current();
+    };
+    const touch = (event: TouchEvent) => {
+      if (finished) return;
+      event.preventDefault();
+      enter.current();
+    };
+    window.addEventListener("wheel", wheel, { passive: false });
+    window.addEventListener("keydown", key);
+    screen.addEventListener("touchmove", touch, { passive: false });
+    return () => {
+      timeline?.kill();
+      clearTimeout(releaseTimer);
+      enter.current = () => {};
+      main.inert = previousInert;
+      body.style.overflow = previousOverflow;
+      body.style.overscrollBehavior = previousOverscroll;
+      window.removeEventListener("wheel", wheel);
+      window.removeEventListener("keydown", key);
+      screen.removeEventListener("touchmove", touch);
+    };
+  }, [mainRef, onStateChange]);
+
+  return (
+    <div ref={overlay} className="luma-intro">
+      <svg className="luma-intro-mask" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <mask id="luma-arrival-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1000" height="1000" style={{ maskType: "luminance" }}>
+            <rect width="1000" height="1000" fill="white" />
+            <g ref={aperture} transform="translate(500 545) scale(3)">
+              <svg x="-38" y="-57" width="76" height="84" viewBox={BRAND_ICON_VIEWBOX} style={{ overflow: "hidden" }}>
+                <BrandSilhouette />
+              </svg>
+              <circle ref={passage} r="0" fill="black" />
+            </g>
+          </mask>
+        </defs>
+        <rect width="1000" height="1000" fill="#000" mask="url(#luma-arrival-mask)" />
+      </svg>
+      <button ref={button} type="button" className="luma-intro-enter" aria-label={label} onClick={() => enter.current()}>
+        <span className="luma-intro-hint">{hint}<span aria-hidden="true">↗</span></span>
+      </button>
+    </div>
+  );
+}

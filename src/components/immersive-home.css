@@ -1,14 +1,35 @@
-/* Cinematic scientific matter. Black #000, pearl #f4f2ed, gray #999da3,
+/* Cinematic scientific matter. Black #000, pearl #f4f2ed, gray #c9d2db,
    ice #a9d9ee, blue-black #090e14. Cormorant / Noto Serif SC display. */
 .luma-home {
   --luma-white: #f4f2ed;
-  --luma-muted: #999da3;
+  --luma-muted: #c9d2db;
+  --luma-body-size: 18px;
+  --luma-label-size: 16px;
+  --luma-detail-size: 15px;
   background: #000;
   color: var(--luma-white);
   overflow: clip;
 }
 .luma-home > header {
   --bg-0: #000;
+  --text-secondary: #dce3e8;
+  --text-tertiary: #c9d2db;
+}
+.luma-home > header .link-quiet,
+.luma-home > header > nav > div:last-child > button:last-child {
+  font-size: 17px;
+  font-weight: 550;
+}
+.luma-home > header [role="group"] button {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.luma-home :is(.luma-hero-description, .luma-statement-note, .luma-chapter-copy p, .luma-research-heading > p, .luma-research-caption p, .luma-workflow-heading p, .luma-step-copy, .luma-finale-kicker) {
+  font-weight: 500;
+}
+.luma-home :is(.luma-hero-description, .luma-hero-links, .luma-model-toolbar, .luma-scroll-cue, .luma-chapter-copy, .luma-chapter-foot) {
+  text-shadow: 0 2px 12px #000b;
 }
 .luma-home > header > nav {
   max-width: none;
@@ -53,8 +74,8 @@
   justify-content: center;
   border-radius: 100px;
   padding: 16px 28px;
-  font-size: 16px;
-  font-weight: 550;
+  font-size: 18px;
+  font-weight: 600;
   line-height: 1.4;
   transition:
     background 0.2s,
@@ -154,7 +175,7 @@
   height: 100%;
   border: 0;
   padding: 0;
-  color: #898d91;
+  color: #d3dde5;
   background: transparent;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -176,8 +197,9 @@
   justify-content: center;
   align-items: center;
   gap: 16px;
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: 0.1em;
   line-height: 2;
 }
 .luma-intro-hint > span {
@@ -254,10 +276,10 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
 }
 .luma-hero-description {
   margin: 20px auto 0;
-  max-width: 580px;
-  color: #a7aaae;
+  max-width: 660px;
+  color: #e0e7ed;
   line-height: 1.7;
-  font-size: 16px;
+  font-size: 20px;
   text-wrap: balance;
 }
 .luma-artwork {
@@ -308,9 +330,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
       #030a10cc
     );
 }
-.luma-hero-description {
-  color: #d0d9df;
-}
 .luma-hero .luma-button-outline {
   background: #07131e55;
   border-color: #ffffff6b;
@@ -327,8 +346,9 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   min-height: 44px;
   display: flex;
   align-items: center;
-  font-size: 13px;
-  color: #d5e1e9;
+  font-size: var(--luma-label-size);
+  font-weight: 550;
+  color: #e3edf4;
   border-bottom: 1px solid #d5e1e944;
 }
 .luma-hero-links a:hover {
@@ -344,8 +364,9 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   align-items: center;
   gap: 18px;
   pointer-events: none;
-  font-size: 12px;
-  color: #d5e1e9;
+  font-size: var(--luma-detail-size);
+  font-weight: 550;
+  color: #e3edf4;
 }
 .luma-model-switch {
   display: flex;
@@ -374,8 +395,9 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   align-items: center;
   gap: 12px;
   width: fit-content;
-  font-size: 11px;
-  color: #c4d3de;
+  font-size: var(--luma-detail-size);
+  font-weight: 550;
+  color: #e3edf4;
 }
 .luma-scroll-cue > span {
   display: block;
@@ -394,10 +416,10 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   font-weight: 450;
 }
 .luma-statement-note {
-  max-width: 510px;
+  max-width: 580px;
   margin: 34px auto 0;
   color: var(--luma-muted);
-  font-size: 16px;
+  font-size: var(--luma-body-size);
   line-height: 1.9;
   text-wrap: balance;
 }
@@ -439,15 +461,17 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
 }
 .luma-section-name {
   display: block;
-  color: #c3c9cf;
+  color: #e1e8ee;
   margin-bottom: 30px;
-  font-size: 14px;
+  font-size: var(--luma-label-size);
+  font-weight: 600;
+  line-height: 1.6;
 }
 .luma-chapter-copy p {
-  max-width: 390px;
-  font-size: 17px;
+  max-width: 460px;
+  font-size: 20px;
   line-height: 1.9;
-  color: #c1c5cb;
+  color: #dce3e9;
   margin-top: 30px;
   text-wrap: pretty;
 }
@@ -457,7 +481,8 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   gap: 35px;
   margin-top: 34px;
   min-height: 48px;
-  font-size: 15px;
+  font-size: 18px;
+  font-weight: 550;
   border-bottom: 1px solid #fff6;
 }
 .luma-text-link:hover {
@@ -470,8 +495,11 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   right: 8vw;
   display: flex;
   justify-content: space-between;
-  color: #b7bdc6;
-  font-size: 12px;
+  gap: 24px;
+  color: #d6e0e8;
+  font-size: var(--luma-detail-size);
+  font-weight: 550;
+  line-height: 1.6;
 }
 .luma-intelligence {
   justify-content: flex-end;
@@ -492,9 +520,11 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   display: flex;
   align-items: center;
   gap: 16px;
-  color: #c7dfe9;
+  color: #d7edf8;
   margin-top: 36px;
-  font-size: 13px;
+  font-size: var(--luma-label-size);
+  font-weight: 550;
+  flex-wrap: wrap;
 }
 .luma-science-path i {
   display: block;
@@ -515,8 +545,8 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   margin: 0 2vw 50px;
 }
 .luma-research-heading > p {
-  max-width: 310px;
-  font-size: 16px;
+  max-width: 360px;
+  font-size: var(--luma-body-size);
   line-height: 1.9;
   color: var(--luma-muted);
   padding-bottom: 8px;
@@ -532,8 +562,9 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   border-radius: 100px;
   padding: 12px 24px;
   min-height: 48px;
-  font-size: 14px;
-  color: #b5b7bc;
+  font-size: var(--luma-label-size);
+  font-weight: 550;
+  color: #dce3e9;
   cursor: pointer;
   transition:
     background 0.2s,
@@ -570,8 +601,8 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   font-weight: 450;
 }
 .luma-research-caption p {
-  max-width: 420px;
-  font-size: 15px;
+  max-width: 460px;
+  font-size: var(--luma-body-size);
   line-height: 1.9;
   color: var(--luma-muted);
 }
@@ -586,9 +617,9 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
 .luma-workflow-heading p {
   color: var(--luma-muted);
   line-height: 1.8;
-  font-size: 16px;
+  font-size: var(--luma-body-size);
   margin: 30px auto 0;
-  max-width: 450px;
+  max-width: 520px;
 }
 .luma-workflow-body {
   display: grid;
@@ -608,7 +639,7 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   border-top: 1px solid #fff2;
   text-align: left;
   width: 100%;
-  color: #878b91;
+  color: #c9d2db;
   cursor: pointer;
 }
 .luma-workflow-steps button:last-child {
@@ -619,19 +650,20 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
 }
 .luma-step-number,
 .luma-step-mark {
-  font-size: 12px;
+  font-size: var(--luma-label-size);
+  font-weight: 550;
   line-height: 32px;
 }
 .luma-workflow-steps strong {
   font-size: 22px;
-  font-weight: 450;
+  font-weight: 550;
   display: block;
 }
 .luma-step-copy {
   display: block;
   margin-top: 13px;
   color: var(--luma-muted);
-  font-size: 14px;
+  font-size: var(--luma-body-size);
   line-height: 1.8;
 }
 .luma-workflow-steps button[aria-selected="false"] .luma-step-copy {
@@ -671,7 +703,7 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   padding: 180px 24px 120px;
 }
 .luma-finale-kicker {
-  font-size: 16px;
+  font-size: var(--luma-body-size);
   color: var(--luma-muted);
 }
 .luma-finale h2 {
@@ -706,7 +738,8 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   padding-top: 28px;
   border-top: 1px solid #fff2;
   color: var(--luma-muted);
-  font-size: 14px;
+  font-size: var(--luma-label-size);
+  font-weight: 500;
 }
 .luma-footer-bottom nav {
   display: flex;
@@ -716,14 +749,18 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  font-size: 17px;
-  font-weight: 500;
-  color: #c8ccd0;
+  font-size: 18px;
+  font-weight: 550;
+  color: #e0e7ed;
 }
 .luma-footer-bottom a:hover {
   color: #fff;
 }
 @media (max-width: 1100px) {
+  .luma-scroll-cue,
+  .luma-drag-hint {
+    display: none;
+  }
   .luma-home h2 {
     font-size: clamp(36px, 5vw, 60px);
   }
@@ -741,6 +778,19 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   }
 }
 @media (max-width: 767px) {
+  .luma-home {
+    --luma-body-size: 17px;
+    --luma-label-size: 15px;
+    --luma-detail-size: 14px;
+  }
+  .luma-home > header [role="group"] button {
+    font-size: 13px;
+    padding-inline: 6px;
+  }
+  .luma-intro-hint {
+    font-size: 14px;
+    padding-inline: 24px;
+  }
   .luma-home > header > nav {
     height: 72px;
     padding-inline: 20px;
@@ -753,13 +803,13 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     margin-top: 16px;
   }
   .luma-hero-description {
-    font-size: 14px;
-    max-width: 310px;
+    font-size: 17px;
+    max-width: 350px;
     margin-top: 23px;
     line-height: 1.8;
   }
   .luma-button {
-    font-size: 14px;
+    font-size: 16px;
     min-width: 146px;
     min-height: 54px;
     padding: 15px 22px;
@@ -779,13 +829,10 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     right: 24px;
     left: auto;
   }
-  .luma-drag-hint {
-    font-size: 10px;
-  }
   .luma-model-switch {
     padding: 8px 10px;
     gap: 6px;
-    font-size: 11px;
+    font-size: 14px;
   }
   .luma-scroll-cue {
     display: none;
@@ -801,11 +848,12 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     left: 24px;
     right: 24px;
     bottom: 99px;
-    gap: 22px;
+    gap: 4px 18px;
+    flex-wrap: wrap;
     justify-content: center;
   }
   .luma-hero-links a {
-    font-size: 12px;
+    font-size: 14px;
   }
   .luma-hero-environment .luma-artwork {
     object-position: 48% center;
@@ -835,14 +883,13 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     line-height: 1.5;
   }
   .luma-statement-note {
-    font-size: 14px;
-    max-width: 290px;
+    max-width: 340px;
     margin-top: 26px;
   }
   .luma-chapter {
-    height: 100svh;
-    min-height: 680px;
-    padding: 100px 28px;
+    height: auto;
+    min-height: max(740px, 100svh);
+    padding: 100px 28px 120px;
     align-items: center;
   }
   .luma-home h2 {
@@ -852,8 +899,8 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     max-width: 100%;
   }
   .luma-chapter-copy p {
-    font-size: 15px;
-    max-width: 300px;
+    font-size: var(--luma-body-size);
+    max-width: 360px;
     margin-top: 26px;
   }
   .luma-chapter::after {
@@ -862,7 +909,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
       linear-gradient(0deg, #000c, transparent 70%);
   }
   .luma-section-name {
-    font-size: 13px;
     margin-bottom: 26px;
   }
   .luma-intelligence {
@@ -875,15 +921,16 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     left: 28px;
     right: 28px;
     bottom: 28px;
-    gap: 20px;
-    font-size: 10px;
+    gap: 12px;
+  }
+  .luma-chapter-foot > span {
+    flex: 1;
   }
   .luma-chapter-foot > span:last-child {
     text-align: right;
   }
   .luma-science-path {
     gap: 10px;
-    font-size: 12px;
   }
   .luma-science-path i {
     width: 25px;
@@ -896,7 +943,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     margin: 0 8px 30px;
   }
   .luma-research-heading > p {
-    font-size: 14px;
     margin-top: 26px;
     padding-bottom: 0;
   }
@@ -907,7 +953,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   .luma-tabs button {
     padding: 10px 15px;
     min-height: 44px;
-    font-size: 12px;
   }
   .luma-research-image {
     height: 100vw;
@@ -923,7 +968,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     font-size: 23px;
   }
   .luma-research-caption p {
-    font-size: 14px;
     margin-top: 14px;
   }
   .luma-workflow {
@@ -933,7 +977,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     text-align: left;
   }
   .luma-workflow-heading p {
-    font-size: 14px;
     margin-top: 26px;
   }
   .luma-workflow-body {
@@ -950,9 +993,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   .luma-workflow-steps strong {
     font-size: 19px;
   }
-  .luma-step-copy {
-    font-size: 13px;
-  }
   .luma-workflow-view {
     height: 330px;
   }
@@ -964,9 +1004,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   }
   .luma-finale {
     padding: 100px 24px 70px;
-  }
-  .luma-finale-kicker {
-    font-size: 14px;
   }
   .luma-finale h2 {
     font-size: clamp(30px, 7.3vw, 48px);
@@ -984,7 +1021,7 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   .luma-footer-bottom {
     flex-wrap: wrap;
     gap: 12px;
-    font-size: 13px;
+    font-size: 14px;
   }
   .luma-footer-bottom nav {
     order: -1;
@@ -1034,13 +1071,11 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   margin-top: 22px;
 }
 .luma-home:lang(zh-CN) .luma-hero-description {
-  font-size: 16px;
-  font-weight: 400;
   line-height: 1.9;
   letter-spacing: 0.045em;
 }
 .luma-home:lang(zh-CN) .luma-button {
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.055em;
 }
 @media (max-width: 767px) {
@@ -1051,7 +1086,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     margin-top: 18px;
   }
   .luma-home:lang(zh-CN) .luma-hero-description {
-    font-size: 14px;
     letter-spacing: 0.025em;
   }
 }

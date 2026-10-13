@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { ComputeWorkflow, ScienceEvidence, DeploymentOptions } from "./ScienceEvidence";
 import { Nav } from "@/components/Nav";
 import { ConsoleEntryButton } from "@/components/ConsoleEntryButton";
 import { ScienceScene } from "@/components/primitives/ScienceScene";
@@ -466,6 +467,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
           </span>
         </div>
       </section>
+      <ComputeWorkflow />
       <section
         id="intelligence"
         className="luma-chapter luma-intelligence"
@@ -656,6 +658,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
           </div>
         </div>
       </section>
+      <ScienceEvidence />
       <section
         id="infrastructure"
         className="luma-chapter luma-infrastructure"
@@ -697,6 +700,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
           </span>
         </div>
       </section>
+      <DeploymentOptions />
       <section
         className="luma-finale"
         id="join"

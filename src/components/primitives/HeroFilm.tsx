@@ -8,7 +8,7 @@ import { BACKGROUND_ACTIVITY_EVENT, isBackgroundSuspended } from "@/lib/backgrou
 type Connection = EventTarget & { saveData?: boolean; effectiveType?: string };
 
 /** One local, silent film. No decoding when the hero or tab is out of view. */
-export function HeroFilm({ pauseLabel, playLabel }: { pauseLabel: string; playLabel: string }) {
+export function HeroFilm({ pauseLabel, playLabel, showControls = true }: { pauseLabel: string; playLabel: string; showControls?: boolean }) {
   const video = useRef<HTMLVideoElement>(null);
   const failed = useRef(false);
   const [paused, setPaused] = useState(false);
@@ -67,7 +67,7 @@ export function HeroFilm({ pauseLabel, playLabel }: { pauseLabel: string; playLa
           onError={event => { failed.current = true; event.currentTarget.dataset.loaded = "false"; setAvailable(false); }}
         />
       </div>
-      {available && (
+      {showControls && available && (
         <button
           type="button"
           className="luma-film-toggle"

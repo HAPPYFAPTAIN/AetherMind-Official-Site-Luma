@@ -11,7 +11,6 @@ import { HomeIntro, HOME_INTRO_BOOTSTRAP, type Arrival } from "@/components/prim
 import { ScrollRefresher } from "@/components/ScrollRefresher";
 import { useLanguage } from "@/components/LanguageProvider";
 import { gsap, scheduleScrollRefresh } from "@/lib/gsap";
-import { HERO_PROGRESS_EVENT } from "@/lib/hero-scroll";
 import { SiteLink } from "./primitives/SiteLink";
 import { getHomeEntry, getServerHomeEntry, subscribeHomeEntry } from "@/lib/home-entry";
 import { tr } from "@/lib/i18n";
@@ -102,7 +101,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
   const { language } = useLanguage();
   const [research, setResearch] = useState(0);
   const [workflow, setWorkflow] = useState(0);
-  const [model, setModel] = useState(0);
+  // const [model, setModel] = useState(0); // Structure selector intentionally hidden.
   const [arrival, setArrival] = useState<Arrival>("waiting");
   const t = (en: string, zh: string) => tr(language, en, zh);
 
@@ -284,6 +283,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
     scheduleScrollRefresh();
   }, [language, research, workflow]);
 
+  /* Structure selector disabled at the user's request.
   const changeModel = () => {
     const next = (model + 1) % 3;
     const phase = [0, 0.58, 1][next];
@@ -295,6 +295,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
       );
     }
   };
+  */
 
   function moveTab(
     event: KeyboardEvent<HTMLButtonElement>,
@@ -333,7 +334,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
         ref={hero}
         aria-labelledby="luma-title"
       >
-        <HeroFilm pauseLabel={t("Pause background film", "暂停背景影片")} playLabel={t("Play background film", "播放背景影片")} />
+        <HeroFilm showControls={false} pauseLabel={t("Pause background film", "暂停背景影片")} playLabel={t("Play background film", "播放背景影片")} />
         <ScienceScene mode="hero" className="luma-hero-model" enabled={arrival === "ready"} />
         <div className="luma-hero-shade" aria-hidden="true" />
         <div className="luma-hero-heading">
@@ -368,6 +369,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
             </a>
           ))}
         </nav>
+        {/* Structure selector and drag hint intentionally hidden.
         <div className="luma-model-toolbar">
           <span className="luma-drag-hint">
             {t("Drag to explore", "拖动，探索结构")}
@@ -397,6 +399,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
             </svg>
           </button>
         </div>
+        */}
         <a
           href="#explore"
           className="luma-scroll-cue"

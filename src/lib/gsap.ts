@@ -10,3 +10,15 @@ if (typeof window !== "undefined" && !registered) {
 }
 
 export { gsap, ScrollTrigger };
+
+let refreshFrame = 0;
+/** Coalesce late layout changes and let the clicked control paint first. */
+export function scheduleScrollRefresh() {
+  if (refreshFrame || typeof window === "undefined") return;
+  refreshFrame = requestAnimationFrame(() => {
+    refreshFrame = requestAnimationFrame(() => {
+      refreshFrame = 0;
+      if (ScrollTrigger.getAll().length) ScrollTrigger.refresh();
+    });
+  });
+}

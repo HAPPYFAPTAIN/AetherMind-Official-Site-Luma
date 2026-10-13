@@ -10,6 +10,7 @@ import { productAssets } from "@/data/productAssets";
 import { ProductPurchase } from "./ProductPurchase";
 import { accountApi, type AccountProduct } from "@/lib/account-client";
 import "./products.css";
+import { SiteLink } from "./primitives/SiteLink";
 
 type Product = {
   id: string;
@@ -48,7 +49,7 @@ function ProductArtwork({
     <picture>
       <source
         type="image/webp"
-        srcSet={[640, 1280, 1536].map(width => `${assetUrl(src)}-${width}.webp ${width}w`).join(", ")}
+        srcSet={(src === productAssets.platform ? [640, 1280, 1536, 2172] : [640, 1280, 1536]).map(width => `${assetUrl(src)}-${width}.webp ${width}w`).join(", ")}
         sizes={sizes}
       />
       <Image
@@ -254,7 +255,9 @@ export function ProductsPage() {
           {filtered.map(product => (
             <article key={product.id} className="product-card" data-product={product.id} aria-labelledby={`product-${product.id}`}>
               <div className="product-image">
-                <ProductArtwork src={product.image} sizes="(max-width: 680px) calc(100vw - 40px), (max-width: 1360px) calc((100vw - 104px) / 2), 608px" />
+                <ProductArtwork src={product.image} sizes={product.id === "platform"
+                  ? "(max-width: 680px) calc(187.5vw - 75px), (max-width: 1360px) calc(93.75vw - 97.5px), 1140px"
+                  : "(max-width: 680px) calc(100vw - 40px), (max-width: 1360px) calc((100vw - 104px) / 2), 608px"} />
               </div>
               <div className="product-card-body">
                 <div className="product-meta">
@@ -265,7 +268,7 @@ export function ProductsPage() {
                 <p className="product-description">{tr(language, product.body.en, product.body.zh)}</p>
                 <div className="product-tags">{product.tags.map(tag => <span key={tag.en}>{tr(language, tag.en, tag.zh)}</span>)}</div>
                 {product.id === "learn-everything"
-                  ? <a className="product-detail" href={assetUrl("/products/learn-everything/")} aria-label={zh ? `查看${product.title.zh}` : `Explore ${product.title.en}`}>{zh ? "了解产品" : "Explore product"}<Arrow /></a>
+                  ? <SiteLink className="product-detail" href="/products/learn-everything/" aria-label={zh ? `查看${product.title.zh}` : `Explore ${product.title.en}`}>{zh ? "了解产品" : "Explore product"}<Arrow /></SiteLink>
                   : <button type="button" className="product-detail" onClick={() => setSelected(product)} aria-label={zh ? `查看${product.title.zh}` : `Explore ${product.title.en}`} aria-haspopup="dialog">{zh ? "了解产品" : "Explore product"}<Arrow /></button>}
               </div>
             </article>
@@ -283,13 +286,13 @@ export function ProductsPage() {
         <div className="products-container">
           <div><p className="products-eyebrow">AETHERMIND</p><p>{zh ? "让工具回归研究本身。" : "Keep the focus on your research."}</p></div>
           <nav aria-label={zh ? "产品页相关链接" : "Product resources"}>
-            <a href={assetUrl("/community/")}>{zh ? "进入社区交流" : "Join the community"}<Arrow /></a>
-            <a href={assetUrl("/dashboard/")}>{zh ? "我的产品与权益" : "My products & access"}<Arrow /></a>
+            <SiteLink href="/community/">{zh ? "进入社区交流" : "Join the community"}<Arrow /></SiteLink>
+            <SiteLink href="/dashboard/">{zh ? "我的产品与权益" : "My products & access"}<Arrow /></SiteLink>
           </nav>
         </div>
         <div className="products-container products-footer-note">
           <span>{zh ? "产品介绍与权益购买，统一使用以太智元账号。" : "Explore products and manage access with your AetherMind account."}</span>
-          <a href={assetUrl("/")}>{zh ? "返回首页" : "Back to home"}<Arrow /></a>
+          <SiteLink href="/">{zh ? "返回首页" : "Back to home"}<Arrow /></SiteLink>
         </div>
       </footer>
       {selected && <ProductDialog key={selected.id} product={selected} zh={zh} onClose={() => setSelected(null)} />}

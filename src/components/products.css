@@ -48,6 +48,7 @@
 .product-card{display:flex;flex-direction:column;min-width:0;border-bottom:1px solid var(--products-line)}
 .product-image{position:relative;overflow:hidden;aspect-ratio:16/10;background:#14232b;border-radius:4px}
 .product-image img{object-fit:cover;transition:transform .8s cubic-bezier(.2,.65,.3,1)}
+.product-card[data-product="platform"] .product-image img{object-position:73% center}
 .product-card-body{display:flex;flex:1;flex-direction:column;align-items:flex-start;padding:24px 0 22px}
 .product-meta{display:flex;width:100%;gap:16px;justify-content:space-between;align-items:baseline;margin-bottom:18px;font-size:14px;line-height:1.6;color:var(--products-muted)}
 .product-meta>span:first-child{color:var(--products-accent)}

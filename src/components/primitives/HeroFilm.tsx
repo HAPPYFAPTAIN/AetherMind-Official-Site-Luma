@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { assetUrl } from "@/lib/asset-url";
 import { ImmersiveImage } from "./ImmersiveImage";
+import { BACKGROUND_ACTIVITY_EVENT, isBackgroundSuspended } from "@/lib/background-activity";
 
 type Connection = EventTarget & { saveData?: boolean; effectiveType?: string };
 
@@ -19,12 +20,12 @@ export function HeroFilm({ pauseLabel, playLabel }: { pauseLabel: string; playLa
     if (!film) return;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const connection = (navigator as Navigator & { connection?: Connection }).connection;
-    let visible = true;
+    let visible = false;
     let disposed = false;
     const update = () => {
       const constrained = failed.current || motion.matches || connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType ?? "");
       setAvailable(!constrained);
-      if (constrained || paused || !visible || document.hidden) {
+      if (constrained || paused || !visible || document.hidden || isBackgroundSuspended()) {
         film.pause();
         return;
       }
@@ -38,6 +39,7 @@ export function HeroFilm({ pauseLabel, playLabel }: { pauseLabel: string; playLa
     observer.observe(film.closest("section") ?? film);
     motion.addEventListener("change", update);
     document.addEventListener("visibilitychange", update);
+    window.addEventListener(BACKGROUND_ACTIVITY_EVENT, update);
     connection?.addEventListener("change", update);
     update();
     return () => {
@@ -45,6 +47,7 @@ export function HeroFilm({ pauseLabel, playLabel }: { pauseLabel: string; playLa
       observer.disconnect();
       motion.removeEventListener("change", update);
       document.removeEventListener("visibilitychange", update);
+      window.removeEventListener(BACKGROUND_ACTIVITY_EVENT, update);
       connection?.removeEventListener("change", update);
       film.pause();
     };
@@ -75,7 +78,7 @@ export function HeroFilm({ pauseLabel, playLabel }: { pauseLabel: string; playLa
             else {
               setPaused(false);
               // Keep an explicit retry in the click gesture for autoplay-blocked browsers.
-              video.current?.play().catch(() => setPlaying(false));
+              if (!isBackgroundSuspended()) video.current?.play().catch(() => setPlaying(false));
             }
           }}
         >

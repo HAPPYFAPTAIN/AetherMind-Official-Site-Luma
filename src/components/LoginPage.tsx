@@ -9,6 +9,7 @@ import {
   communityReturnPath,
 } from "@/lib/community-login";
 import { AccountError, publicPost, setSession } from "@/lib/account-client";
+import { suspendBackgroundActivity } from "@/lib/background-activity";
 import "./login.css";
 
 const subscribeLocation = (notify: () => void) => {
@@ -37,6 +38,9 @@ export function LoginPage({ overlay = false, onClose, returnTo: returnToProp }: 
   const [error, setError] = useState("");
   const phoneRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const closeRef = useRef(onClose);
+  useEffect(() => { closeRef.current = onClose; }, [onClose]);
   const statusMessage = message || (params.get("passwordChanged") === "1"
     ? (zh ? "密码已更新，请使用新密码登录。" : "Password updated. Sign in with your new password.") : "");
   useEffect(() => {
@@ -49,12 +53,31 @@ export function LoginPage({ overlay = false, onClose, returnTo: returnToProp }: 
   }, [cooldown]);
   useEffect(() => {
     if (!overlay) return;
+    const resume = suspendBackgroundActivity();
+    const previousFocus = document.activeElement;
+    const background = Array.from(document.querySelectorAll<HTMLElement>("body > main:not(.login-overlay)"));
+    const inertStates = background.map(element => element.inert);
+    background.forEach(element => { element.inert = true; });
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     document.body.classList.add("login-open");
+    panelRef.current?.querySelector<HTMLButtonElement>(".login-close")?.focus({ preventScroll: true });
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); closeRef.current?.(); }
+      if (event.key !== "Tab") return;
+      const controls = Array.from(panelRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),[tabindex="0"]') ?? []);
+      const first = controls[0], last = controls.at(-1);
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
     return () => {
+      document.removeEventListener("keydown", onKey);
+      background.forEach((element, index) => { element.inert = inertStates[index]; });
       document.body.style.overflow = previousOverflow;
       document.body.classList.remove("login-open");
+      resume();
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus({ preventScroll: true });
     };
   }, [overlay]);
   const request = async <T,>(path: string, body: object): Promise<T> => {
@@ -146,7 +169,7 @@ export function LoginPage({ overlay = false, onClose, returnTo: returnToProp }: 
   };
   const page = (
     <main className={`login-page${overlay ? " login-overlay" : ""}`}>
-      <section className="login-card login-panel" aria-labelledby="login-title">
+      <section ref={panelRef} className="login-card login-panel" role={overlay ? "dialog" : undefined} aria-modal={overlay || undefined} aria-labelledby="login-title">
         <nav
           className="login-nav"
           aria-label={zh ? "登录页导航" : "Sign-in navigation"}

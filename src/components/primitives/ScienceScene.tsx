@@ -9,16 +9,17 @@ import { createMolecularQualityMonitor, type MolecularQuality } from "@/lib/mole
 import type { ScienceWorkerResponse } from "@/lib/science-worker";
 import { dragRadiansPerPixel, rotateFromDrag, type DragRotation } from "@/lib/molecular-drag";
 import { HERO_PROGRESS_EVENT } from "@/lib/hero-scroll";
+import { BACKGROUND_ACTIVITY_EVENT, isBackgroundSuspended } from "@/lib/background-activity";
 
-type Props = { mode?: ScienceSceneMode; className?: string };
+type Props = { mode?: ScienceSceneMode; className?: string; enabled?: boolean };
 
 /** Lazy WebGL enhancement. Static imagery remains available when WebGL fails. */
-export function ScienceScene({mode = "hero", className = ""}: Props) {
+export function ScienceScene({mode = "hero", className = "", enabled = true}: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host) return;
+    if (!host || !enabled) return;
     // A transferred canvas cannot be transferred again. Give each effect
     // lifetime its own element, including React Strict Mode's setup replay.
     const canvas = document.createElement("canvas");
@@ -59,7 +60,7 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
         canvas.dataset.renderHeight = String(stats.height);
         canvas.dataset.rotation = JSON.stringify(stats.rotation);
       }
-      if (mode !== "hero" || !visible || document.hidden || motion.matches) return;
+      if (mode !== "hero" || !visible || document.hidden || isBackgroundSuspended() || motion.matches) return;
       const now = performance.now();
       if (qualityMonitor.sample(now, isActive(now))) {
         quality = "low";
@@ -74,7 +75,7 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
 
     const draw = (now: number) => {
       frame = 0;
-      if ((!view && !workerReady) || !visible || document.hidden || cancelled || contextLost) return;
+      if ((!view && !workerReady) || !visible || document.hidden || isBackgroundSuspended() || cancelled || contextLost) return;
       const interval = dragPointer !== null && quality === "medium" ? 15.9 : isActive(now) ? 32 : 64;
       if (mode === "hero" && !motion.matches && now - lastPaint < interval) {requestDraw(); return;}
       // Keep only the latest input while the worker is still drawing.
@@ -92,7 +93,9 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
       current.strength += (input.strength - current.strength) * pointerAlpha;
       renderCurrent();
       const pending = Math.abs(current.progress - input.progress) + Math.abs(current.x - input.x) + Math.abs(current.y - input.y) + Math.abs(current.strength - input.strength);
-      if (pending > 0.0001 || (mode === "hero" && !motion.matches)) requestDraw();
+      // The film supplies ambient motion. The model renders only while input
+      // settles or someone is interacting, instead of competing with every click.
+      if (pending > 0.0001 || (mode === "hero" && !motion.matches && isActive(now))) requestDraw();
     };
     function renderCurrent() {
       const progress = motion.matches ? 0 : current.progress;
@@ -108,7 +111,7 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
       }
     }
     function requestDraw() {
-      if (!frame && visible && !document.hidden && (view || workerReady) && !cancelled && !contextLost) frame = requestAnimationFrame(draw);
+      if (!frame && visible && !document.hidden && !isBackgroundSuspended() && (view || workerReady) && !cancelled && !contextLost) frame = requestAnimationFrame(draw);
     }
     const resize = () => {
       const {width, height} = host.getBoundingClientRect();
@@ -152,7 +155,7 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
       requestDraw();
     };
     const start = async () => {
-      if (loading || view || cancelled) return;
+      if (loading || view || cancelled || !visible || document.hidden || isBackgroundSuspended()) return;
       loading = true;
       try {
         if (typeof Worker !== "undefined" && "transferControlToOffscreen" in canvas) {
@@ -237,11 +240,12 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
       visible = entry.isIntersecting;
       if (visible) { void start(); requestDraw(); }
       else { endDrag(); cancelAnimationFrame(frame); frame = 0; }
-    }, {rootMargin: "160px 0px"});
+    }, {rootMargin: "0px"});
     intersection.observe(host);
 
     const onPointer = (event: PointerEvent) => {
-      if (!visible || motion.matches || !pointerDevice.matches || event.pointerType !== "mouse") return;
+      if (!visible || isBackgroundSuspended() || motion.matches || !pointerDevice.matches || event.pointerType !== "mouse") return;
+      if (dragPointer === null && event.target instanceof Element && event.target.closest("a,button,input,textarea,select,[role='button']")) return;
       lastInteraction = performance.now();
       if (dragPointer !== null) {
         if (event.pointerId !== dragPointer) return;
@@ -261,7 +265,7 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
       requestDraw();
     };
     const onDown = (event: PointerEvent) => {
-      if (mode !== "hero" || !visible || motion.matches || !pointerDevice.matches || event.pointerType !== "mouse" || event.button !== 0 || dragPointer !== null || (!view && !workerReady) || contextLost) return;
+      if (mode !== "hero" || !visible || isBackgroundSuspended() || motion.matches || !pointerDevice.matches || event.pointerType !== "mouse" || event.button !== 0 || dragPointer !== null || (!view && !workerReady) || contextLost) return;
       if (event.target instanceof Element && event.target.closest("a,button,input,textarea,select,[role='button'],[contenteditable='true']")) return;
       const bounds = interactionSurface.getBoundingClientRect();
       dragSensitivity = dragRadiansPerPixel(bounds.width, bounds.height);
@@ -290,8 +294,8 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
     const onVisibility = () => {
       qualityMonitor.reset();
       last = 0;
-      if (document.hidden) { endDrag(); cancelAnimationFrame(frame); frame = 0; }
-      else requestDraw();
+      if (document.hidden || isBackgroundSuspended()) { endDrag(); cancelAnimationFrame(frame); frame = 0; }
+      else { void start(); requestDraw(); }
     };
     const onLoss = (event: Event) => {
       event.preventDefault();
@@ -323,6 +327,7 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
     window.addEventListener("blur", endDrag);
     section.addEventListener(HERO_PROGRESS_EVENT, onHeroProgress);
     document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener(BACKGROUND_ACTIVITY_EVENT, onVisibility);
     motion.addEventListener("change", setupScroll);
     canvas.addEventListener("webglcontextlost", onLoss);
     canvas.addEventListener("webglcontextrestored", onRestore);
@@ -347,6 +352,7 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
       window.removeEventListener("blur", endDrag);
       section.removeEventListener(HERO_PROGRESS_EVENT, onHeroProgress);
       document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener(BACKGROUND_ACTIVITY_EVENT, onVisibility);
       motion.removeEventListener("change", setupScroll);
       canvas.removeEventListener("webglcontextlost", onLoss);
       canvas.removeEventListener("webglcontextrestored", onRestore);
@@ -356,7 +362,7 @@ export function ScienceScene({mode = "hero", className = ""}: Props) {
       canvas.remove();
       delete host.dataset.ready;
     };
-  }, [mode]);
+  }, [mode, enabled]);
 
   return (
     <div ref={hostRef} className={`science-scene ${className}`} data-science-scene={mode} aria-hidden="true">

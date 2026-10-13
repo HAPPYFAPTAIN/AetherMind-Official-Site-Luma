@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 import { Nav } from "@/components/Nav";
 import { ConsoleEntryButton } from "@/components/ConsoleEntryButton";
 import { ScienceScene } from "@/components/primitives/ScienceScene";
@@ -10,9 +10,10 @@ import { HeroFilm } from "@/components/primitives/HeroFilm";
 import { HomeIntro, HOME_INTRO_BOOTSTRAP, type Arrival } from "@/components/primitives/HomeIntro";
 import { ScrollRefresher } from "@/components/ScrollRefresher";
 import { useLanguage } from "@/components/LanguageProvider";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
-import { assetUrl } from "@/lib/asset-url";
+import { gsap, scheduleScrollRefresh } from "@/lib/gsap";
 import { HERO_PROGRESS_EVENT } from "@/lib/hero-scroll";
+import { SiteLink } from "./primitives/SiteLink";
+import { getHomeEntry, getServerHomeEntry, subscribeHomeEntry } from "@/lib/home-entry";
 import { tr } from "@/lib/i18n";
 import type { AssetKey } from "@/lib/assets";
 import "./immersive-home.css";
@@ -83,6 +84,11 @@ const WORKFLOW = [
 ];
 
 export function ImmersiveHome() {
+  const entry = useSyncExternalStore(subscribeHomeEntry, getHomeEntry, getServerHomeEntry);
+  return <ImmersiveHomeContent key={entry} restartAtTop={entry > 0} />;
+}
+
+function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
   const root = useRef<HTMLElement>(null);
   const hero = useRef<HTMLElement>(null);
   const { language } = useLanguage();
@@ -249,9 +255,9 @@ export function ImmersiveHome() {
     return () => media.revert();
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     // Translations and tab descriptions can change later pin positions.
-    ScrollTrigger.refresh();
+    scheduleScrollRefresh();
   }, [language, research, workflow]);
 
   const changeModel = () => {
@@ -304,7 +310,7 @@ export function ImmersiveHome() {
         aria-labelledby="luma-title"
       >
         <HeroFilm pauseLabel={t("Pause background film", "暂停背景影片")} playLabel={t("Play background film", "播放背景影片")} />
-        <ScienceScene mode="hero" className="luma-hero-model" />
+        <ScienceScene mode="hero" className="luma-hero-model" enabled={arrival === "ready"} />
         <div className="luma-hero-shade" aria-hidden="true" />
         <div className="luma-hero-heading">
           <div className="luma-hero-copy">
@@ -421,10 +427,10 @@ export function ImmersiveHome() {
               "构建结构，设定条件，跟随原子的运动。让物质的变化，从抽象的参数变成可观察的过程。",
             )}
           </p>
-          <a className="luma-text-link" href={assetUrl("/products/")}>
+          <SiteLink className="luma-text-link" href="/products/">
             {t("Explore simulation tools", "了解模拟工具")}
             <span aria-hidden="true">↗</span>
-          </a>
+          </SiteLink>
         </div>
         <div className="luma-chapter-foot">
           <span>LAMMPS</span>
@@ -687,8 +693,8 @@ export function ImmersiveHome() {
             © {new Date().getFullYear()} {t("AetherMind", "以太智元")}
           </span>
           <nav aria-label={t("Footer", "页脚导航")}>
-            <a href={assetUrl("/products/")}>{t("Products", "产品")}</a>
-            <a href={assetUrl("/community/")}>{t("Community", "社区")}</a>
+            <SiteLink href="/products/">{t("Products", "产品")}</SiteLink>
+            <SiteLink href="/community/">{t("Community", "社区")}</SiteLink>
             <a href="#about">{t("About us", "关于我们")}</a>
             <a href="#careers">{t("Join us", "加入我们")}</a>
           </nav>
@@ -696,7 +702,7 @@ export function ImmersiveHome() {
         </div>
       </footer>
     </main>
-    {arrival !== "ready" && <HomeIntro mainRef={root} onStateChange={setArrival} label={t("Enter AetherMind", "进入以太智元")} hint={t("Click or scroll to enter", "点击或滚动，进入")} />}
+    {arrival !== "ready" && <HomeIntro mainRef={root} restartAtTop={restartAtTop} onStateChange={setArrival} label={t("Enter AetherMind", "进入以太智元")} hint={t("Click or scroll to enter", "点击或滚动，进入")} />}
     </>
   );
 }

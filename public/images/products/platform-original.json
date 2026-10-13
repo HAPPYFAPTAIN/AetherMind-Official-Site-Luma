@@ -1,0 +1,23 @@
+{
+  "source": "public/assets/products/platform.png",
+  "sourceSha256": "69191c5915d00991f31e6d5ac656e2a44c54d8e2b3d0befc16a048814b9a9536",
+  "operation": "Original platform artwork restored; responsive resizing and WebP encoding only.",
+  "files": [
+    {
+      "file": "public/images/products/platform-original-640.webp",
+      "bytes": 23162
+    },
+    {
+      "file": "public/images/products/platform-original-1280.webp",
+      "bytes": 57958
+    },
+    {
+      "file": "public/images/products/platform-original-1536.webp",
+      "bytes": 71758
+    },
+    {
+      "file": "public/images/products/platform-original-2172.webp",
+      "bytes": 109370
+    }
+  ]
+}

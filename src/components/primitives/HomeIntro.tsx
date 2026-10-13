@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, type RefObject } from "react";
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { gsap, scheduleScrollRefresh } from "@/lib/gsap";
 import { ACCOUNT_SESSION_STORAGE_KEYS, hasAccountSession } from "@/lib/account-client";
 import { BrandSilhouette, BRAND_ICON_VIEWBOX } from "./BrandMark";
 
@@ -17,11 +17,13 @@ export function HomeIntro({
   onStateChange,
   label,
   hint,
+  restartAtTop = false,
 }: {
   mainRef: RefObject<HTMLElement | null>;
   onStateChange: (state: Arrival) => void;
   label: string;
   hint: string;
+  restartAtTop?: boolean;
 }) {
   const overlay = useRef<HTMLDivElement>(null);
   const aperture = useRef<SVGGElement>(null);
@@ -46,6 +48,7 @@ export function HomeIntro({
       return;
     }
 
+    if (restartAtTop) window.scrollTo({ top: 0, behavior: "instant" });
     let anchor = window.location.hash.slice(1);
     try {
       anchor = decodeURIComponent(anchor);
@@ -90,7 +93,7 @@ export function HomeIntro({
       body.style.overflow = previousOverflow;
       body.style.overscrollBehavior = previousOverscroll;
       onStateChange("ready");
-      ScrollTrigger.refresh();
+      scheduleScrollRefresh();
       const title = main.querySelector<HTMLElement>("#luma-title");
       title?.focus({ preventScroll: true });
     };
@@ -152,7 +155,7 @@ export function HomeIntro({
       window.removeEventListener("keydown", key);
       screen.removeEventListener("touchmove", touch);
     };
-  }, [mainRef, onStateChange]);
+  }, [mainRef, onStateChange, restartAtTop]);
 
   return (
     <div ref={overlay} className="luma-intro">

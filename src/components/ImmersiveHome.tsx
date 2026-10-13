@@ -23,10 +23,14 @@ const RESEARCH: {
   name: [string, string];
   title: [string, string];
   copy: [string, string];
+  href: string;
+  link: [string, string];
 }[] = [
   {
     image: "g01-04-materials-science",
     name: ["Materials", "材料科学"],
+    href: "/products/#product-materials",
+    link: ["Explore materials computing", "了解材料计算"],
     title: ["A new perspective on matter.", "看见材料的另一种可能。"],
     copy: [
       "Explore crystal structures, defects and interfaces. Connect atomic behavior with the properties of a material.",
@@ -36,6 +40,8 @@ const RESEARCH: {
   {
     image: "g01-05-computational-chemistry",
     name: ["Chemistry", "计算化学"],
+    href: "/products/#product-chemistry",
+    link: ["Explore computational chemistry", "了解计算化学"],
     title: [
       "Follow the energy. Find the mechanism.",
       "沿着能量，寻找反应的线索。",
@@ -48,6 +54,8 @@ const RESEARCH: {
   {
     image: "g01-02-molecular-dynamics",
     name: ["Molecular dynamics", "分子动力学"],
+    href: "/products/#product-md-exp",
+    link: ["Explore MD EXP", "了解 MD EXP"],
     title: ["Every motion tells a story.", "每一次运动，都有迹可循。"],
     copy: [
       "Observe trajectories, temperature and structural evolution through a continuous molecular simulation workflow.",
@@ -540,7 +548,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
             tabIndex={0}
             className="luma-research-panel"
           >
-            <div className="luma-research-image">
+            <div className={`luma-research-image${i === 2 ? " luma-research-image-graph" : ""}`}>
               {i === 0 ? (
                 <ImmersiveImage
                   name="crystal-matter"
@@ -550,6 +558,8 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
                   )}
                   sizes="(max-width: 767px) 100vw, 88vw"
                 />
+              ) : i === 2 ? (
+                <ImmersiveImage name="md-research-graph" alt={t("MD EXP research knowledge graph", "MD EXP 研究图谱界面")} sizes="(max-width: 767px) 100vw, 88vw" />
               ) : (
                 <SceneImage
                   id={item.image}
@@ -559,7 +569,12 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
               )}
             </div>
             <div className="luma-research-caption">
-              <h3>{t(...item.title)}</h3>
+              <div>
+                <h3>{t(...item.title)}</h3>
+                <SiteLink href={item.href} className="luma-text-link luma-research-link">
+                  {t(...item.link)}<span aria-hidden="true">↗</span>
+                </SiteLink>
+              </div>
               <p>{t(...item.copy)}</p>
             </div>
           </div>
@@ -646,8 +661,8 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
       >
         <div className="luma-chapter-visual">
           <div className="luma-chapter-image">
-            <SceneImage
-              id="g03-05-computational-data-atmosphere"
+            <ImmersiveImage
+              name="quiet-compute"
               sizes="100vw"
             />
           </div>
@@ -662,20 +677,18 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
             {t("Your environment.", "你的计算环境。")}
           </h2>
           <p>
-            {t(
-              "Private cloud, on-premise HPC or hybrid infrastructure. Bring the workflow to where your research data lives.",
-              "私有云、本地 HPC 或混合部署。让计算工作流，进入科研数据所在的环境。",
-            )}
+            <span>{t("Private cloud, on-premise HPC or hybrid infrastructure.", "私有云、本地 HPC 或混合部署。")}</span>
+            <span>{t("Bring the workflow to where your research data lives.", "让计算工作流，进入科研数据所在的环境。")}</span>
           </p>
-          <button
-            data-showcase="enterprise"
+          <SiteLink
+            href="/enterprise/"
             className="luma-button luma-button-outline"
           >
             {t("Enterprise services", "了解企业服务")}
-          </button>
+          </SiteLink>
         </div>
         <div className="luma-chapter-foot">
-          <span>CPU / GPU / HPC</span>
+          <span>{t("Computing built for research teams", "面向科研团队的计算服务")}</span>
           <span>
             {t("Private / On-premise / Hybrid", "私有云 / 本地 / 混合")}
           </span>

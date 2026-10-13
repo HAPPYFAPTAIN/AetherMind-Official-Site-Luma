@@ -30,6 +30,7 @@ E-041（2026-10-11）：仪表盘「产品权益」改为只展示当前已激�
 E-042（2026-10-11）：新增总管理员模型控制：供应商 URL/协议/密钥加密配置、全局模型路由、按用户额外模型授权；官方网关模型目录与调用均按用户有效授权过滤，dsh provisioner 按绑定用户刷新 settings。专项迁移/加密/授权回归 `9 passed`，build:ip、TypeScript、lint、`git diff --check` 通过；生产认证数据库迁移到 0006、完整性检查 ok，auth/gateway/mdagent active，dsh 刷新 23 个租户，模型管理前端发布 `20261011-model-admin`，后端默认模型费率补丁发布 `20261011-model-access-rate`，dashboard HTTP 200。
 E-042（2026-10-11）：修复新用户（手机号尾号 2080）进入 MD EXP 后发送消息报 `Provider is not configured: deepseek`。根因是新用户模板的 Kimi/DeepSeek provider 缺少 `apiKeyEnv: MDEXP_PROXY_KEY`；已补齐模板并重写已绑定租户配置，生产备份 `/var/backups/aethericai-official/20261011-145754-model-catalog/`，`mdagent-api` 重启后 active。2080 用户配置和模板均已核验包含代理环境变量；入口票据生成成功，官网入口 HTTP 200 且不再返回该 provider 错误。新增模型目录回归断言。
 E-043（2026-10-13）：产品卡片移除英文大标题和重复中文副标题，四个产品分别使用「分子模拟智能体、分子模拟工作流、电子结构与材料计算、轨迹与性质分析」作为大标题。桌面/390px 浏览器截图和 DOM 验证通过，原 `.agent-subtitle` 数量为 0、无横向溢出、控制台无错误；`build:ip` 和 lint 通过（保留原有 `<img>` 性能 warning）。生产发布 `20261013-console-cn-titles`，console HTML SHA-256 `e9cbf056a6a3289b71ad7d6b89767283cb6ba2c7dc4b33656a77a3a18ca73d9c`。
+E-044（2026-10-13）：第二个产品标题改为「分子模拟智能体」，第三、第四个标题分别加上「智能体」后缀，最终为「电子结构与材料计算智能体」「轨迹与性质分析智能体」。390px DOM 验证确认四个标题、旧副标题数量为 0、无横向溢出、控制台无错误；`build:ip` 和 lint 通过。生产发布 `20261013-console-agent-suffix`，console HTML SHA-256 `6e949b1b504b196194a85f87132e52453c209051fbd1f50d0e6e10c098fbdf26`。
 
 | 证据 ID | 时间 | 方法摘要 | 退出状态 | 版本或文件哈希 | 结果摘要 | 证据位置 | 有效期 |
 |---|---|---|---|---|---|---|---|

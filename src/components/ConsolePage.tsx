@@ -29,7 +29,7 @@ const agents = [
   },
   {
     id: "gromacs",
-    title: "分子模拟工作流",
+    title: "分子模拟智能体",
     description: "蛋白质与膜体系的后续智能体。",
     tags: ["蛋白质 · 膜体系"],
     image: "/assets/products/biology.png",
@@ -37,7 +37,7 @@ const agents = [
   },
   {
     id: "dft",
-    title: "电子结构与材料计算",
+    title: "电子结构与材料计算智能体",
     description: "结构优化、电子性质与材料计算。",
     tags: ["结构优化 · 电子性质"],
     image: "/assets/products/materials.png",
@@ -45,7 +45,7 @@ const agents = [
   },
   {
     id: "materials",
-    title: "轨迹与性质分析",
+    title: "轨迹与性质分析智能体",
     description: "从轨迹中提取结构、能量和科学图表。",
     tags: ["轨迹解析 · 科学图表"],
     image: "/assets/products/platform.png",

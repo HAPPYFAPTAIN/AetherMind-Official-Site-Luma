@@ -15,15 +15,15 @@ export function ImmersiveImage({
   sizes?: string;
 }) {
   const path = `/images/immersive/${name}`;
-  const width = name === "md-research-graph" ? 1324 : 1672;
-  const height = name === "md-research-graph" ? 838 : 941;
+  const width = name === "md-research-graph" ? 1024 : 1672;
+  const height = name === "md-research-graph" ? 576 : 941;
   return (
     // Pre-compressed local artwork is intentionally served without an image server.
     // eslint-disable-next-line @next/next/no-img-element
     <img
       className={`luma-artwork ${className}`}
       src={assetUrl(`${path}.full.webp`)}
-      srcSet={`${assetUrl(`${path}.sm.webp`)} 640w, ${assetUrl(`${path}.md.webp`)} 1024w, ${assetUrl(`${path}.full.webp`)} ${width}w`}
+      srcSet={`${assetUrl(`${path}.sm.webp`)} 640w, ${assetUrl(`${path}.md.webp`)} ${name === "md-research-graph" ? 800 : 1024}w, ${assetUrl(`${path}.full.webp`)} ${width}w`}
       sizes={sizes}
       width={width}
       height={height}

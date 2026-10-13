@@ -24,3 +24,8 @@
 @media(max-width:767px){.site-navigation>nav{height:72px;padding-inline:20px}.site-navigation .brand-name{font-size:22px}.site-navigation [role=group] button{font-size:13px}}
 @media(max-width:374px){.site-navigation>nav{padding-inline:14px}.site-navigation .brand-name{font-size:19px;letter-spacing:0}.site-navigation>nav>div:first-child a{gap:6px}.site-navigation>nav>div:last-child{gap:6px}.site-navigation [role=group] button{padding-inline:5px;min-width:28px}}
 @media(prefers-reduced-motion:reduce){.nav-preview{animation:none}.nav-destination,.nav-destination svg,.nav-preview-topics a{transition:none}}
+.nav-preview:has(.nav-product-grid) .nav-preview-inner{grid-template-columns:.8fr 1.6fr;gap:64px}
+.nav-product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px;align-content:start}
+.nav-product-grid a{font-size:17px;line-height:1.5;min-height:64px;gap:16px}
+.nav-mobile-products{display:grid;grid-template-columns:1fr;gap:2px;padding:0 0 20px 16px}
+.nav-mobile-products a{display:flex;justify-content:space-between;gap:12px;padding:12px 0;font-size:16px;color:#bdd5e2;min-height:48px;line-height:1.5}

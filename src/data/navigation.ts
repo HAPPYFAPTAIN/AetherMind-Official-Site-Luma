@@ -6,3 +6,14 @@ export const navigation = [
   { id: "about", href: "/about/", title: ["About us", "关于我们"], description: ["AetherMind brings computation closer to scientific research.", "以太智元，让计算更贴近科学研究本身。"], topics: [["Our focus", "我们关注什么"], ["Our approach", "我们如何工作"], ["Our team", "团队与方向"]] },
 ] as const;
 export type InformationPageKey = "enterprise" | "careers" | "about";
+
+export const productNavigation = [
+  {id:"platform",title:["AetherMind Platform","以太智元平台"]},
+  {id:"lammps",title:["LAMMPS Compute Engine","LAMMPS 计算引擎"]},
+  {id:"md-exp",title:["MD EXP","MD EXP"]},
+  {id:"agent",title:["Science Agents","科学智能体"]},
+  {id:"learn-everything",title:["Learn Everything Agent","Learn Everything 学习 Agent"]},
+  {id:"materials",title:["Materials Computing","材料计算"]},
+  {id:"chemistry",title:["Chemistry & Molecular Computing","化学与分子计算"]},
+  {id:"biology",title:["Biological Computing","生物计算"]},
+] as const;

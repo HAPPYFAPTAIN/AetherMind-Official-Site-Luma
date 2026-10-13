@@ -596,13 +596,11 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   padding: 28px 2vw 0;
 }
 .luma-research-image-graph {
-  height: auto;
-  min-height: 0;
-  aspect-ratio: 1324 / 838;
   background: #090c10;
 }
 .luma-research-image-graph img {
-  object-fit: contain;
+  object-fit: cover;
+  object-position: right center;
 }
 .luma-research-link {
   margin-top: 18px;
@@ -1046,10 +1044,6 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   }
   .luma-infrastructure .luma-chapter-copy p {
     margin-inline: auto;
-  }
-  .luma-research-image.luma-research-image-graph {
-    height: auto;
-    min-height: 0;
   }
   .luma-finale {
     padding: 104px 20px 24px;

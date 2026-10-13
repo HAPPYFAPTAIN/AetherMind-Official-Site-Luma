@@ -14,3 +14,5 @@ Use case: stylized-concept. Asset type: original 16:9 widescreen material scienc
 
 - `md-research-graph.*.webp`: user-supplied MD EXP graph screenshot, 1324 × 838. Resized and WebP encoded only; full framing and labels retained.
 - `quiet-compute.*.webp`: previously generated `output/art-direction-20261013/05-infrastructure-quiet-compute.png`, 1672 × 941, built-in image generator. Architectural concept illustration, not a photograph of company facilities. Resized and WebP encoded only.
+
+Update 2026-10-13: per user request, `md-research-graph` now crops the original at x=300, y=131, width=1024, height=576 to focus on the right-hand graph; responsive widths are 640/800/1024. Display frame matches the other research tabs on desktop and mobile.

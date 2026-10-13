@@ -76,7 +76,7 @@ export function Nav() {
         <div className="flex items-center gap-5 justify-self-start">
           <SiteLink href="/" className="flex items-center gap-3 text-white">
             <Mark />
-            <span className="brand-name font-display text-[19px] font-semibold tracking-[0.04em] sm:text-[22px]">
+            <span lang={language === "zh" ? "zh-CN" : "en"} className="brand-name font-display text-[19px] font-semibold tracking-[0.04em] sm:text-[22px]">
               {tr(language, BRAND.en, BRAND.zh)}
             </span>
           </SiteLink>

@@ -1,5 +1,6 @@
 .site-navigation>nav{height:84px;max-width:1600px;padding-inline:clamp(24px,4vw,72px)}
 .site-navigation .brand-name{font-size:24px;letter-spacing:.015em;white-space:nowrap}
+.site-navigation .brand-name:lang(zh-CN){font-family:var(--font-brand-cn),"Songti SC","STSong","SimSun",serif;font-weight:500;letter-spacing:.04em}
 .site-navigation [data-primary-nav]{gap:18px}
 .nav-destination{display:flex;align-items:center;gap:8px;min-height:52px;padding:12px 10px;font-size:18px;font-weight:550;white-space:nowrap;color:#d3dde3;transition:color .16s}
 .nav-destination:hover,.nav-destination[aria-expanded=true],.nav-destination[aria-current=page]{color:#f2f6f8}

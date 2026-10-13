@@ -55,6 +55,12 @@
 - 旧的 `data/memory` 共享链接已移除，改为账号私有目录；共享进化目录不再作为用户记忆或工作区来源。
 - 两个生产绑定账号分别只能看到自己的 `default` 工作区；跨账号读写测试均被 UID 权限拒绝。回滚材料：`/var/backups/aethericai-official/20261009-233037-private-workspace/`。
 
+## 2026-10-13 无节点执行与红色错误
+
+- 用户没有在线 mdshell 节点时，租户 overlay 不再伪造 `n_none` 的 remote-world 地址；dsh 保留本机 `fs/subprocess/sandbox` provider，文件操作走本机 Landlock/bwrap 沙箱。只有用户节点在线时才注入 `remote-fs`、`remote-subprocess` 和 `remote-sandbox`。
+- `workspace-write no sandbox backend` 的根因是远程 provider 被强制启用但 mdshell 没有连接；`mdshell websocket 403` 是同一条 remote-world 链路的节点/短票问题，不是 HPC 未连接。`INSUFFICIENT_CREDITS 402` 是官方 LLM 网关余额预检，和超算提交无关。
+- 当前没有把 `danger-full-access` 作为修复手段；它会跳过文件限制和确认策略。无节点时本机受限 sandbox 先保证读写边界，科研命令白名单与无确认策略仍待存储配额、沙箱能力和命令范围一起设计。
+
 ## 2026-10-10 模型目录修复
 
 - dsh 原先同时展示内置 `deepseek-official` 和代理 `deepseek`，造成重复目录；当前只保留代理目录。

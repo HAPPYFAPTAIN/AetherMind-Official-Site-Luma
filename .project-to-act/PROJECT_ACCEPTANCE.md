@@ -35,6 +35,7 @@ E-045（2026-10-13）：移除产品目录上方的筛选/搜索横排，产品�
 E-046（2026-10-13）：控制台侧栏移除「模型配置」选项和对应页面；模型配置继续保留在总管理员后台。浏览器 DOM 确认侧栏仅有智能体目录、超算连接、计算任务，模型配置页面节点为 0，控制台无错误；`build:ip` 和 lint 通过。生产发布 `20261013-console-no-model-tab`，console HTML SHA-256 `c035710043357fa994471ed753e4de2dbd1a4a7d895b6e3aeea0b3209284b938`。
 E-047（2026-10-13）：移除产品卡片右侧的「可用、已获得产品资格、下个月上架」状态标签，并取消第一张可用卡片的蓝色高亮大边框；进入/敬请期待按钮保留。浏览器 DOM 确认 `.agent-status` 数量为 0，普通边框样式生效，标题保持正确且控制台无错误；`build:ip` 和 lint 通过。生产发布 `20261013-console-no-status-highlight`，console HTML SHA-256 `822bd1c6d482708be2f7b8c72c86f46c3c719e3b1135ee9bb62add7223399e51`。
 E-048（2026-10-13）：超算连接页改为两个选项：以太智元超算和用户自配超算。平台选项显示规格 `auto`；用户自配选项显示「联系客服」，不声明虚假的在线状态。浏览器 DOM 验证两个选项、`auto` 规格和联系客服按钮，控制台无错误；`build:ip` 和 lint 通过。生产发布 `20261013-console-compute-options`，console HTML SHA-256 `d729b33a73a8da22345ba8b60e0731aa4f86444f4fefc8b1507f99e887ce1804`。
+E-049（2026-10-13）：修复无在线 mdshell 时仍强制 remote-world 的配置错误；无节点租户保留本机 sandbox provider，在线节点仍使用 remote-world。生产备份 `/var/backups/aethericai-official/20261013-210904-local-sandbox-fallback/`，`mdagent-api` active，健康检查 200，本地/远程 overlay 模式回归通过，Landlock runner 存在。超算连接未改动。
 
 | 证据 ID | 时间 | 方法摘要 | 退出状态 | 版本或文件哈希 | 结果摘要 | 证据位置 | 有效期 |
 |---|---|---|---|---|---|---|---|

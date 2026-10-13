@@ -16,3 +16,21 @@
 .luma-home:lang(zh-CN) .luma-scroll-cue{font-family:var(--font-brand-cn),"Songti SC","STSong","SimSun",serif;font-weight:500;letter-spacing:.05em}
 @media(max-width:1000px){.science-evidence,.compute-workflow{grid-template-columns:1fr;gap:48px}.deployment-heading{grid-template-columns:1fr;gap:24px}.deployment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.science-evidence,.compute-workflow,.deployment-options{width:calc(100% - 48px);padding:64px 0}.evidence-plots{grid-template-columns:1fr}.compute-flow-panel{padding:24px}.deployment-grid{gap:30px 20px;margin-top:36px}.deployment-grid h3{font-size:21px}.deployment-grid p,.evidence-intro>p,.compute-workflow>div>p,.deployment-heading>p{font-size:17px}.evidence-intro .evidence-note{font-size:14px}}
+/* Scientific workbench: one focal specimen and one large analysis view. */
+.compute-flow-panel{padding:0;overflow:hidden;background:#0b1218;border-color:#2c3942;border-radius:8px}
+.compute-flow-label{padding:22px 26px;margin:0;font-size:14px;letter-spacing:.06em}
+.compute-specimen{height:280px;position:relative;overflow:hidden;background:#070c11}
+.compute-specimen::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,#080e15dd,transparent 50%)}
+.specimen-caption{position:absolute;bottom:20px;left:26px;right:26px;z-index:1;display:flex;justify-content:space-between;gap:16px;color:#b9cad7;font-size:13px;letter-spacing:.04em}
+.specimen-cross{position:absolute;right:24px;top:18px;color:#8195a4;font-size:22px}
+.compute-flow-panel ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:26px;gap:20px;border-top:1px solid #28363f}
+.compute-flow-panel li{display:block;padding:0;border:0}.compute-flow-panel li:last-child{padding:0}.compute-flow-panel h3{font-size:19px;margin-top:12px}.compute-flow-panel p{font-size:14px;line-height:1.9;margin-top:10px}.compute-flow-panel li>span{font-size:12px;letter-spacing:.12em}
+.evidence-studio{min-width:0;background:radial-gradient(ellipse at 65% 35%,#14232d,#0a1117 75%);border:1px solid #293b48;border-radius:8px;padding:26px}
+.studio-heading,.studio-foot{display:flex;justify-content:space-between;gap:16px;color:#8fa8b8;font-size:12px;letter-spacing:.08em;line-height:1.7}
+.evidence-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:28px;border-bottom:1px solid #30404b}
+.evidence-tabs button{padding:12px 0 16px;font-size:15px;line-height:1.6;color:#93a8b6;border-bottom:1px solid transparent;cursor:pointer}
+.evidence-tabs button[aria-selected=true]{color:#e4edf3;border-color:#aecddd}.evidence-tabs button:hover{color:#fff}
+.evidence-studio .evidence-plots{display:block}.evidence-studio figure{border:0;padding:28px 0 22px;background:none;border-radius:0}.evidence-studio figure[hidden]{display:none}
+.evidence-studio figcaption{font-size:22px}.evidence-studio svg{margin-top:28px;min-height:240px}.evidence-studio svg text{font-size:10px}.evidence-studio figure p{margin-top:20px;font-size:16px;border:0;padding-top:0;min-height:28px}
+.studio-foot{padding-top:18px;border-top:1px solid #293c49;font-size:10px}
+@media(max-width:600px){.compute-flow-panel{padding:0}.compute-specimen{height:235px}.compute-flow-label{padding:20px}.compute-flow-panel ol{padding:20px;gap:16px;grid-template-columns:1fr}.compute-flow-panel li{display:flex;gap:18px}.compute-flow-panel h3{margin-top:0}.compute-flow-panel p{margin-top:6px}.evidence-studio{padding:20px 16px}.evidence-tabs{gap:6px}.evidence-tabs button{font-size:13px}.evidence-studio svg{min-height:190px}.studio-foot{flex-wrap:wrap}.specimen-caption{left:20px;right:20px}}

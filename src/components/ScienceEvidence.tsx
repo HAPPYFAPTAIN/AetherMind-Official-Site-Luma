@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { SceneImage } from "./primitives/SceneImage";
 import { useLanguage } from "./LanguageProvider";
 import { SiteLink } from "./primitives/SiteLink";
 import "./science-evidence.css";
@@ -12,6 +14,7 @@ const charts = [
 ];
 
 export function ScienceEvidence() {
+  const [active, setActive] = useState(0);
   const {language}=useLanguage();
   const t=(en:string,zh:string)=>language==="zh"?zh:en;
   return <section className="science-evidence" id="results" aria-labelledby="evidence-title">
@@ -22,7 +25,10 @@ export function ScienceEvidence() {
       <p className="evidence-note">{t("Illustrative curves, not measured data. RDF and energy derive from simulation analysis; electronic DOS requires an electronic-structure calculation.","以下为曲线示意，非实测数据。径向分布与能量来自模拟分析；电子态密度需结合电子结构计算。")}</p>
       <SiteLink href="/products/#product-chemistry" className="luma-text-link">{t("Explore analysis tools","了解计算与分析工具")} <span aria-hidden="true">↗</span></SiteLink>
     </div>
-    <div className="evidence-plots">{charts.map((chart,i)=><figure key={chart.symbol}>
+    <div className="evidence-studio">
+      <div className="studio-heading"><span>ANALYSIS / 0{active+1}</span><span>{t("Illustrative data","示意数据")}</span></div>
+      <div className="evidence-tabs" role="tablist" aria-label={t("Analysis view","分析视图")}>{charts.map((chart,i)=><button key={chart.symbol} role="tab" id={`evidence-tab-${i}`} aria-controls={`evidence-plot-${i}`} aria-selected={active===i} tabIndex={active===i?0:-1} onClick={()=>setActive(i)} onKeyDown={e=>{let next=i;if(e.key==='ArrowRight')next=(i+1)%4;else if(e.key==='ArrowLeft')next=(i+3)%4;else if(e.key==='Home')next=0;else if(e.key==='End')next=3;else return;e.preventDefault();setActive(next);document.getElementById(`evidence-tab-${next}`)?.focus();}}>{t(chart.name[0],chart.name[1])}</button>)}</div>
+      <div className="evidence-plots">{charts.map((chart,i)=><figure key={chart.symbol} role="tabpanel" id={`evidence-plot-${i}`} aria-labelledby={`evidence-tab-${i}`} hidden={active!==i} tabIndex={0}>
       <figcaption><span>0{i+1}</span>{t(chart.name[0],chart.name[1])}</figcaption>
       <svg viewBox="0 0 320 190" role="img" aria-label={t(chart.name[0]+" illustrative curve",chart.name[1]+"示意曲线")}>
         {[40,80,120,160].map(y=><line key={y} x1="38" x2="302" y1={y} y2={y} stroke="#26343c" strokeWidth=".6"/>)}
@@ -32,6 +38,8 @@ export function ScienceEvidence() {
       </svg>
       <p>{t(chart.caption[0],chart.caption[1])}</p>
     </figure>)}</div>
+      <div className="studio-foot"><span>{t("METHOD → CALCULATION → INTERPRETATION","方法 → 计算 → 解释")}</span><span>AI FOR SCIENCE</span></div>
+    </div>
   </section>;
 }
 
@@ -40,6 +48,7 @@ export function ComputeWorkflow() {
   return <section className="compute-workflow" aria-labelledby="compute-title">
     <div><span className="luma-section-name">{t("Computational engine","计算引擎")}</span><h2 id="compute-title">{t("From a model","从模型准备，")}<br/>{t("to a traceable calculation.","到可追溯的计算。")}</h2><p>{t("Connect LAMMPS job preparation, execution and analysis. Discuss GPU and HPC integration in the context of your existing resources.","连接 LAMMPS 任务准备、计算执行与结果分析，结合现有资源，规划 GPU 与 HPC 算力接入。")}</p><SiteLink href="/products/#product-lammps" className="luma-text-link">{t("LAMMPS compute engine","了解 LAMMPS 计算引擎")} <span aria-hidden="true">↗</span></SiteLink></div>
     <div className="compute-flow-panel"><div className="compute-flow-label"><span>LAMMPS</span><span>{t("Workflow overview","工作流示意")}</span></div>
+      <div className="compute-specimen"><SceneImage id="g02-02-crystal-lattice-block" alt={t("Illustrative crystal structure","晶体结构示意")} sizes="(max-width: 1000px) 84vw, 45vw" /><div className="specimen-caption"><span>{t("Structure preview","结构预览")}</span><span>{t("Conceptual model","概念模型")}</span></div><span className="specimen-cross" aria-hidden="true">+</span></div>
       <ol>{[
         ["Prepare","准备任务","Structure · Force field · Parameters","结构 · 力场 · 参数"],
         ["Execute","执行计算","Resources · Job submission · Logs","算力配置 · 任务提交 · 运行日志"],

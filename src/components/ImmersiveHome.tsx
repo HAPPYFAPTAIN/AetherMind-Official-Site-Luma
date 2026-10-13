@@ -240,6 +240,26 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
                 opacity: 0, duration: 1, ease: "power1.inOut", immediateRender: false,
               }, 0);
             });
+          // New scientific sections use one reversible timeline per block.
+          // Read layout offsets, not animated bounds, when refresh recalculates positions.
+          root.current?.querySelectorAll<HTMLElement>(
+            ".compute-workflow > div, .science-evidence > div, .deployment-heading, .deployment-grid article, .deployment-options > a"
+          ).forEach(block => {
+            const layoutTop = () => {
+              let top = 0;
+              for (let node: HTMLElement | null = block; node; node = node.offsetParent as HTMLElement | null) top += node.offsetTop;
+              return top;
+            };
+            gsap.timeline({scrollTrigger:{
+              trigger:block,
+              start:()=>layoutTop()-window.innerHeight*.92,
+              end:()=>layoutTop()+block.offsetHeight-90,
+              scrub:.45,
+              invalidateOnRefresh:true,
+            }}).fromTo(block,{opacity:0,y:38},{opacity:1,y:0,duration:.24,ease:"power1.out"})
+              .to(block,{opacity:1,y:0,duration:.60})
+              .to(block,{opacity:0,y:22,duration:.16,ease:"power1.in"});
+          });
           const brandAssembly = gsap.timeline({
             scrollTrigger: {
               trigger: ".luma-finale",

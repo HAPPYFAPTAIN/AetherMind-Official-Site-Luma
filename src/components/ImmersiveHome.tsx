@@ -10,7 +10,7 @@ import { HeroFilm } from "@/components/primitives/HeroFilm";
 import { HomeIntro, HOME_INTRO_BOOTSTRAP, type Arrival } from "@/components/primitives/HomeIntro";
 import { ScrollRefresher } from "@/components/ScrollRefresher";
 import { useLanguage } from "@/components/LanguageProvider";
-import { gsap, scheduleScrollRefresh } from "@/lib/gsap";
+import { gsap, ScrollTrigger, scheduleScrollRefresh } from "@/lib/gsap";
 import { HERO_PROGRESS_EVENT } from "@/lib/hero-scroll";
 import { SiteLink } from "./primitives/SiteLink";
 import { getHomeEntry, getServerHomeEntry, subscribeHomeEntry } from "@/lib/home-entry";
@@ -232,7 +232,23 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
                 opacity: 0, duration: 1, ease: "power1.inOut", immediateRender: false,
               }, 0);
             });
-          [".luma-research-heading", ".luma-workflow-heading", ".luma-finale"].forEach(selector => {
+          const brandAssembly = gsap.timeline({
+            scrollTrigger: {
+              trigger: ".luma-finale",
+              start: "top bottom",
+              // Finish with a short readable pause before the document ends.
+              end: () => ScrollTrigger.maxScroll(window) - Math.min(window.innerHeight * 0.18, 160),
+              scrub: 0.45,
+              invalidateOnRefresh: true,
+            },
+          });
+          brandAssembly.fromTo(".luma-wordmark-aether", {
+            x: () => -Math.max(window.innerWidth * 0.45, 180), opacity: 0.12,
+          }, { x: 0, opacity: 1, duration: 1, ease: "power1.out" }, 0);
+          brandAssembly.fromTo(".luma-wordmark-mind", {
+            x: () => Math.max(window.innerWidth * 0.45, 180), opacity: 0.12,
+          }, { x: 0, opacity: 1, duration: 1, ease: "power1.out" }, 0);
+          [".luma-research-heading", ".luma-workflow-heading", ".luma-finale-copy"].forEach(selector => {
             const copy = root.current?.querySelector(selector);
             if (!copy) return;
             gsap.fromTo(copy, { y: 52, opacity: 0 }, {
@@ -667,40 +683,40 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
       </section>
       <section
         className="luma-finale"
-        id="console"
+        id="join"
         aria-labelledby="finale-title"
       >
-        <span className="luma-finale-kicker">
-          {t("The next question is yours.", "下一个问题，由你提出。")}
-        </span>
-        <h2 id="finale-title">
-          {t("Imagine what's next.", "想象，下一次发现。")}
-        </h2>
-        <ConsoleEntryButton className="luma-button luma-button-light">
-          {t("Open console", "打开控制台")}
-        </ConsoleEntryButton>
-      </section>
-      <footer className="luma-footer">
+        <div className="luma-finale-copy">
+          <span className="luma-finale-kicker">
+            {t("The next question is yours.", "下一个问题，由你提出。")}
+          </span>
+          <h2 id="finale-title">
+            {t("Imagine what's next.", "想象，下一次发现。")}
+          </h2>
+          <SiteLink href="/careers/" className="luma-button luma-button-light">
+            {t("Join us", "加入我们")}
+          </SiteLink>
+        </div>
         <a
           href="#top"
           className="luma-wordmark"
           aria-label={t("AetherMind, back to top", "以太智元，回到顶部")}
         >
-          Aether<span>Mind</span>
+          <span className="luma-wordmark-aether">Aether</span><span className="luma-wordmark-mind">Mind</span>
         </a>
-        <div className="luma-footer-bottom">
+        <footer className="luma-footer luma-footer-bottom">
           <span>
             © {new Date().getFullYear()} {t("AetherMind", "以太智元")}
           </span>
           <nav aria-label={t("Footer", "页脚导航")}>
             <SiteLink href="/products/">{t("Products", "产品")}</SiteLink>
             <SiteLink href="/community/">{t("Community", "社区")}</SiteLink>
-            <a href="#about">{t("About us", "关于我们")}</a>
-            <a href="#careers">{t("Join us", "加入我们")}</a>
+            <SiteLink href="/about/">{t("About us", "关于我们")}</SiteLink>
+            <SiteLink href="/careers/">{t("Join us", "加入我们")}</SiteLink>
           </nav>
           <span>AI for Science</span>
-        </div>
-      </footer>
+        </footer>
+      </section>
     </main>
     {arrival !== "ready" && <HomeIntro mainRef={root} restartAtTop={restartAtTop} onStateChange={setArrival} label={t("Enter AetherMind", "进入以太智元")} hint={t("Click or scroll to enter", "点击或滚动，进入")} />}
     </>

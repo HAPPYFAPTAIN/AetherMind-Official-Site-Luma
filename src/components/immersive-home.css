@@ -699,8 +699,14 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   margin-top: 32px;
 }
 .luma-finale {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  overflow: clip;
   text-align: center;
-  padding: 180px 24px 120px;
+  padding: 112px 4vw 28px;
+  background: radial-gradient(ellipse at 50% 52%, #09232d 0, #020a10 42%, #000 76%);
 }
 .luma-finale-kicker {
   font-size: var(--luma-body-size);
@@ -714,18 +720,24 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
   margin-top: 44px;
 }
 .luma-footer {
-  padding: 30px 4vw 32px;
+  width: 100%;
 }
 .luma-wordmark {
-  display: block;
+  display: flex;
   width: fit-content;
-  margin: 0 auto 65px;
+  margin: 40px auto;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(74px, 17.3vw, 310px);
   line-height: 1;
   letter-spacing: -0.073em;
 }
-.luma-wordmark > span {
+.luma-wordmark-aether {
+  display: inline-block;
+  color: #35d8f7;
+}
+.luma-wordmark-mind {
+  display: inline-block;
+  color: #8e9db2;
   font-family: var(--font-inter-tight), sans-serif;
   font-weight: 600;
   letter-spacing: -0.065em;
@@ -1003,7 +1015,7 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     margin-left: 0;
   }
   .luma-finale {
-    padding: 100px 24px 70px;
+    padding: 104px 20px 24px;
   }
   .luma-finale h2 {
     font-size: clamp(30px, 7.3vw, 48px);
@@ -1012,11 +1024,11 @@ html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-he
     margin-top: 32px;
   }
   .luma-footer {
-    padding: 30px 24px;
+    padding-top: 24px;
   }
   .luma-wordmark {
     font-size: 17vw;
-    margin-bottom: 46px;
+    margin-block: 48px;
   }
   .luma-footer-bottom {
     flex-wrap: wrap;

@@ -5,6 +5,7 @@ import { Nav } from "@/components/Nav";
 import { ConsoleEntryButton } from "@/components/ConsoleEntryButton";
 import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { SceneImage } from "@/components/primitives/SceneImage";
+import { ImmersiveImage } from "@/components/primitives/ImmersiveImage";
 import { ScrollRefresher } from "@/components/ScrollRefresher";
 import { useLanguage } from "@/components/LanguageProvider";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
@@ -103,16 +104,16 @@ export function ImmersiveHome() {
             duration: 1.1,
             ease: "power3.out",
           });
-          gsap.from(".luma-gallery", {
+          gsap.from(".luma-hero-environment", {
             opacity: 0,
-            y: 46,
+            scale: 1.06,
             duration: 1.3,
             delay: 0.15,
             ease: "power3.out",
           });
-          gsap.to(".luma-gallery-motion", {
-            y: -50,
-            scale: 0.94,
+          gsap.to(".luma-hero-environment", {
+            y: 70,
+            scale: 1.08,
             ease: "none",
             scrollTrigger: {
               trigger: ".luma-hero",
@@ -226,11 +227,20 @@ export function ImmersiveHome() {
         {t("Skip to the platform", "跳至平台介绍")}
       </a>
       <section
-        className="luma-hero"
+        className="luma-hero science-hero__stage luma-live"
         id="top"
         ref={hero}
         aria-labelledby="luma-title"
       >
+        <div className="luma-hero-environment" aria-hidden="true">
+          <ImmersiveImage
+            name="hero-lattice"
+            priority
+            sizes="(max-aspect-ratio: 16/9) 178vh, 100vw"
+          />
+        </div>
+        <ScienceScene mode="hero" className="luma-hero-model" />
+        <div className="luma-hero-shade" aria-hidden="true" />
         <div className="luma-hero-heading">
           <h1 id="luma-title" className="luma-hero-title">
             <span lang="en">Science</span>
@@ -251,95 +261,44 @@ export function ImmersiveHome() {
             </a>
           </div>
         </div>
-        <div className="luma-gallery-motion">
-          <div className="luma-gallery">
-            <a
-              href="#research"
-              onClick={() => setResearch(1)}
-              className="luma-frame luma-frame-far-left"
-              aria-label={t("Explore computational chemistry", "探索计算化学")}
-            >
-              <SceneImage id="g01-07-energy-landscape" sizes="28vw" priority />
+        <nav
+          className="luma-hero-links"
+          aria-label={t("Explore research areas", "探索研究方向")}
+        >
+          {RESEARCH.map((item, i) => (
+            <a key={item.image} href="#research" onClick={() => setResearch(i)}>
+              {t(...item.name)}
             </a>
-            <a
-              href="#research"
-              onClick={() => setResearch(0)}
-              className="luma-frame luma-frame-left"
+          ))}
+        </nav>
+        <div className="luma-model-toolbar">
+          <span className="luma-drag-hint">
+            {t("Drag to explore", "拖动，探索结构")}
+          </span>
+          <button
+            onClick={changeModel}
+            className="luma-model-switch"
+            aria-label={t("Change molecular structure", "切换分子结构")}
+          >
+            <span aria-live="polite">
+              {
+                [
+                  t("Structure", "结构"),
+                  t("Simulation", "模拟"),
+                  t("Discovery", "发现"),
+                ][model]
+              }
+            </span>
+            <svg
+              viewBox="0 0 20 20"
+              width="18"
+              height="18"
+              fill="none"
+              aria-hidden="true"
             >
-              <SceneImage id="g01-04-materials-science" sizes="32vw" priority />
-              <span className="luma-frame-caption">
-                {t("Materials", "材料科学")}
-              </span>
-            </a>
-            <div className="luma-frame luma-frame-center science-hero__stage luma-live">
-              <div className="luma-live-backdrop">
-                <SceneImage
-                  id="g03-03-optical-volumetric-haze"
-                  sizes="45vw"
-                  priority
-                />
-              </div>
-              <ScienceScene mode="hero" className="luma-hero-model" />
-              <div className="luma-model-toolbar">
-                <span className="luma-drag-hint">
-                  {t("Drag to explore", "拖动，探索结构")}
-                </span>
-                <button
-                  onClick={changeModel}
-                  className="luma-model-switch"
-                  aria-label={t("Change molecular structure", "切换分子结构")}
-                >
-                  <span aria-live="polite">
-                    {
-                      [
-                        t("Structure", "结构"),
-                        t("Simulation", "模拟"),
-                        t("Discovery", "发现"),
-                      ][model]
-                    }
-                  </span>
-                  <svg
-                    viewBox="0 0 20 20"
-                    width="18"
-                    height="18"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="m7 4 6 6-6 6"
-                      stroke="currentColor"
-                      strokeWidth="1.4"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <a
-              href="#research"
-              onClick={() => setResearch(2)}
-              className="luma-frame luma-frame-right"
-            >
-              <SceneImage
-                id="g01-02-molecular-dynamics"
-                sizes="32vw"
-                priority
-              />
-              <span className="luma-frame-caption">
-                {t("Molecular dynamics", "分子动力学")}
-              </span>
-            </a>
-            <a
-              href="#intelligence"
-              className="luma-frame luma-frame-far-right"
-              aria-label={t("Explore AI for Science", "探索科学智能")}
-            >
-              <SceneImage
-                id="g01-06-ai-science-transformation"
-                sizes="28vw"
-                priority
-              />
-            </a>
-          </div>
+              <path d="m7 4 6 6-6 6" stroke="currentColor" strokeWidth="1.4" />
+            </svg>
+          </button>
         </div>
         <a
           href="#explore"
@@ -491,11 +450,22 @@ export function ImmersiveHome() {
             className="luma-research-panel"
           >
             <div className="luma-research-image">
-              <SceneImage
-                id={item.image}
-                alt={t(...item.name)}
-                sizes="(max-width: 767px) 100vw, 88vw"
-              />
+              {i === 0 ? (
+                <ImmersiveImage
+                  name="crystal-matter"
+                  alt={t(
+                    "Crystalline material, artistic visualization",
+                    "晶体材料艺术示意",
+                  )}
+                  sizes="(max-width: 767px) 100vw, 88vw"
+                />
+              ) : (
+                <SceneImage
+                  id={item.image}
+                  alt={t(...item.name)}
+                  sizes="(max-width: 767px) 100vw, 88vw"
+                />
+              )}
             </div>
             <div className="luma-research-caption">
               <h3>{t(...item.title)}</h3>

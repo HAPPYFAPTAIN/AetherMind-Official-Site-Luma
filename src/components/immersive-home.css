@@ -86,17 +86,30 @@
   gap: 12px;
   margin-top: 28px;
 }
-.luma-hero {
+.luma-home .luma-hero {
   position: relative;
-  padding-top: clamp(110px, 11svh, 155px);
-  min-height: 100svh;
-  padding-bottom: 28px;
+  height: 100svh;
+  min-height: 760px;
+  padding: 100px 0 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  overflow: hidden;
+  background: #08131c;
 }
 .luma-hero-heading {
   position: relative;
-  z-index: 5;
+  z-index: 4;
+  width: 100%;
   text-align: center;
   padding: 0 24px;
+  pointer-events: none;
+  text-shadow: 0 2px 40px #02101e55;
+}
+.luma-hero-heading a,
+.luma-hero-heading button {
+  pointer-events: auto;
 }
 .luma-hero-title {
   margin: 0;
@@ -125,125 +138,102 @@
   font-size: 16px;
   text-wrap: balance;
 }
-.luma-gallery-motion {
-  margin-top: 40px;
-}
-.luma-gallery {
-  position: relative;
+.luma-artwork {
   width: 100%;
-  height: clamp(260px, 33svh, 430px);
-  perspective: 1400px;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
-.luma-gallery::before {
-  content: "";
+.luma-hero-environment {
   position: absolute;
-  left: 15%;
-  right: 15%;
-  bottom: -60px;
-  height: 140px;
-  background: radial-gradient(ellipse, #355d7650, transparent 68%);
+  inset: -3%;
+  z-index: 0;
   pointer-events: none;
 }
-.luma-frame {
-  position: absolute;
-  display: block;
-  overflow: hidden;
-  border-radius: 15px;
-  border: 1px solid #ffffff22;
-  background: #090e14;
-  height: 90%;
-  backface-visibility: hidden;
-}
-.luma-frame > div:not(.luma-model-toolbar):not(.luma-hero-model) {
-  height: 100%;
-}
-.luma-frame-far-left {
-  width: 27%;
-  left: -15%;
-  top: 7%;
-  transform: rotateY(30deg) rotateZ(-7deg);
-  z-index: 0;
-  filter: brightness(0.65);
-}
-.luma-frame-left {
-  width: 32%;
-  left: 4%;
-  top: 4%;
-  transform: rotateY(25deg) rotateZ(-4deg);
-  z-index: 1;
-}
-.luma-frame-center {
-  width: 40%;
-  left: 30%;
-  top: 0;
-  z-index: 3;
-  box-shadow: 0 20px 70px #0008;
-}
-.luma-frame-right {
-  width: 32%;
-  left: 64%;
-  top: 4%;
-  transform: rotateY(-25deg) rotateZ(4deg);
-  z-index: 1;
-}
-.luma-frame-far-right {
-  width: 27%;
-  left: 88%;
-  top: 7%;
-  transform: rotateY(-30deg) rotateZ(7deg);
-  z-index: 0;
-  filter: brightness(0.65);
-}
-.luma-frame-caption {
-  position: absolute;
-  bottom: 20px;
-  left: 24px;
-  z-index: 1;
-  font-size: 14px;
-  text-shadow: 0 2px 8px #000;
-}
-.luma-frame-right .luma-frame-caption {
-  left: auto;
-  right: 24px;
-}
-.luma-home .luma-live {
-  height: 100%;
-  min-height: 0;
-}
-.luma-live-backdrop {
-  position: absolute;
-  inset: 0;
-  opacity: 0.4;
+.luma-hero-environment .luma-artwork {
+  opacity: 0.82;
+  object-position: center;
 }
 .luma-home .luma-hero-model {
   position: absolute;
+  left: -10%;
+  top: -10%;
+  width: 120%;
+  height: 120%;
+  z-index: 1;
+  opacity: 0.8;
+  pointer-events: none;
+  mask-image: linear-gradient(
+    180deg,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+}
+.luma-hero-shade {
+  position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  mask-image: none;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 46%, #03111d88, #04121f10 65%),
+    linear-gradient(
+      180deg,
+      #02101f55,
+      transparent 28%,
+      transparent 66%,
+      #030a10cc
+    );
+}
+.luma-hero-description {
+  color: #d0d9df;
+}
+.luma-hero .luma-button-outline {
+  background: #07131e55;
+  border-color: #ffffff6b;
+}
+.luma-hero-links {
+  position: absolute;
+  left: 4vw;
+  bottom: 36px;
+  z-index: 5;
+  display: flex;
+  gap: 28px;
+}
+.luma-hero-links a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #d5e1e9;
+  border-bottom: 1px solid #d5e1e944;
+}
+.luma-hero-links a:hover {
+  border-color: #fff;
+  color: #fff;
 }
 .luma-model-toolbar {
   position: absolute;
-  bottom: 12px;
-  left: 22px;
-  right: 12px;
+  bottom: 36px;
+  right: 4vw;
+  z-index: 5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 18px;
   pointer-events: none;
   font-size: 12px;
-  color: #c9d4dc;
+  color: #d5e1e9;
 }
 .luma-model-switch {
   display: flex;
   gap: 16px;
   align-items: center;
-  padding: 10px 14px;
-  min-height: 44px;
-  border: 1px solid #ffffff28;
+  padding: 10px 16px;
+  min-height: 46px;
+  border: 1px solid #ffffff55;
   border-radius: 100px;
-  background: #0008;
+  background: #06101e66;
   color: #fff;
   pointer-events: auto;
   cursor: pointer;
@@ -252,20 +242,24 @@
   visibility: hidden;
 }
 .luma-scroll-cue {
-  margin: 20px auto 0;
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 13px;
+  gap: 12px;
   width: fit-content;
   font-size: 11px;
-  color: #91969d;
+  color: #c4d3de;
 }
 .luma-scroll-cue > span {
   display: block;
   width: 1px;
-  height: 22px;
-  background: linear-gradient(transparent, #b5bcc9);
+  height: 30px;
+  background: linear-gradient(transparent, #c7dceb);
 }
 .luma-statement {
   text-align: center;
@@ -604,35 +598,12 @@
 .luma-footer-bottom a:hover {
   color: #fff;
 }
-@media (min-width: 1800px) {
-  .luma-hero {
-    padding-top: 160px;
-  }
-  .luma-gallery-motion {
-    margin-top: 80px;
-  }
-}
 @media (max-width: 1100px) {
   .luma-home h2 {
     font-size: clamp(36px, 5vw, 60px);
   }
   .luma-hero-title > span:last-child {
     font-size: 7vw;
-  }
-  .luma-gallery {
-    height: 34vw;
-  }
-  .luma-frame-center {
-    width: 48%;
-    left: 26%;
-  }
-  .luma-frame-left {
-    left: -2%;
-    width: 34%;
-  }
-  .luma-frame-right {
-    left: 68%;
-    width: 34%;
   }
   .luma-intelligence .luma-chapter-copy {
     width: 53%;
@@ -651,14 +622,6 @@
   }
   .luma-home :is(section, footer) {
     scroll-margin-top: 72px;
-  }
-  .luma-hero {
-    padding-top: 125px;
-    min-height: auto;
-    padding-bottom: 24px;
-  }
-  .luma-hero-title > span:first-child {
-    font-size: clamp(85px, 22vw, 142px);
   }
   .luma-hero-title > span:last-child {
     font-size: clamp(34px, 8.3vw, 57px);
@@ -686,45 +649,10 @@
     max-width: 190px;
     padding-inline: 14px;
   }
-  .luma-gallery-motion {
-    margin-top: 50px;
-  }
-  .luma-gallery {
-    height: 65vw;
-    min-height: 255px;
-    max-height: 390px;
-    perspective: 1000px;
-  }
-  .luma-frame {
-    border-radius: 10px;
-  }
-  .luma-frame-center {
-    width: 76%;
-    left: 12%;
-  }
-  .luma-frame-left {
-    width: 42%;
-    left: -30%;
-    transform: rotateY(28deg);
-    top: 8%;
-    height: 85%;
-  }
-  .luma-frame-right {
-    width: 42%;
-    left: 88%;
-    transform: rotateY(-28deg);
-    top: 8%;
-    height: 85%;
-  }
-  .luma-frame-far-left,
-  .luma-frame-far-right,
-  .luma-frame-caption {
-    display: none;
-  }
   .luma-model-toolbar {
-    bottom: 8px;
-    left: 14px;
-    right: 8px;
+    bottom: 30px;
+    right: 24px;
+    left: auto;
   }
   .luma-drag-hint {
     font-size: 10px;
@@ -735,7 +663,44 @@
     font-size: 11px;
   }
   .luma-scroll-cue {
-    margin-top: 26px;
+    display: none;
+  }
+  .luma-home .luma-hero {
+    min-height: 740px;
+    padding: 110px 0 180px;
+  }
+  .luma-hero-heading {
+    padding-inline: 24px;
+  }
+  .luma-hero-links {
+    left: 24px;
+    right: 24px;
+    bottom: 99px;
+    gap: 22px;
+    justify-content: center;
+  }
+  .luma-hero-links a {
+    font-size: 12px;
+  }
+  .luma-hero-environment .luma-artwork {
+    object-position: 48% center;
+    opacity: 0.9;
+  }
+  .luma-home .luma-hero-model {
+    left: -40%;
+    top: 0;
+    width: 180%;
+    height: 110%;
+    opacity: 0.7;
+  }
+  .luma-hero-shade {
+    background: linear-gradient(
+      180deg,
+      #04132344,
+      #03102077 50%,
+      #04112122 78%,
+      #030a1099
+    );
   }
   .luma-statement {
     padding: 100px 24px 120px;

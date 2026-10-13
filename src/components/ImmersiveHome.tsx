@@ -305,8 +305,8 @@ export function ImmersiveHome() {
             <ConsoleEntryButton className="luma-button luma-button-light">
               {t("Open console", "打开控制台")}
             </ConsoleEntryButton>
-            <a className="luma-button luma-button-outline" href="#explore">
-              {t("Explore the platform", "探索平台")}
+            <a className="luma-button luma-button-outline" href="mailto:superhim1000@foxmail.com">
+              {t("Contact us", "联系我们")}
             </a>
           </div>
           </div>

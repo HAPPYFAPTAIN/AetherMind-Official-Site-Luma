@@ -21,17 +21,89 @@ OLD = '''    url = "%s/v1/world/%s" % (SELF_WS, node_id or "n_none")
         body += "- id: %s\\n  config: {url: '%s', token: '%s'}\\n" % (pid, url, world_token)
 '''
 
-NEW = '''    # A missing node is a valid local-workspace mode. Do not synthesize
-    # n_none: remote-world would then return 403 and disable the local sandbox.
+POLICY = '''- id: sandbox-policy
+  config:
+    mode: workspace-write
+    workspaceRoot: !!js process.cwd()
+- id: approval
+  config:
+    policy: never
+- id: permission
+  config:
+    presets:
+      read-only:
+        sandbox: read-only
+        approval: ask
+        name: read-only
+        description: Read-only workspace access.
+      workspace-write:
+        sandbox: workspace-write
+        approval: ask
+        name: workspace-write
+        description: Workspace writes with approval.
+      scientific-sandbox:
+        sandbox: workspace-write
+        approval: never
+        name: scientific-sandbox
+        description: Fixed scientific workspace sandbox without user approval prompts.
+      danger-full-access:
+        sandbox: danger-full-access
+        approval: never
+        name: danger-full-access
+        description: Full file access without approval prompts.
+    defaultPreset: scientific-sandbox
+- id: ui-permission
+  disabled: true
+'''
+
+NEW = '''    # dsh-remote-world disables the local providers before applying this
+    # overlay. The no-node path must explicitly restore local Landlock/bwrap,
+    # disable the remote providers, and keep the policy overlay valid YAML.
+    body = ""
     if node_id is None:
-        # dsh parses every overlay with a strict top-level-array contract.
-        # An empty patch preserves the base local providers and is valid YAML.
-        body = "[]\\n"
+        for pid in ("subprocess", "sandbox", "fs-sandbox"):
+            body += "- id: %s\\n  disabled: false\\n" % pid
+        body += "- id: directory-picker\\n  disabled: false\\n"
+        for pid in ("remote-fs", "remote-subprocess", "remote-sandbox", "remote-directorypicker"):
+            body += "- id: %s\\n  disabled: true\\n" % pid
     else:
         url = "%s/v1/world/%s" % (SELF_WS, node_id)
-        body = ""
         for pid in ("remote-fs", "remote-subprocess", "remote-sandbox"):
             body += "- id: %s\\n  config: {url: '%s', token: '%s'}\\n" % (pid, url, world_token)
+    body += """- id: sandbox-policy
+  config:
+    mode: workspace-write
+    workspaceRoot: !!js process.cwd()
+- id: approval
+  config:
+    policy: never
+- id: permission
+  config:
+    presets:
+      read-only:
+        sandbox: read-only
+        approval: ask
+        name: read-only
+        description: Read-only workspace access.
+      workspace-write:
+        sandbox: workspace-write
+        approval: ask
+        name: workspace-write
+        description: Workspace writes with approval.
+      scientific-sandbox:
+        sandbox: workspace-write
+        approval: never
+        name: scientific-sandbox
+        description: Fixed scientific workspace sandbox without user approval prompts.
+      danger-full-access:
+        sandbox: danger-full-access
+        approval: never
+        name: danger-full-access
+        description: Full file access without approval prompts.
+    defaultPreset: scientific-sandbox
+- id: ui-permission
+  disabled: true
+"""
 '''
 
 CURRENT = '''    # A missing node is a valid local-workspace mode. Do not synthesize
@@ -45,6 +117,23 @@ CURRENT = '''    # A missing node is a valid local-workspace mode. Do not synthe
             body += "- id: %s\\n  config: {url: '%s', token: '%s'}\\n" % (pid, url, world_token)
 '''
 
+INTERMEDIATE = '''    # A missing node is a valid local-workspace mode. Do not synthesize
+    # n_none: remote-world would then return 403 and disable the local sandbox.
+    if node_id is None:
+        # dsh parses every overlay with a strict top-level-array contract.
+        # An empty patch preserves the base local providers and is valid YAML.
+        body = "[]\\n"
+    else:
+        url = "%s/v1/world/%s" % (SELF_WS, node_id)
+        body = ""
+        for pid in ("remote-fs", "remote-subprocess", "remote-sandbox"):
+            body += "- id: %s\\n  config: {url: '%s', token: '%s'}\\n" % (pid, url, world_token)
+'''
+
+LOCAL_PROVIDER_ANCHOR = '''        for pid in ("subprocess", "sandbox", "fs-sandbox"):
+            body += "- id: %s\\n  disabled: false\\n" % pid
+'''
+
 
 def patch(path: Path) -> str:
     source = path.read_text(encoding="utf-8")
@@ -52,6 +141,14 @@ def patch(path: Path) -> str:
         patched = source.replace(OLD, NEW, 1)
     elif source.count(CURRENT) == 1:
         patched = source.replace(CURRENT, NEW, 1)
+    elif source.count(INTERMEDIATE) == 1:
+        patched = source.replace(INTERMEDIATE, NEW, 1)
+    elif source.count(LOCAL_PROVIDER_ANCHOR) == 1 and 'id: directory-picker' not in source:
+        patched = source.replace(
+            LOCAL_PROVIDER_ANCHOR,
+            LOCAL_PROVIDER_ANCHOR + '        body += "- id: directory-picker\\n  disabled: false\\n"\n',
+            1,
+        )
     else:
         raise ValueError("unexpected _write_overlay source anchor")
     compile(patched, str(path), "exec")

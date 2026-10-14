@@ -33,27 +33,15 @@ POLICY = '''- id: sandbox-policy
     presets:
       read-only:
         sandbox: read-only
-        approval: ask
-        name: read-only
+        approval: never
+        name: Read Only
         description: Read-only workspace access.
-      workspace-write:
-        sandbox: workspace-write
-        approval: ask
-        name: workspace-write
-        description: Workspace writes with approval.
       scientific-sandbox:
         sandbox: workspace-write
         approval: never
-        name: scientific-sandbox
-        description: Fixed scientific workspace sandbox without user approval prompts.
-      danger-full-access:
-        sandbox: danger-full-access
-        approval: never
-        name: danger-full-access
-        description: Full file access without approval prompts.
+        name: Sandbox
+        description: Fixed per-user scientific workspace sandbox.
     defaultPreset: scientific-sandbox
-- id: ui-permission
-  disabled: true
 '''
 
 NEW = '''    # dsh-remote-world disables the local providers before applying this
@@ -82,27 +70,15 @@ NEW = '''    # dsh-remote-world disables the local providers before applying thi
     presets:
       read-only:
         sandbox: read-only
-        approval: ask
-        name: read-only
+        approval: never
+        name: Read Only
         description: Read-only workspace access.
-      workspace-write:
-        sandbox: workspace-write
-        approval: ask
-        name: workspace-write
-        description: Workspace writes with approval.
       scientific-sandbox:
         sandbox: workspace-write
         approval: never
-        name: scientific-sandbox
-        description: Fixed scientific workspace sandbox without user approval prompts.
-      danger-full-access:
-        sandbox: danger-full-access
-        approval: never
-        name: danger-full-access
-        description: Full file access without approval prompts.
+        name: Sandbox
+        description: Fixed per-user scientific workspace sandbox.
     defaultPreset: scientific-sandbox
-- id: ui-permission
-  disabled: true
 """
 '''
 
@@ -149,6 +125,10 @@ def patch(path: Path) -> str:
             LOCAL_PROVIDER_ANCHOR + '        body += "- id: directory-picker\\n  disabled: false\\n"\n',
             1,
         )
+    elif source.count('    body += """- id: sandbox-policy') == 1:
+        start = source.index('    body += """- id: sandbox-policy')
+        end = source.index('"""', start + len('    body += """')) + 3
+        patched = source[:start] + '    body += """' + POLICY + '"""' + source[end:]
     else:
         raise ValueError("unexpected _write_overlay source anchor")
     compile(patched, str(path), "exec")

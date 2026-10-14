@@ -2,7 +2,7 @@ const COMMAND_KEYS = ["command", "cmd", "input"];
 const DELETE_COMMAND = /(^|[;&|]\s*)(?:rm|rmdir|unlink|shred|truncate|wipe|srm)\b|(^|\s)find\b[^\n]*\s-delete\b|\bgit\s+(?:clean|reset\s+--hard)\b|\b(?:kill|pkill|killall)\b/i;
 
 export const name = "mdagent-safety";
-export const inject = ["tools"];
+export const inject = ["tools", "sessions"];
 
 function commandOf(args) {
   for (const key of COMMAND_KEYS) {
@@ -12,6 +12,26 @@ function commandOf(args) {
 }
 
 export function apply(ctx) {
+  const enforceSession = (session) => {
+    const events = session.events ?? [];
+    const last = (type) => {
+      for (let i = events.length - 1; i >= 0; i -= 1) {
+        if (events[i]?.type === type) return events[i].data;
+      }
+      return undefined;
+    };
+    if (last("approval/policy")?.policy !== "never") {
+      session.append("approval/policy", { policy: "never" });
+    }
+    if (last("sandbox/mode")?.mode !== "workspace-write") {
+      session.append("sandbox/mode", { mode: "workspace-write" });
+    }
+    if (last("permission/preset")?.preset !== "scientific-sandbox") {
+      session.append("permission/preset", { preset: "scientific-sandbox" });
+    }
+  };
+  for (const session of ctx.sessions.list()) enforceSession(session);
+  ctx.on("session/created", (session) => enforceSession(session), { global: true });
   ctx.tools.guard((execution) => {
     const args = execution.arguments ?? {};
     if (["bash", "pwsh", "shell", "mcp__mdsim__sim_exec"].includes(execution.name)) {

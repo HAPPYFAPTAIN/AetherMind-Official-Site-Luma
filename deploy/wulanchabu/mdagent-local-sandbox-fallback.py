@@ -39,7 +39,7 @@ POLICY = '''- id: sandbox-policy
       scientific-sandbox:
         sandbox: workspace-write
         approval: never
-        name: Sandbox
+        name: Work
         description: Fixed per-user scientific workspace sandbox.
     defaultPreset: scientific-sandbox
 '''
@@ -76,7 +76,7 @@ NEW = '''    # dsh-remote-world disables the local providers before applying thi
       scientific-sandbox:
         sandbox: workspace-write
         approval: never
-        name: Sandbox
+        name: Work
         description: Fixed per-user scientific workspace sandbox.
     defaultPreset: scientific-sandbox
 """

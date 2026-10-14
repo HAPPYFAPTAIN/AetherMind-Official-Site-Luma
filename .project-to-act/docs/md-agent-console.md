@@ -59,7 +59,7 @@
 
 - 用户没有在线 mdshell 节点时，租户 overlay 写入合法的 YAML provider 补丁，不再伪造 `n_none` 的 remote-world 地址；它重新启用本机 `subprocess/sandbox/fs-sandbox`，禁用 remote providers，文件操作走本机 Landlock/bwrap 沙箱。只有用户节点在线时才注入 `remote-fs`、`remote-subprocess` 和 `remote-sandbox`。
 - 生产权限策略固定为 `workspace-write + approval=never`：每个租户进程仍以独立 UID、独立 `DSH_HOME` 和独立数据根运行；越界或需要升权的操作自动拒绝，不再显示权限选择器或向用户弹批准框。删除、清空、杀进程和终止作业由 `mdagent-safety` 工具 guard 固定拒绝。
-- 权限预设只保留 `Read Only` 与 `Sandbox` 两项；`Workspace Write`、`Full access` 不再出现在菜单中，`Sandbox` 对应当前用户的 workspace-write 沙箱且不触发审批。
+- 权限预设只保留 `Read Only` 与 `Work` 两项；`Workspace Write`、`Full access` 不再出现在菜单中，`Work` 对应当前用户的 workspace-write 沙箱并带文件夹图标，不触发审批。
 - `mdagent-safety` 在启动时为已恢复会话补写固定权限事实，新会话和旧会话都不会回到 `ask` 或 `danger-full-access`。
 - `workspace-write no sandbox backend` 的根因是远程 provider 被强制启用但 mdshell 没有连接；`mdshell websocket 403` 是同一条 remote-world 链路的节点/短票问题，不是 HPC 未连接。`INSUFFICIENT_CREDITS 402` 是官方 LLM 网关余额预检，和超算提交无关。
 - 当前没有把 `danger-full-access` 作为修复手段；它会跳过文件限制和确认策略。科研命令仍受当前用户沙箱、独立 UID 和 `mdagent-safety` guard 约束。

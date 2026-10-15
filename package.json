@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "bun scripts/build-science-worker.ts && next dev",
-    "build": "bun scripts/build-science-worker.ts && next build",
+    "build": "bun scripts/build-science-worker.ts && node node_modules/next/dist/bin/next build --webpack",
     "build:ip": "NEXT_PUBLIC_BASE_PATH=/official bun run build",
     "start": "next start",
     "lint": "eslint"

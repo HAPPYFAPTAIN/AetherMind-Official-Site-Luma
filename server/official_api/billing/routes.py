@@ -3,7 +3,18 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request
 
-from .rates import ModelEdit, RateEdit, get_models, get_rates, set_model, set_rate
+from .providers import ProviderEdit, list_providers, refresh_dsh_model_settings, set_provider
+from .rates import (
+    ModelEdit,
+    RateEdit,
+    UserModelAccessEdit,
+    get_models,
+    get_rates,
+    set_model,
+    set_rate,
+    set_user_model_access,
+    user_model_access,
+)
 from .usage import Usage
 from ..errors import ApiError
 
@@ -59,7 +70,44 @@ def mount_billing_routes(app, w, current_user):
             w.require(c, uid, owner=True)
             saved = set_model(w, c, body)
             w.audit(c, uid, body.model, 'MODEL_UPDATED', body.model_dump())
-            return saved
+        return {**saved, "sync": refresh_dsh_model_settings()}
+
+    @r.get('/admin/providers')
+    def providers(uid: str = Depends(current_user)):
+        with w.db.connect() as c:
+            w.require(c, uid, owner=True)
+            return {'items': list_providers(c, w)}
+
+    @r.put('/admin/providers')
+    def upsert_provider(body: ProviderEdit, uid: str = Depends(current_user)):
+        with w.db.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
+            w.require(c, uid, owner=True)
+            saved = set_provider(w, c, body, uid)
+            w.audit(c, uid, body.provider, 'LLM_PROVIDER_UPDATED', {
+                'provider': body.provider,
+                'api': body.api,
+                'baseUrl': body.baseUrl,
+                'hasApiKey': bool(body.apiKey and body.apiKey.strip()),
+                'enabled': body.enabled,
+            })
+        return {**saved, "sync": refresh_dsh_model_settings()}
+
+    @r.get('/admin/users/{target}/models')
+    def user_models(target: str, uid: str = Depends(current_user)):
+        with w.db.connect() as c:
+            w.require(c, uid, owner=True)
+            w.user_exists(c, target)
+            return {'items': user_model_access(c, target)}
+
+    @r.put('/admin/users/{target}/models')
+    def update_user_models(target: str, body: UserModelAccessEdit, uid: str = Depends(current_user)):
+        with w.db.connect() as c:
+            c.execute('BEGIN IMMEDIATE')
+            w.require(c, uid, owner=True)
+            saved = set_user_model_access(w, c, target, body.models, uid)
+            w.audit(c, uid, target, 'USER_MODEL_ACCESS_UPDATED', {'models': sorted(set(body.models))})
+        return {'items': saved, 'sync': refresh_dsh_model_settings()}
 
     @r.post('/integrations/usage')
     def usage(body: Usage, request: Request):

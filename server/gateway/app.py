@@ -18,6 +18,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from official_api.auth.service import AuthService
+from official_api.billing.providers import provider_credentials
+from official_api.billing.rates import effective_models
 from official_api.billing.rates import price
 from official_api.billing.wallet import UsageEvent, balance, charge, fingerprint
 from official_api.config import Settings
@@ -194,16 +196,25 @@ class Gateway:
         if not row or (row["expires_at_ms"] or 0) <= self.workspace.now():
             raise _error("ENTITLEMENT_REQUIRED", "产品未激活或已到期", 403)
 
-    def route(self, model: str) -> Route:
+    def route(self, model: str, user_id: str | None = None) -> Route:
         with self.workspace.db.connect() as c:
             row = c.execute("SELECT * FROM official_llm_models WHERE model=? AND enabled=1", (model,)).fetchone()
+            if user_id is not None:
+                row = c.execute(
+                    """SELECT m.* FROM official_llm_models m
+                       LEFT JOIN official_user_llm_models a ON a.model=m.model AND a.user_id=?
+                       WHERE m.model=? AND COALESCE(a.enabled,m.enabled)=1""",
+                    (user_id, model),
+                ).fetchone()
         if not row:
             raise _error("MODEL_NOT_FOUND", "模型不存在或暂未开放", 404)
-        if not re.fullmatch(r"[A-Za-z0-9_]+", row["provider"]):
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", row["provider"]):
             raise _error("PROVIDER_NOT_CONFIGURED", "供应商标识不合法", 503)
-        prefix = "GATEWAY_PROVIDER_" + row["provider"].upper()
-        base = os.environ.get(prefix + "_BASEURL", "").strip()
-        key = os.environ.get(prefix + "_KEY", "").strip()
+        with self.workspace.db.connect() as c:
+            configured = provider_credentials(c, self.workspace, row["provider"])
+        if configured is None:
+            raise _error("PROVIDER_NOT_CONFIGURED", "模型服务配置不完整", 503)
+        base, key, _api = configured
         url = urlsplit(base)
         if not key or url.scheme not in ("http", "https") or not url.hostname or url.username or url.password or url.query or url.fragment:
             raise _error("PROVIDER_NOT_CONFIGURED", "模型服务配置不完整", 503)
@@ -403,7 +414,7 @@ class Gateway:
         fp = fingerprint({"user": principal.user_id, "product": principal.product_id, "kind": kind, "body": body})
         with self.workspace.db.connect() as c:
             exists = c.execute("SELECT 1 FROM gateway_events WHERE product_id=? AND event_id=?", (principal.product_id, event)).fetchone()
-        route = self.route(model) if not exists else None
+        route = self.route(model, principal.user_id) if not exists else None
         prior = self._claim(principal, model, kind, event, fp)
         response_headers = {"X-Event-Id": event, "Cache-Control": "no-store", "X-Accel-Buffering": "no"}
         if prior:
@@ -447,8 +458,12 @@ class Gateway:
         principal = self.authenticate(request)
         with self.workspace.db.connect() as c:
             self._entitled(c, principal)
-            rows = c.execute("SELECT model,provider FROM official_llm_models WHERE enabled=1 ORDER BY model").fetchall()
-        return {"object": "list", "data": [{"id": row["model"], "object": "model", "created": 0, "owned_by": row["provider"]} for row in rows]}
+            rows = effective_models(c, principal.user_id)
+            visible = []
+            for row in rows:
+                if provider_credentials(c, self.workspace, row["provider"]) is not None:
+                    visible.append(row)
+        return {"object": "list", "data": [{"id": row["model"], "object": "model", "created": 0, "owned_by": row["provider"]} for row in visible]}
 
     async def shutdown(self) -> None:
         self.closing = True

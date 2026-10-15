@@ -55,6 +55,20 @@ type LlmModel = {
   enabled: number;
   updated_at_ms: number;
 };
+type ProviderConfig = {
+  provider: string;
+  display_name: string;
+  api: string;
+  base_url: string;
+  enabled: boolean;
+  has_key: boolean;
+  source: string;
+};
+type UserModelAccess = LlmModel & {
+  global_enabled: boolean;
+  granted: boolean;
+  effective: boolean;
+};
 const date = (n: number) =>
   new Date(n).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
 
@@ -83,6 +97,9 @@ export function AdminPanel({
   const [keys, setKeys] = useState<ProductKey[]>([]);
   const [rates, setRates] = useState<Rate[]>([]);
   const [models, setModels] = useState<LlmModel[]>([]);
+  const [providers, setProviders] = useState<ProviderConfig[]>([]);
+  const [modelAccess, setModelAccess] = useState<UserModelAccess[]>([]);
+  const [modelGrants, setModelGrants] = useState<string[]>([]);
   const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(false);
   const [asOf, setAsOf] = useState(0);
@@ -91,7 +108,7 @@ export function AdminPanel({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [target, setTarget] = useState<AccountProfile | null>(null);
-  const [action, setAction] = useState<"role" | "credits" | "redeem" | "duration">("role");
+  const [action, setAction] = useState<"role" | "credits" | "redeem" | "duration" | "models">("role");
   const [role, setRole] = useState<"USER" | "ADMIN">("USER");
   const [scopes, setScopes] = useState<string[]>([]);
   const [delta, setDelta] = useState("");
@@ -132,6 +149,14 @@ export function AdminPanel({
     model: "",
     provider: "",
     upstreamModel: "",
+    enabled: true,
+  });
+  const [providerDraft, setProviderDraft] = useState({
+    provider: "",
+    displayName: "",
+    api: "openai-completions",
+    baseUrl: "",
+    apiKey: "",
     enabled: true,
   });
   const [confirmRevoke, setConfirmRevoke] = useState<{
@@ -182,8 +207,14 @@ export function AdminPanel({
           const r = await accountApi<{ items: Rate[] }>("/admin/rates");
           if (active) setRates(r.items);
         } else if (section === "models" && owner) {
-          const r = await accountApi<{ items: LlmModel[] }>("/admin/models");
-          if (active) setModels(r.items);
+          const [modelResponse, providerResponse] = await Promise.all([
+            accountApi<{ items: LlmModel[] }>("/admin/models"),
+            accountApi<{ items: ProviderConfig[] }>("/admin/providers"),
+          ]);
+          if (active) {
+            setModels(modelResponse.items);
+            setProviders(providerResponse.items);
+          }
         }
       } catch (e) {
         if (active) setError(e instanceof Error ? e.message : String(e));
@@ -222,7 +253,24 @@ export function AdminPanel({
     setDelta("");
     setReason("");
     setCode("");
+    setModelAccess([]);
+    setModelGrants([]);
     setError("");
+  }
+  async function openModelAccess(user: AccountProfile) {
+    if (!owner || user.role === "OWNER") return;
+    setTarget(user);
+    setAction("models");
+    setError("");
+    setModelAccess([]);
+    try {
+      const response = await accountApi<{ items: UserModelAccess[] }>(`/admin/users/${user.userId}/models`);
+      setModelAccess(response.items);
+      setModelGrants(response.items.filter((item) => item.granted).map((item) => item.model));
+    } catch (e) {
+      setTarget(null);
+      setError(e instanceof Error ? e.message : String(e));
+    }
   }
   function saveUser(e: FormEvent) {
     e.preventDefault();
@@ -245,6 +293,8 @@ export function AdminPanel({
           });
         if (action === "duration")
           await accountApi(`/admin/users/${target.userId}/products/${accessProduct}/duration`, {method: "PUT", body: JSON.stringify({days: accessDays})});
+        if (action === "models")
+          await accountApi(`/admin/users/${target.userId}/models`, {method: "PUT", body: JSON.stringify({models: modelGrants})});
         if (action === "redeem")
           await redeemActivationCode(code, target.userId);
         setTarget(null);
@@ -352,6 +402,28 @@ export function AdminPanel({
         setModelDraft({ model: "", provider: "", upstreamModel: "", enabled: true });
       },
       t("模型配置已保存。", "Model configuration saved."),
+    );
+  }
+
+  function saveProvider(e: FormEvent) {
+    e.preventDefault();
+    if (!providerDraft.provider.trim() || !providerDraft.displayName.trim() || !providerDraft.baseUrl.trim()) return;
+    void run(
+      async () => {
+        await accountApi("/admin/providers", {
+          method: "PUT",
+          body: JSON.stringify({
+            provider: providerDraft.provider.trim(),
+            displayName: providerDraft.displayName.trim(),
+            api: providerDraft.api.trim(),
+            baseUrl: providerDraft.baseUrl.trim(),
+            apiKey: providerDraft.apiKey.trim() || null,
+            enabled: providerDraft.enabled,
+          }),
+        });
+        setProviderDraft({ ...providerDraft, apiKey: "" });
+      },
+      t("供应商配置已保存。", "Provider configuration saved."),
     );
   }
 
@@ -500,6 +572,7 @@ export function AdminPanel({
                           </button>
                         )}
                         {owner && <button onClick={() => openUser(u, "duration")}>{t("设置产品期限", "Set product duration")}</button>}
+                        {owner && u.role !== "OWNER" && <button onClick={() => void openModelAccess(u)}>{t("模型权限", "Model access")}</button>}
                         <button onClick={() => openUser(u, "redeem")}>
                           {t("激活码授权", "Grant with code")}
                         </button>
@@ -927,10 +1000,32 @@ export function AdminPanel({
         </>
       )}
       {section === "models" && owner && (
+        <>
+        <section className="dash-panel">
+          <div className="dash-panel-title">
+            <h3>{t("全局供应商", "Global providers")}</h3>
+            <span>{t("仅总管理员可修改 URL、协议和密钥；密钥不会回显。", "Owner-only URL, protocol and key settings; keys are never returned.")}</span>
+          </div>
+          <form className="dash-admin-form" onSubmit={saveProvider}>
+            <label>{t("供应商标识", "Provider ID")}<input required maxLength={32} value={providerDraft.provider} onChange={(e) => setProviderDraft({ ...providerDraft, provider: e.target.value })} placeholder="openai" /></label>
+            <label>{t("显示名称", "Display name")}<input required maxLength={100} value={providerDraft.displayName} onChange={(e) => setProviderDraft({ ...providerDraft, displayName: e.target.value })} placeholder="OpenAI" /></label>
+            <label>{t("协议", "Protocol")}<select value={providerDraft.api} onChange={(e) => setProviderDraft({ ...providerDraft, api: e.target.value })}><option value="openai-completions">OpenAI compatible</option></select></label>
+            <label>{t("Base URL", "Base URL")}<input required maxLength={500} value={providerDraft.baseUrl} onChange={(e) => setProviderDraft({ ...providerDraft, baseUrl: e.target.value })} placeholder="https://api.example.com/v1" /></label>
+            <label className="full">{t("API 密钥（留空保持现有密钥）", "API key (blank keeps the current key)")}<input type="password" autoComplete="new-password" maxLength={2000} value={providerDraft.apiKey} onChange={(e) => setProviderDraft({ ...providerDraft, apiKey: e.target.value })} placeholder={t("不会回显", "Never shown again")} /></label>
+            <label className="dash-check"><input type="checkbox" checked={providerDraft.enabled} onChange={(e) => setProviderDraft({ ...providerDraft, enabled: e.target.checked })} />{t("启用供应商", "Enable provider")}</label>
+            <button className="dash-primary" disabled={busy}>{t("保存供应商", "Save provider")}</button>
+          </form>
+          <div className="dash-table-wrap">
+            <table><thead><tr><th>{t("供应商", "Provider")}</th><th>{t("URL", "URL")}</th><th>{t("密钥", "Key")}</th><th>{t("状态", "Status")}</th></tr></thead><tbody>
+              {providers.map((item) => <tr key={item.provider}><td><strong>{item.display_name}</strong><small>{item.provider}</small></td><td>{item.base_url || "—"}</td><td>{item.has_key ? t("已配置", "Configured") : t("未配置", "Missing")}</td><td>{item.enabled ? t("启用", "Enabled") : t("停用", "Disabled")}</td></tr>)}
+            </tbody></table>
+            {!providers.length && !loading && <p className="dash-empty-inline">{t("暂无供应商配置。", "No providers configured.")}</p>}
+          </div>
+        </section>
         <section className="dash-panel">
           <div className="dash-panel-title">
             <h3>{t("模型路由", "Model routing")}</h3>
-            <span>{t("配置产品服务使用的供应商与上游模型", "Configure providers and upstream model IDs")}</span>
+            <span>{t("全局开放关闭后，可在用户列表单独授权给客户。", "Disable global access to grant a model to selected users only.")}</span>
           </div>
           <form className="dash-admin-form" onSubmit={saveModel}>
             <label>
@@ -947,7 +1042,7 @@ export function AdminPanel({
             </label>
             <label className="dash-check">
               <input type="checkbox" checked={modelDraft.enabled} onChange={(e) => setModelDraft({ ...modelDraft, enabled: e.target.checked })} />
-              {t("启用此路由", "Enable route")}
+              {t("全局开放此模型", "Open this model globally")}
             </label>
             <button className="dash-primary" disabled={busy}>{t("保存模型", "Save model")}</button>
           </form>
@@ -966,6 +1061,7 @@ export function AdminPanel({
             {!models.length && !loading && <p className="dash-empty-inline">{t("暂无模型路由。", "No model routes configured.")}</p>}
           </div>
         </section>
+        </>
       )}
       {section === "rates" && owner && (
         <section className="dash-panel">
@@ -1082,7 +1178,11 @@ export function AdminPanel({
                 ? t("设置用户身份", "Set user role")
                 : action === "credits"
                   ? t("调整积分", "Adjust credits")
-                  : action === "duration" ? t("设置产品期限", "Set product duration") : t("使用激活码授权", "Grant with a code")}
+                  : action === "duration"
+                    ? t("设置产品期限", "Set product duration")
+                    : action === "models"
+                      ? t("设置模型权限", "Set model access")
+                      : t("使用激活码授权", "Grant with a code")}
             </h2>
             <p>
               {target.displayName} · {target.phoneMasked}
@@ -1095,6 +1195,24 @@ export function AdminPanel({
                 <label>{t("自定义有效天数", "Custom access days")}<input required type="number" min={1} max={3650} step={1} value={accessDays} onChange={e=>setAccessDays(Number(e.target.value))}/></label>
                 <p>{t("从保存时起计算；有效期内不限次数，模型调用单独扣积分。", "Starts when saved. Unlimited access until expiry; model calls cost credits.")}</p>
               </>}
+              {action === "models" && (
+                <fieldset>
+                  <legend>{t("允许该用户使用的模型", "Models available to this user")}</legend>
+                  <p className="dash-form-note">{t("全局开放模型默认对所有用户可见；这里勾选的是额外开放给该用户的模型。", "Globally open models are visible to everyone; these checks grant additional models to this user.")}</p>
+                  {modelAccess.map((item) => (
+                    <label className="dash-check" key={item.model}>
+                      <input
+                        type="checkbox"
+                        disabled={item.global_enabled}
+                        checked={item.global_enabled || modelGrants.includes(item.model)}
+                        onChange={(e) => setModelGrants(e.target.checked ? [...new Set([...modelGrants, item.model])] : modelGrants.filter((model) => model !== item.model))}
+                      />
+                      <span>{item.model} · {item.provider}{item.global_enabled ? ` · ${t("全局开放", "global")}` : ""}</span>
+                    </label>
+                  ))}
+                  {!modelAccess.length && <p className="dash-empty-inline">{t("暂无模型路由，请先在模型配置中添加。", "No model routes. Add one in Model routing first.")}</p>}
+                </fieldset>
+              )}
               {action === "role" && (
                 <>
                   <label>

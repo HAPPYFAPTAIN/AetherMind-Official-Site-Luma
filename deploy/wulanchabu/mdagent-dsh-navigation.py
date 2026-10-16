@@ -49,13 +49,13 @@ SIDEBAR_LINKS = '''wide && (0, react_jsx_runtime.jsx)("a", {
 \t\t\t\t\t\t\t\t\thref: "/official/console/compute/",
 \t\t\t\t\t\t\t\t\t"aria-label": "超算连接",
 \t\t\t\t\t\t\t\t\ttitle: "超算连接",
-\t\t\t\t\t\t\t\t\tchildren: "⚡"
+\t\t\t\t\t\t\t\t\tchildren: "超算"
 \t\t\t\t\t\t\t\t}), wide && (0, react_jsx_runtime.jsx)("a", {
 \t\t\t\t\t\t\t\t\tclassName: SidebarRoot_module_css_default.iconButton,
 \t\t\t\t\t\t\t\t\thref: "/official/console/compute/#jobs",
 \t\t\t\t\t\t\t\t\t"aria-label": "计算任务",
 \t\t\t\t\t\t\t\t\ttitle: "计算任务",
-\t\t\t\t\t\t\t\t\tchildren: "▣"
+\t\t\t\t\t\t\t\t\tchildren: "任务"
 \t\t\t\t\t\t\t\t}), '''
 
 

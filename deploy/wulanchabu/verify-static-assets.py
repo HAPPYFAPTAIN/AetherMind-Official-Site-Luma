@@ -13,6 +13,9 @@ from urllib.request import Request, urlopen
 PREFIX = '/official/'
 PAGES = ['', 'console/', 'console/compute/', 'dashboard/', 'products/', 'products/learn-everything/', 'products/md-exp/', 'profile/', 'community/', 'legal/', 'login/']
 ROOTS = ('/assets/', '/images/', '/videos/', '/science/', '/_next/')
+# This entry is served by the existing Nginx agent proxy, not the static export.
+# Keep the allowlist exact; assets and other paths still require local files.
+SERVER_PAGES = {PREFIX + 'md-agent/'}
 CSS_URL = re.compile(r'''url\(\s*(?:"([^"]*)"|'([^']*)'|([^\s)]+))\s*\)''')
 
 def css_references(text):
@@ -80,6 +83,8 @@ def local_check(root, public=None):
             url = urljoin('https://release.invalid' + PREFIX + name, ref)
             parsed = urlparse(url)
             if parsed.netloc != 'release.invalid' or not parsed.path.startswith((PREFIX,) + ROOTS):
+                continue
+            if unquote(parsed.path) in SERVER_PAGES:
                 continue
             try:
                 if not local_target(root, url).is_file():

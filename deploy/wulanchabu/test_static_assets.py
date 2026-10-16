@@ -46,6 +46,17 @@ class StaticAssetsTest(unittest.TestCase):
         file.write_bytes(b'two')
         self.assertNotEqual(before, assets.inventory(self.root))
 
+    def test_agent_proxy_entry_is_not_required_in_static_export(self):
+        (self.root / 'index.html').write_text('<a href="/official/md-agent/">Agent</a>')
+        _, errors = assets.local_check(self.root)
+        self.assertFalse(any('Missing reference' in error for error in errors))
+
+    def test_agent_proxy_exception_does_not_hide_missing_assets(self):
+        (self.root / 'index.html').write_text('<script src="/official/md-agent/assets/missing.js"></script><a href="/official/md-agent-missing/">Missing</a>')
+        _, errors = assets.local_check(self.root)
+        self.assertTrue(any('assets/missing.js' in error for error in errors))
+        self.assertTrue(any('md-agent-missing' in error for error in errors))
+
     def test_svg_filter_inside_data_url_is_not_a_file(self):
         refs = assets.references('a{background:url("data:image/svg+xml,<svg filter=\'url(%23n)\'/>")}', False)
         self.assertEqual(len(refs), 1)

@@ -52,7 +52,7 @@ export function FinalCTA() {
             <ConsoleEntryButton
               className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-[15px] font-semibold text-bg-0 transition-colors hover:bg-accent"
             >
-              {tr(language, "Open Console", "打开控制台")}
+              {tr(language, "Enter agent", "进入智能体")}
               <span className="transition-transform group-hover:translate-x-0.5">→</span>
             </ConsoleEntryButton>
             <a

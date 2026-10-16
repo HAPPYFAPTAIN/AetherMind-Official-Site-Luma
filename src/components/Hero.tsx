@@ -206,7 +206,7 @@ export function Hero() {
                 <ConsoleEntryButton
                   className="science-hero__action inline-flex items-center rounded-full border border-white/25 font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft"
                 >
-                  {tr(language, "Open Console", "打开控制台")}
+                  {tr(language, "Enter agent", "进入智能体")}
                 </ConsoleEntryButton>
               </div>
             </div>

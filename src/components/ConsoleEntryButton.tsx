@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { LoginPage } from "./LoginPage";
 import { hasAccountSession } from "@/lib/account-client";
 import { assetUrl } from "@/lib/asset-url";
@@ -15,9 +14,8 @@ export function ConsoleEntryButton({
   children: ReactNode;
 }) {
   const [loginOpen, setLoginOpen] = useState(false);
-  const router = useRouter();
   const enter = () => {
-    if (hasAccountSession()) router.push("/dashboard/");
+    if (hasAccountSession()) window.location.assign(assetUrl("/md-agent/"));
     else setLoginOpen(true);
   };
   return (
@@ -28,7 +26,7 @@ export function ConsoleEntryButton({
       {loginOpen && (
         <LoginPage
           overlay
-          returnTo={assetUrl("/dashboard/")}
+          returnTo={assetUrl("/md-agent/")}
           onClose={() => setLoginOpen(false)}
         />
       )}

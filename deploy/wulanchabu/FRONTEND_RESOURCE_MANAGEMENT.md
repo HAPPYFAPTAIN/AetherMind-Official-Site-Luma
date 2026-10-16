@@ -102,7 +102,8 @@ python3 deploy/wulanchabu/verify-static-assets.py
 
 `public/console/compute/index.html` 归档自生产 release `20261013-console-compute-options`，
 保留同源接口与登录入口，不包含用户凭据；用完整浏览器导航访问，不能用 Next 路由预取。
-MD EXP 产品地址也已纳入源码，产品权益沿用账号 API，工作区入口经过现有控制台权限检查。
+MD EXP 产品地址也已纳入源码，产品权益沿用账号 API。同步最新开发分支后，已登录用户的入口及登录返回地址使用 `/official/md-agent/`，旧 `/official/console/` 地址也重定向到该入口。此入口由既有智能体服务承载，不应交给 Next 静态路由处理。
+本地资源校验仅豁免上述智能体入口页面，不要求在静态包内生成它；该目录下的资源和其他未知路径仍需校验。公网检查继续请求该入口，实际服务可用性需在部署环境确认。
 SSH 端口为 23850，使用个人私钥；私钥、密码及账号数据不得放入源码或发布包。
 
 ## 回滚操作

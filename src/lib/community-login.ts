@@ -14,7 +14,7 @@ export function communityReturnPath(candidate: string | null): string {
         community,
         fallback,
         assetUrl("/products/"),
-        assetUrl("/console/"),
+        assetUrl("/md-agent/"),
       ].includes(url.pathname) &&
       !url.pathname.startsWith(assetUrl("/products/"))
     )

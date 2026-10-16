@@ -15,7 +15,7 @@ export function ConsoleEntryButton({
 }) {
   const [loginOpen, setLoginOpen] = useState(false);
   const enter = () => {
-    if (hasAccountSession()) window.location.assign(assetUrl("/dashboard/"));
+    if (hasAccountSession()) window.location.assign(assetUrl("/md-agent/"));
     else setLoginOpen(true);
   };
   return (
@@ -26,7 +26,7 @@ export function ConsoleEntryButton({
       {loginOpen && (
         <LoginPage
           overlay
-          returnTo={assetUrl("/dashboard/")}
+          returnTo={assetUrl("/md-agent/")}
           onClose={() => setLoginOpen(false)}
         />
       )}

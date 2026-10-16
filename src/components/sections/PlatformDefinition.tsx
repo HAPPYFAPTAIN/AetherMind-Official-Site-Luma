@@ -2,10 +2,8 @@
 
 import { Section } from "@/components/primitives/Section";
 import { Reveal } from "@/components/primitives/Reveal";
-import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
-import { assetUrl } from "@/lib/asset-url";
 
 const TAGS = [
   { en: "Molecular Dynamics", zh: "分子动力学" },
@@ -28,20 +26,6 @@ export function PlatformDefinition() {
 
   return (
     <Section id="platform" className="py-32 md:py-44">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <EdgeFadeVisual variant="section" className="absolute inset-0">
-          <div className="absolute left-1/2 top-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 opacity-[0.14]">
-            <img
-              src={assetUrl("/images/g01/g01-09-multiscale-science.md.webp")}
-              alt=""
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        </EdgeFadeVisual>
-        <div className="grid-overlay absolute inset-0 opacity-25" />
-      </div>
-
       <div className="relative">
         <Reveal>
           <div className="mono-label mb-8 flex items-center gap-3">
@@ -81,7 +65,7 @@ export function PlatformDefinition() {
         </Reveal>
 
         <Reveal delay={0.2}>
-          <div className="mt-14 flex flex-wrap gap-3">
+          <div data-story-stagger className="mt-14 flex flex-wrap gap-3">
             {TAGS.map((tag) => (
               <span
                 key={tag.en}
@@ -95,20 +79,21 @@ export function PlatformDefinition() {
 
         {/* scale indicator */}
         <Reveal delay={0.26}>
-          <div className="mt-20 border-t border-line pt-10">
-            <div className="flex items-end justify-between">
+          <div data-story-scale className="mt-20 border-t border-line pt-10">
+            <div data-story-stagger className="grid grid-cols-4 items-end gap-2">
               {SCALES.map((s) => (
-                <div key={s.label} className="flex flex-col items-center gap-3">
+                <div key={s.label} className="flex min-w-0 flex-col items-center gap-3">
                   <span className="font-display text-xl font-medium text-white sm:text-2xl">
                     {s.label}
                   </span>
-                  <span className="mono-label whitespace-nowrap text-text-faint">
+                  <span className="story-scale-label mono-label text-center text-text-faint">
                     {tr(language, s.sub.en, s.sub.zh)}
                   </span>
                 </div>
               ))}
             </div>
             <div className="relative mt-5 h-px bg-line-strong">
+              <span data-story-rail className="absolute inset-0 origin-left bg-accent/70" />
               {SCALES.map((_, i) => (
                 <span
                   key={i}
@@ -116,7 +101,9 @@ export function PlatformDefinition() {
                   style={{ left: `${(i / (SCALES.length - 1)) * 100}%` }}
                 />
               ))}
-              <span className="absolute -top-1 h-2 w-2 rounded-full bg-accent" style={{ left: "38%" }} />
+              <span data-story-scale-cursor className="pointer-events-none absolute inset-y-0 left-0 w-0">
+                <span className="absolute -top-1 left-0 h-2 w-2 -translate-x-1/2 rounded-full bg-accent" />
+              </span>
             </div>
             <div className="mt-4 flex justify-between font-mono text-[10px] tracking-[0.14em] text-text-faint">
               <span>10⁻¹⁰ m</span>

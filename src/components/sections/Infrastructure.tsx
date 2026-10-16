@@ -140,7 +140,7 @@ export function Infrastructure() {
         </div>
 
         <Reveal delay={0.1} y={40}>
-          <div className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-bg-1">
+          <div data-story-panel className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-bg-1">
             <img
               src={assetUrl("/images/g03/g03-09-dark-scientific-material.md.webp")}
               alt=""

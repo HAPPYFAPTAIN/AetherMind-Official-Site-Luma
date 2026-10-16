@@ -3,6 +3,8 @@ export const ACCOUNT_API =
 const ACCESS = "aethericai-community-access-token";
 const REFRESH = "aethericai-community-refresh-token";
 const EXPIRES = "aethericai-community-access-expires";
+// Shared with the homepage's first-paint session hint; never an access check.
+export const ACCOUNT_SESSION_STORAGE_KEYS = [ACCESS, REFRESH] as const;
 let refreshing: Promise<void> | null = null;
 
 // Absolute URL for API-served resources such as avatar images.

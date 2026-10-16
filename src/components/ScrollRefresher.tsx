@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ScrollTrigger } from "@/lib/gsap";
+import { scheduleScrollRefresh } from "@/lib/gsap";
 
 /**
  * Recalculates ScrollTrigger positions after fonts/images load, so scroll
@@ -9,15 +9,16 @@ import { ScrollTrigger } from "@/lib/gsap";
  */
 export function ScrollRefresher() {
   useEffect(() => {
-    const refresh = () => ScrollTrigger.refresh();
+    let disposed = false;
+    const refresh = () => { if (!disposed) scheduleScrollRefresh(); };
     window.addEventListener("load", refresh);
+    if (document.readyState === "complete") refresh();
     if (typeof document !== "undefined" && document.fonts?.ready) {
       document.fonts.ready.then(refresh).catch(() => {});
     }
-    const t = window.setTimeout(refresh, 800);
     return () => {
+      disposed = true;
       window.removeEventListener("load", refresh);
-      window.clearTimeout(t);
     };
   }, []);
   return null;

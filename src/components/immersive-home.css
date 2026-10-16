@@ -1,0 +1,1116 @@
+/* Cinematic scientific matter. Black #000, pearl #f4f2ed, gray #c9d2db,
+   ice #a9d9ee, blue-black #090e14. Cormorant / Noto Serif SC display. */
+.luma-home {
+  --luma-white: #f4f2ed;
+  --luma-muted: #c9d2db;
+  --luma-body-size: 18px;
+  --luma-label-size: 16px;
+  --luma-detail-size: 15px;
+  background: #000;
+  color: var(--luma-white);
+  overflow: clip;
+}
+.luma-home > header {
+  --bg-0: #000;
+  --text-secondary: #dce3e8;
+  --text-tertiary: #c9d2db;
+}
+.luma-home > header .link-quiet,
+.luma-home > header > nav > div:last-child > button:last-child {
+  font-size: 17px;
+  font-weight: 550;
+}
+.luma-home > header [role="group"] button {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.luma-home :is(.luma-hero-description, .luma-statement-note, .luma-chapter-copy p, .luma-research-heading > p, .luma-research-caption p, .luma-workflow-heading p, .luma-step-copy, .luma-finale-kicker) {
+  font-weight: 500;
+}
+.luma-home :is(.luma-hero-description, .luma-hero-links, .luma-model-toolbar, .luma-scroll-cue, .luma-chapter-copy, .luma-chapter-foot) {
+  text-shadow: 0 2px 12px #000b;
+}
+.luma-home > header > nav {
+  max-width: none;
+  padding-inline: clamp(24px, 4vw, 72px);
+  height: 84px;
+}
+.luma-home :is(a, button) {
+  -webkit-tap-highlight-color: transparent;
+}
+.luma-home :is(a, button, [tabindex]):focus-visible {
+  outline: 2px solid #a9d9ee;
+  outline-offset: 6px;
+}
+.luma-home :is(section, footer) {
+  scroll-margin-top: 84px;
+}
+.luma-home h2 {
+  font-size: clamp(36px, 4.6vw, 72px);
+  line-height: 1.14;
+  font-weight: 550;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+.luma-skip {
+  position: fixed;
+  left: 24px;
+  top: -80px;
+  z-index: 80;
+  background: #fff;
+  color: #000;
+  padding: 16px 24px;
+  border-radius: 30px;
+}
+.luma-skip:focus {
+  top: 90px;
+}
+.luma-button {
+  min-height: 58px;
+  min-width: 168px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+  padding: 16px 28px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+  cursor: pointer;
+}
+.luma-button-light {
+  background: var(--luma-white);
+  color: #000;
+  border: 1px solid var(--luma-white);
+}
+.luma-button-light:hover {
+  background: #cce6f1;
+  border-color: #cce6f1;
+}
+.luma-button-outline {
+  border: 1px solid #ffffff48;
+  background: #0002;
+  color: var(--luma-white);
+}
+.luma-button-outline:hover {
+  background: #ffffff12;
+  border-color: #fff9;
+}
+.luma-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+.luma-home .luma-hero {
+  position: relative;
+  height: 100svh;
+  min-height: 760px;
+  padding: 100px 0 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  overflow: hidden;
+  background: #08131c;
+}
+.luma-hero-heading {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  text-align: center;
+  padding: 0 24px;
+  pointer-events: none;
+  text-shadow: 0 2px 40px #02101e55;
+}
+.luma-hero-heading a,
+.luma-hero-heading button {
+  pointer-events: auto;
+}
+.luma-hero-title {
+  margin: 0;
+}
+.luma-hero-title > span:first-child {
+  display: block;
+  font-family: var(--font-brand-display), Georgia, "Times New Roman", serif;
+  font-size: clamp(42px, 9.4vw, 154px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.095em;
+  text-indent: 0.095em;
+}
+.luma-hero-title > span:last-child {
+  display: block;
+  font-size: clamp(38px, 4.5vw, 72px);
+  line-height: 1.15;
+  font-weight: 550;
+  letter-spacing: -0.05em;
+  margin-top: 20px;
+}
+.luma-home .luma-hero-title:focus-visible {
+  outline: none;
+}
+.luma-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+.luma-intro-mask {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.luma-intro-enter {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  color: #d3dde5;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.luma-intro-enter:focus-visible {
+  outline: none;
+}
+.luma-intro-enter:focus-visible .luma-intro-hint {
+  color: #d5e5ee;
+  text-decoration: underline;
+  text-underline-offset: 8px;
+}
+.luma-intro-hint {
+  position: absolute;
+  bottom: max(8vh, 44px);
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: 0.1em;
+  line-height: 2;
+}
+.luma-intro-hint > span {
+  font-size: 18px;
+}
+html[data-home-session="true"] .luma-intro {
+  display: none;
+}
+html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] :is(.luma-hero-heading, .luma-hero-links, .luma-model-toolbar, .luma-scroll-cue, .luma-film-toggle),
+html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] > header {
+  opacity: 0;
+  visibility: hidden;
+}
+html:not([data-home-session="true"]) .luma-home[data-arrival="waiting"] .luma-hero-heading {
+  transform: translateY(28px);
+}
+.luma-home[data-arrival="entering"] .luma-hero-heading {
+  transition: opacity 1s 0.4s, transform 1.2s 0.35s;
+}
+.luma-home[data-arrival="entering"] :is(.luma-hero-links, .luma-model-toolbar, .luma-scroll-cue, .luma-film-toggle),
+.luma-home[data-arrival="entering"] > header {
+  transition: opacity 0.7s 0.75s;
+}
+.luma-hero-film {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 1.2s;
+}
+.luma-hero-film[data-loaded="true"] {
+  opacity: 1;
+}
+.luma-film-toggle {
+  position: absolute;
+  left: clamp(24px, 4vw, 72px);
+  bottom: 100px;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #fff3;
+  border-radius: 50%;
+  color: #d3dce3;
+  background: #03101c44;
+  cursor: pointer;
+}
+.luma-film-toggle:hover {
+  background: #ffffff1c;
+  border-color: #ffffff66;
+}
+@media (max-width: 767px) {
+  .luma-hero-title > span:first-child {
+    font-size: clamp(32px, 9.25vw, 70px);
+    letter-spacing: 0.065em;
+    text-indent: 0.065em;
+  }
+  .luma-film-toggle {
+    top: 98px;
+    bottom: auto;
+    right: 24px;
+    left: auto;
+  }
+  .luma-hero-film {
+    object-position: 48% center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .luma-hero-film { display: none; }
+}
+.luma-hero-description {
+  margin: 20px auto 0;
+  max-width: 660px;
+  color: #e0e7ed;
+  line-height: 1.7;
+  font-size: 20px;
+  text-wrap: balance;
+}
+.luma-artwork {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.luma-hero-environment {
+  position: absolute;
+  inset: -3%;
+  z-index: 0;
+  pointer-events: none;
+}
+.luma-hero-environment .luma-artwork {
+  opacity: 0.82;
+  object-position: center;
+}
+.luma-home .luma-hero-model {
+  position: absolute;
+  left: -10%;
+  top: -10%;
+  width: 120%;
+  height: 120%;
+  z-index: 1;
+  opacity: 0.8;
+  pointer-events: none;
+  mask-image: linear-gradient(
+    180deg,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+}
+.luma-hero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 46%, #03111d88, #04121f10 65%),
+    linear-gradient(
+      180deg,
+      #02101f55,
+      transparent 28%,
+      transparent 66%,
+      #030a10cc
+    );
+}
+.luma-hero .luma-button-outline {
+  background: #07131e55;
+  border-color: #ffffff6b;
+}
+.luma-hero-links {
+  position: absolute;
+  left: 4vw;
+  bottom: 36px;
+  z-index: 5;
+  display: flex;
+  gap: 28px;
+}
+.luma-hero-links a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: var(--luma-label-size);
+  font-weight: 550;
+  color: #e3edf4;
+  border-bottom: 1px solid #d5e1e944;
+}
+.luma-hero-links a:hover {
+  border-color: #fff;
+  color: #fff;
+}
+.luma-model-toolbar {
+  position: absolute;
+  bottom: 36px;
+  right: 4vw;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  pointer-events: none;
+  font-size: var(--luma-detail-size);
+  font-weight: 550;
+  color: #e3edf4;
+}
+.luma-model-switch {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 16px;
+  min-height: 46px;
+  border: 1px solid #ffffff55;
+  border-radius: 100px;
+  background: #06101e66;
+  color: #fff;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.luma-live:not([data-drag-ready="true"]) .luma-model-toolbar {
+  visibility: hidden;
+}
+.luma-scroll-cue {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  font-size: var(--luma-detail-size);
+  font-weight: 550;
+  color: #e3edf4;
+}
+.luma-scroll-cue > span {
+  display: block;
+  width: 1px;
+  height: 30px;
+  background: linear-gradient(transparent, #c7dceb);
+}
+.luma-statement {
+  text-align: center;
+  padding: clamp(130px, 16vw, 240px) 24px;
+}
+.luma-statement p {
+  font-size: clamp(32px, 4vw, 64px);
+  line-height: 1.45;
+  letter-spacing: -0.04em;
+  font-weight: 450;
+}
+.luma-statement-note {
+  max-width: 580px;
+  margin: 34px auto 0;
+  color: var(--luma-muted);
+  font-size: var(--luma-body-size);
+  line-height: 1.9;
+  text-wrap: balance;
+}
+.luma-chapter {
+  position: relative;
+  min-height: 720px;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 120px 8vw;
+  isolation: isolate;
+  background: #000;
+}
+.luma-chapter-visual {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+}
+.luma-chapter-image {
+  width: 100%;
+  height: 100%;
+}
+.luma-chapter-image img {
+  object-position: center;
+}
+.luma-chapter::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, #000e 0%, #000a 30%, #0001 75%),
+    linear-gradient(0deg, #000b, transparent 30%, transparent 80%, #0004);
+  pointer-events: none;
+}
+.luma-chapter-copy {
+  max-width: 620px;
+}
+.luma-section-name {
+  display: block;
+  color: #e1e8ee;
+  margin-bottom: 30px;
+  font-size: var(--luma-label-size);
+  font-weight: 600;
+  line-height: 1.6;
+}
+.luma-chapter-copy p {
+  max-width: 460px;
+  font-size: 20px;
+  line-height: 1.9;
+  color: #dce3e9;
+  margin-top: 30px;
+  text-wrap: pretty;
+}
+.luma-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 35px;
+  margin-top: 34px;
+  min-height: 48px;
+  font-size: 18px;
+  font-weight: 550;
+  border-bottom: 1px solid #fff6;
+}
+.luma-text-link:hover {
+  border-color: #fff;
+}
+.luma-chapter-foot {
+  position: absolute;
+  bottom: 40px;
+  left: 8vw;
+  right: 8vw;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  color: #d6e0e8;
+  font-size: var(--luma-detail-size);
+  font-weight: 550;
+  line-height: 1.6;
+}
+.luma-intelligence {
+  justify-content: flex-end;
+}
+.luma-intelligence::after {
+  background:
+    linear-gradient(270deg, #000e, #000b 35%, #0002 80%),
+    linear-gradient(0deg, #000b, transparent 40%);
+}
+.luma-intelligence .luma-chapter-copy {
+  width: 46%;
+  max-width: 630px;
+}
+.luma-intelligence .luma-chapter-image img {
+  object-position: 35% center;
+}
+.luma-science-path {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #d7edf8;
+  margin-top: 36px;
+  font-size: var(--luma-label-size);
+  font-weight: 550;
+  flex-wrap: wrap;
+}
+.luma-science-path i {
+  display: block;
+  height: 1px;
+  width: 35px;
+  background: #a9d9ee66;
+}
+.luma-research {
+  padding: 160px 6vw 100px;
+  max-width: 1800px;
+  margin: auto;
+}
+.luma-research-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 64px;
+  margin: 0 2vw 50px;
+}
+.luma-research-heading > p {
+  max-width: 360px;
+  font-size: var(--luma-body-size);
+  line-height: 1.9;
+  color: var(--luma-muted);
+  padding-bottom: 8px;
+}
+.luma-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 0 2vw 32px;
+  flex-wrap: wrap;
+}
+.luma-tabs button {
+  border: 1px solid #fff3;
+  border-radius: 100px;
+  padding: 12px 24px;
+  min-height: 48px;
+  font-size: var(--luma-label-size);
+  font-weight: 550;
+  color: #dce3e9;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.luma-tabs button[aria-selected="true"] {
+  background: var(--luma-white);
+  border-color: var(--luma-white);
+  color: #000;
+}
+.luma-tabs button:hover {
+  border-color: #fff8;
+}
+.luma-research-panel[hidden],
+.luma-workflow-panel[hidden] {
+  display: none;
+}
+.luma-research-image {
+  height: min(58vw, 640px);
+  min-height: 340px;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.luma-research-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 60px;
+  padding: 28px 2vw 0;
+}
+.luma-research-image-graph {
+  background: #090c10;
+}
+.luma-research-image-graph img {
+  object-fit: cover;
+  object-position: right center;
+}
+.luma-research-link {
+  margin-top: 18px;
+  color: #a8dceb;
+  border-color: #a8dceb70;
+}
+.luma-research-caption h3 {
+  font-size: clamp(22px, 2.1vw, 32px);
+  line-height: 1.5;
+  font-weight: 450;
+}
+.luma-research-caption p {
+  max-width: 460px;
+  font-size: var(--luma-body-size);
+  line-height: 1.9;
+  color: var(--luma-muted);
+}
+.luma-workflow {
+  max-width: 1700px;
+  margin: auto;
+  padding: 100px 8vw 180px;
+}
+.luma-workflow-heading {
+  text-align: center;
+}
+.luma-workflow-heading p {
+  color: var(--luma-muted);
+  line-height: 1.8;
+  font-size: var(--luma-body-size);
+  margin: 30px auto 0;
+  max-width: 520px;
+}
+.luma-workflow-body {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  align-items: center;
+  gap: 70px;
+  margin-top: 80px;
+}
+.luma-workflow-steps {
+  min-width: 0;
+}
+.luma-workflow-steps button {
+  display: grid;
+  grid-template-columns: 24px 1fr 18px;
+  gap: 18px;
+  padding: 26px 0;
+  border-top: 1px solid #fff2;
+  text-align: left;
+  width: 100%;
+  color: #c9d2db;
+  cursor: pointer;
+}
+.luma-workflow-steps button:last-child {
+  border-bottom: 1px solid #fff2;
+}
+.luma-workflow-steps button[aria-selected="true"] {
+  color: var(--luma-white);
+}
+.luma-step-number,
+.luma-step-mark {
+  font-size: var(--luma-label-size);
+  font-weight: 550;
+  line-height: 32px;
+}
+.luma-workflow-steps strong {
+  font-size: 22px;
+  font-weight: 550;
+  display: block;
+}
+.luma-step-copy {
+  display: block;
+  margin-top: 13px;
+  color: var(--luma-muted);
+  font-size: var(--luma-body-size);
+  line-height: 1.8;
+}
+.luma-workflow-steps button[aria-selected="false"] .luma-step-copy {
+  display: none;
+}
+.luma-workflow-view {
+  border-radius: 14px;
+  overflow: hidden;
+  height: 510px;
+  background: #090e14;
+}
+.luma-workflow-panel {
+  width: 100%;
+  height: 100%;
+}
+.luma-infrastructure {
+  text-align: center;
+  justify-content: center;
+}
+.luma-infrastructure::after {
+  background:
+    radial-gradient(ellipse at 50% 48%, #03090e9e 0%, #03090e55 65%, #0003 100%),
+    linear-gradient(0deg, #000e, transparent 28%, transparent 78%, #0009);
+}
+.luma-infrastructure .luma-chapter-copy {
+  width: 100%;
+  max-width: 850px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.luma-infrastructure .luma-section-name {
+  margin-bottom: 24px;
+  letter-spacing: .08em;
+}
+.luma-infrastructure h2 {
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.luma-infrastructure .luma-chapter-copy p {
+  width: 100%;
+  max-width: 560px;
+  margin: 28px auto 0;
+  text-wrap: balance;
+}
+.luma-infrastructure .luma-chapter-copy p span {
+  display: block;
+}
+.luma-infrastructure .luma-button {
+  margin-top: 32px;
+}
+.luma-finale {
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-items: center;
+  overflow: clip;
+  text-align: center;
+  padding: 112px 4vw 28px;
+  background: radial-gradient(ellipse at 50% 52%, #09232d 0, #020a10 42%, #000 76%);
+}
+.luma-finale-kicker {
+  font-size: var(--luma-body-size);
+  color: var(--luma-muted);
+}
+.luma-finale h2 {
+  font-size: clamp(36px, 5vw, 80px);
+  margin-top: 24px;
+}
+.luma-finale .luma-button {
+  margin-top: 44px;
+}
+.luma-wordmark {
+  display: flex;
+  width: fit-content;
+  margin: 40px auto;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(74px, 17.3vw, 310px);
+  line-height: 1;
+  letter-spacing: -0.073em;
+}
+.luma-wordmark-aether {
+  display: inline-block;
+  color: #35d8f7;
+}
+.luma-wordmark-mind {
+  display: inline-block;
+  color: #8e9db2;
+  font-family: var(--font-inter-tight), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.065em;
+}
+@media (max-width: 1100px) {
+  .luma-scroll-cue,
+  .luma-drag-hint {
+    display: none;
+  }
+  .luma-home h2 {
+    font-size: clamp(36px, 5vw, 60px);
+  }
+  .luma-hero-title > span:last-child {
+    font-size: 7vw;
+  }
+  .luma-intelligence .luma-chapter-copy {
+    width: 53%;
+  }
+  .luma-workflow-body {
+    gap: 36px;
+  }
+  .luma-workflow-view {
+    height: 440px;
+  }
+}
+@media (max-width: 767px) {
+  .luma-home {
+    --luma-body-size: 17px;
+    --luma-label-size: 15px;
+    --luma-detail-size: 14px;
+  }
+  .luma-home > header [role="group"] button {
+    font-size: 13px;
+    padding-inline: 6px;
+  }
+  .luma-intro-hint {
+    font-size: 14px;
+    padding-inline: 24px;
+  }
+  .luma-home > header > nav {
+    height: 72px;
+    padding-inline: 20px;
+  }
+  .luma-home :is(section, footer) {
+    scroll-margin-top: 72px;
+  }
+  .luma-hero-title > span:last-child {
+    font-size: clamp(34px, 8.3vw, 57px);
+    margin-top: 16px;
+  }
+  .luma-hero-description {
+    font-size: 17px;
+    max-width: 350px;
+    margin-top: 23px;
+    line-height: 1.8;
+  }
+  .luma-button {
+    font-size: 16px;
+    min-width: 146px;
+    min-height: 54px;
+    padding: 15px 22px;
+  }
+  .luma-actions {
+    gap: 10px;
+    margin-top: 25px;
+  }
+  .luma-actions .luma-button {
+    min-width: 0;
+    flex: 1;
+    max-width: 190px;
+    padding-inline: 14px;
+  }
+  .luma-model-toolbar {
+    bottom: 30px;
+    right: 24px;
+    left: auto;
+  }
+  .luma-model-switch {
+    padding: 8px 10px;
+    gap: 6px;
+    font-size: 14px;
+  }
+  .luma-scroll-cue {
+    display: none;
+  }
+  .luma-home .luma-hero {
+    min-height: 740px;
+    padding: 110px 0 180px;
+  }
+  .luma-hero-heading {
+    padding-inline: 24px;
+  }
+  .luma-hero-links {
+    left: 24px;
+    right: 24px;
+    bottom: 99px;
+    gap: 4px 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .luma-hero-links a {
+    font-size: 14px;
+  }
+  .luma-hero-environment .luma-artwork {
+    object-position: 48% center;
+    opacity: 0.9;
+  }
+  .luma-home .luma-hero-model {
+    left: -40%;
+    top: 0;
+    width: 180%;
+    height: 110%;
+    opacity: 0.7;
+  }
+  .luma-hero-shade {
+    background: linear-gradient(
+      180deg,
+      #04132344,
+      #03102077 50%,
+      #04112122 78%,
+      #030a1099
+    );
+  }
+  .luma-statement {
+    padding: 100px 24px 120px;
+  }
+  .luma-statement p {
+    font-size: clamp(26px, 6.4vw, 44px);
+    line-height: 1.5;
+  }
+  .luma-statement-note {
+    max-width: 340px;
+    margin-top: 26px;
+  }
+  .luma-chapter {
+    height: auto;
+    min-height: max(740px, 100svh);
+    padding: 100px 28px 120px;
+    align-items: center;
+  }
+  .luma-home h2 {
+    font-size: clamp(34px, 8vw, 52px);
+  }
+  .luma-chapter-copy {
+    max-width: 100%;
+  }
+  .luma-chapter-copy p {
+    font-size: var(--luma-body-size);
+    max-width: 360px;
+    margin-top: 26px;
+  }
+  .luma-chapter::after {
+    background:
+      linear-gradient(90deg, #000d, #0006),
+      linear-gradient(0deg, #000c, transparent 70%);
+  }
+  .luma-section-name {
+    margin-bottom: 26px;
+  }
+  .luma-intelligence {
+    justify-content: flex-start;
+  }
+  .luma-intelligence .luma-chapter-copy {
+    width: 100%;
+  }
+  .luma-chapter-foot {
+    left: 28px;
+    right: 28px;
+    bottom: 28px;
+    gap: 12px;
+  }
+  .luma-chapter-foot > span {
+    flex: 1;
+  }
+  .luma-chapter-foot > span:last-child {
+    text-align: right;
+  }
+  .luma-science-path {
+    gap: 10px;
+  }
+  .luma-science-path i {
+    width: 25px;
+  }
+  .luma-research {
+    padding: 100px 20px 70px;
+  }
+  .luma-research-heading {
+    display: block;
+    margin: 0 8px 30px;
+  }
+  .luma-research-heading > p {
+    margin-top: 26px;
+    padding-bottom: 0;
+  }
+  .luma-tabs {
+    gap: 6px;
+    margin: 0 8px 24px;
+  }
+  .luma-tabs button {
+    padding: 10px 15px;
+    min-height: 44px;
+  }
+  .luma-research-image {
+    height: 100vw;
+    min-height: 320px;
+    max-height: 520px;
+    border-radius: 10px;
+  }
+  .luma-research-caption {
+    display: block;
+    padding: 24px 8px 0;
+  }
+  .luma-research-caption h3 {
+    font-size: 23px;
+  }
+  .luma-research-caption p {
+    margin-top: 14px;
+  }
+  .luma-workflow {
+    padding: 60px 28px 110px;
+  }
+  .luma-workflow-heading {
+    text-align: left;
+  }
+  .luma-workflow-heading p {
+    margin-top: 26px;
+  }
+  .luma-workflow-body {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 36px;
+    align-items: stretch;
+  }
+  .luma-workflow-steps button {
+    padding: 22px 0;
+    gap: 12px;
+  }
+  .luma-workflow-steps strong {
+    font-size: 19px;
+  }
+  .luma-workflow-view {
+    height: 330px;
+  }
+  .luma-infrastructure {
+    text-align: center;
+  }
+  .luma-infrastructure .luma-chapter-copy p {
+    margin-inline: auto;
+  }
+  .luma-finale {
+    padding: 104px 20px 24px;
+  }
+  .luma-finale h2 {
+    font-size: clamp(30px, 7.3vw, 48px);
+  }
+  .luma-finale .luma-button {
+    margin-top: 32px;
+  }
+  .luma-footer {
+    padding-top: 24px;
+  }
+  .luma-wordmark {
+    font-size: 17vw;
+    margin-block: 48px;
+  }
+  .luma-footer-bottom {
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 14px;
+  }
+  .luma-footer-bottom nav {
+    order: -1;
+    width: 100%;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .luma-footer-bottom a {
+    font-size: 16px;
+  }
+}
+@media (hover: none), (pointer: coarse) {
+  .luma-drag-hint {
+    display: none;
+  }
+  .luma-model-toolbar {
+    justify-content: flex-end;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .luma-home *,
+  .luma-home *::before,
+  .luma-home *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .luma-drag-hint,
+  .luma-model-switch {
+    display: none;
+  }
+}
+
+/* Song-style Chinese titles echo the English wordmark; body/UI stay sans-serif. */
+.luma-home:lang(zh-CN) :is(h2, .luma-statement-copy > p),
+.luma-home:lang(zh-CN) .luma-hero-title > span:last-child {
+  font-family: var(--font-brand-cn), "Songti SC", "STSong", serif;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  line-height: 1.3;
+}
+.luma-home:lang(zh-CN) .luma-hero-title > span:last-child {
+  font-size: clamp(36px, 4.2vw, 68px);
+  letter-spacing: 0.085em;
+  text-indent: 0.085em;
+  margin-top: 22px;
+}
+.luma-home:lang(zh-CN) .luma-hero-description {
+  line-height: 1.9;
+  letter-spacing: 0.045em;
+}
+.luma-home:lang(zh-CN) .luma-button {
+  font-weight: 600;
+  letter-spacing: 0.055em;
+}
+@media (max-width: 767px) {
+  .luma-home:lang(zh-CN) .luma-hero-title > span:last-child {
+    font-size: clamp(29px, 7.7vw, 52px);
+    letter-spacing: 0.04em;
+    text-indent: 0.04em;
+    margin-top: 18px;
+  }
+  .luma-home:lang(zh-CN) .luma-hero-description {
+    letter-spacing: 0.025em;
+  }
+}
+.luma-service-footer{padding:80px 8vw 30px;background:#070b0e;text-align:left}
+.luma-service-footer-main{max-width:1600px;margin:auto;display:grid;grid-template-columns:1.8fr repeat(4,minmax(0,1fr));gap:40px}
+.luma-service-footer-brand{display:inline-block;font-size:26px;font-weight:500;font-family:var(--font-brand-cn),Georgia,serif;letter-spacing:.04em}
+.luma-service-footer-intro p{max-width:330px;margin-top:24px;font-size:17px;line-height:1.9;color:#b9c6ce}
+.luma-service-footer h3{font-size:16px;line-height:1.6;color:#95a7b3;font-weight:500;margin-bottom:24px}
+.luma-service-footer-main nav a{display:flex;align-items:center;min-height:44px;padding-block:9px;font-size:17px;line-height:1.6;color:#d5dde2}
+.luma-service-footer a:hover{color:#a8dceb}
+.luma-service-footer-legal{max-width:1600px;margin:64px auto 0;padding-top:24px;border-top:1px solid #ffffff20;display:flex;justify-content:space-between;gap:24px;font-size:15px;line-height:1.8;color:#9aadb9}
+.luma-service-footer-legal nav{display:flex;flex-wrap:wrap;gap:28px}.luma-service-footer-legal a{display:inline-flex;align-items:center;min-height:44px}
+@media(max-width:1100px){.luma-service-footer-main{grid-template-columns:repeat(4,minmax(0,1fr));gap:32px}.luma-service-footer-intro{grid-column:1/-1}.luma-service-footer-intro p{max-width:560px}}
+@media(max-width:600px){.luma-service-footer{padding:56px 24px 24px}.luma-service-footer-main{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 20px}.luma-service-footer h3{margin-bottom:14px}.luma-service-footer-main nav a{font-size:16px}.luma-service-footer-legal{margin-top:40px;flex-direction:column;gap:8px}}

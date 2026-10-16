@@ -16,6 +16,14 @@ test("default login enters the workspace and returnTo stays within allowed pages
     assetUrl("/products/"),
   );
   strictEqual(
+    communityReturnPath(assetUrl("/md-agent/") + "?secret=x"),
+    assetUrl("/md-agent/"),
+  );
+  strictEqual(
+    communityReturnPath("https://example.org/official/md-agent/"),
+    assetUrl("/dashboard/"),
+  );
+  strictEqual(
     communityReturnPath(
       assetUrl("/community/") + "?topic=topic_1&compose=1&secret=x",
     ),

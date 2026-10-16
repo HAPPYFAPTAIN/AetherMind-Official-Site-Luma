@@ -39,7 +39,7 @@
 
    ```bash
    bun run build:ip
-   python3 deploy/wulanchabu/verify-static-assets.py
+   python3 deploy/wulanchabu/verify-static-assets.py --out out --public public --manifest output/STATIC_ASSETS.json
    ```
 
 4. 把完整构建输出作为一个新 release 放到：
@@ -61,6 +61,8 @@
 | Next 构建脚本和样式 | 构建生成 | `out/_next/static/` | `/official/_next/static/...` |
 | 产品图片 | `public/assets/products/`、`src/data/productAssets.ts` | `out/assets/products/` | `/official/assets/products/lammps.png` |
 | 官网视觉图 | `public/images/g01..g03/` | `out/images/g01..g03/` | `/official/images/g01/...` |
+| 新版官网视觉图 | `public/images/immersive/`、`products/`、`brand/`、`contact/` | `out/images/` 对应分组 | `/official/images/immersive/...` |
+| 首页影片 | `public/videos/` | `out/videos/` | `/official/videos/aethermind-h3-subtle-hd.mp4` |
 | 科学场景 worker | `public/science/`、构建脚本 | `out/science/` | `/official/science/...` |
 | 计算控制台静态页 | 控制台源文件或 hpc-dev 资源 | `out/console/compute/` | `/official/console/compute/` |
 | 资源说明文档 | 本文件和清单生成脚本 | `/data/aethericai-official/static/` | 通常不作为产品页面展示 |
@@ -76,13 +78,35 @@
 - 浏览器打开首页、控制台、产品页和计算页，确认没有资源 404、白屏或旧资源混入。
 - 页面资源清单已更新到 `/data/aethericai-official/static/STATIC_ASSETS.md`。
 
-可重复执行全量资源检查：
+可重复执行公网入口与引用检查（默认验证 TLS 证书）：
 
 ```bash
 python3 deploy/wulanchabu/verify-static-assets.py
 ```
 
-## 回滚规则
+## 候选发布包与完整清单
+
+执行 `python3 deploy/wulanchabu/prepare-static-release.py 20261015-frontend-resources`，
+校验所有 public 文件原样进入导出目录后，在 `output/releases/` 生成完整压缩包。
+包内包含 `out/`、逐文件大小和 SHA-256 的 `STATIC_ASSETS.json`、清单与本文档；不覆盖已有同名候选包。
+构建脚本使用显式 Next CLI 路径和 webpack，以兼容 Windows 上缺少可执行 shim 的工作目录。
+请从干净的源码检出构建，避免旧导出文件混入；禁止从旧 release 拼接 Next chunk。
+
+上传压缩包到个人暂存目录，核对 SHA-256 后解压到全新的数据盘 release 目录。
+逐文件验证大小和哈希、总数和总字节数，通过浏览器回归后才正式切换。
+候选包准备和校验不会改变 current；正式切换还要同步 static/current 及清单。
+`release-workspace.sh` 是历史整站脚本，不适用于本次数据盘静态发布。
+
+公网验证带 `--manifest STATIC_ASSETS.json` 时会核对每个文件的内容。
+仅在确认服务器身份的自签名证书环境中使用 `--insecure`，默认不关闭 TLS 验证。
+
+`public/console/compute/index.html` 归档自生产 release `20261013-console-compute-options`，
+保留同源接口与登录入口，不包含用户凭据；用完整浏览器导航访问，不能用 Next 路由预取。
+MD EXP 产品地址也已纳入源码，产品权益沿用账号 API。同步最新开发分支后，已登录用户的入口及登录返回地址使用 `/official/md-agent/`，旧 `/official/console/` 地址也重定向到该入口。此入口由既有智能体服务承载，不应交给 Next 静态路由处理。
+本地资源校验仅豁免上述智能体入口页面，不要求在静态包内生成它；该目录下的资源和其他未知路径仍需校验。公网检查继续请求该入口，实际服务可用性需在部署环境确认。
+SSH 端口为 23850，使用个人私钥；私钥、密码及账号数据不得放入源码或发布包。
+
+## 回滚操作
 
 迁移或发布时不要删除旧 release。当前切换前会生成类似下面的回滚链接：
 

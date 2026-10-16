@@ -1,58 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AUX_NAV_LINKS, BRAND, ENTERPRISE_NAV, NAV_LINKS } from "@/lib/site";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { BRAND } from "@/lib/site";
+import { navigation, productNavigation } from "@/data/navigation";
+import { usePathname } from "next/navigation";
+import "./navigation.css";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
-import { assetUrl } from "@/lib/asset-url";
 import { LoginPage } from "@/components/LoginPage";
 import { hasAccountSession } from "@/lib/account-client";
 import { useAccount } from "@/lib/use-account";
+import { BrandMark } from "./primitives/BrandMark";
+import { SiteLink } from "./primitives/SiteLink";
+import { suspendBackgroundActivity } from "@/lib/background-activity";
 
 export function Mark() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden>
-      <circle cx="13" cy="13" r="3.2" fill="var(--accent)" />
-      <ellipse
-        cx="13"
-        cy="13"
-        rx="10.5"
-        ry="4.4"
-        stroke="var(--text-secondary)"
-        strokeWidth="1"
-        transform="rotate(30 13 13)"
-      />
-      <ellipse
-        cx="13"
-        cy="13"
-        rx="10.5"
-        ry="4.4"
-        stroke="var(--text-tertiary)"
-        strokeWidth="1"
-        transform="rotate(-30 13 13)"
-      />
-      <ellipse
-        cx="13"
-        cy="13"
-        rx="10.5"
-        ry="4.4"
-        stroke="var(--text-faint)"
-        strokeWidth="1"
-        transform="rotate(90 13 13)"
-      />
-    </svg>
-  );
+  return <BrandMark />;
 }
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [active, setActive] = useState<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const reveal = (id: string) => { clearTimeout(closeTimer.current); setActive(id); };
+  const leave = () => { closeTimer.current = setTimeout(() => setActive(null), 160); };
+  const closeNavigation = () => { clearTimeout(closeTimer.current); setActive(null); setOpen(false); };
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+  useEffect(() => {
+    if (!active) return;
+    const dismiss = (event: KeyboardEvent) => { if (event.key === "Escape") setActive(null); };
+    window.addEventListener("keydown", dismiss);
+    return () => window.removeEventListener("keydown", dismiss);
+  }, [active]);
   const { account } = useAccount();
   const { language, setLanguage } = useLanguage();
+  const t = (pair: readonly [string, string]) => tr(language, pair[0], pair[1]);
 
   const enterAccount = () => {
-    if (account || hasAccountSession()) window.location.assign(assetUrl("/dashboard/"));
+    if (account || hasAccountSession()) router.push("/dashboard/");
     else setLoginOpen(true);
   };
 
@@ -64,36 +54,63 @@ export function Nav() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    const resume = suspendBackgroundActivity();
+    document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previous;
+      resume();
     };
   }, [open]);
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled
+      className={`site-navigation fixed inset-x-0 top-0 z-50 transition-colors duration-200 ${
+        scrolled || active || open
           ? "border-b border-line bg-bg-0/70 backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
       }`}
     >
       <nav className="mx-auto grid h-16 max-w-[1440px] grid-cols-[1fr_auto] items-center px-6 sm:h-[72px] lg:px-12 xl:grid-cols-[1fr_auto_1fr]">
         <div className="flex items-center gap-5 justify-self-start">
-          <a href={assetUrl("/")} className="flex items-center gap-3 text-white">
+          <SiteLink href="/" className="flex items-center gap-3 text-white">
             <Mark />
-            <span className="font-display text-[17px] font-semibold tracking-[0.22em]">
+            <span lang={language === "zh" ? "zh-CN" : "en"} className="brand-name font-display text-[19px] font-semibold tracking-[0.04em] sm:text-[22px]">
               {tr(language, BRAND.en, BRAND.zh)}
             </span>
-          </a>
+          </SiteLink>
         </div>
 
-        <div data-primary-nav className="hidden items-center justify-self-center gap-[7.6px] xl:flex">
-          <button data-showcase={ENTERPRISE_NAV.key} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">
-            {tr(language, ENTERPRISE_NAV.label.en, ENTERPRISE_NAV.label.zh)}
-          </button>
-          {NAV_LINKS.map((l) => <a key={l.href} href={"externalPath" in l && l.externalPath ? assetUrl(l.href) : l.href} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">{tr(language, l.label.en, l.label.zh)}</a>)}
-          {AUX_NAV_LINKS.map((l) => <a key={l.href} href={l.href} className="link-quiet whitespace-nowrap rounded-full px-2 py-2 text-[15px] font-medium">{tr(language, l.label.en, l.label.zh)}</a>)}
+        <div data-primary-nav className="hidden items-center justify-self-center xl:flex">
+          {navigation.map(item => <div key={item.id} className="nav-entry"
+            onPointerMove={event => { if (event.pointerType === "mouse") reveal(item.id); }}
+            onPointerLeave={leave}
+            onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setActive(null); }}
+            onKeyDown={event => {
+              if (event.key === "Escape") {
+                event.preventDefault(); event.currentTarget.querySelector<HTMLAnchorElement>(".nav-destination")?.focus(); setActive(null);
+              }
+              if (event.key === "ArrowDown" && event.target === event.currentTarget.querySelector(".nav-destination")) {
+                event.preventDefault(); reveal(item.id);
+                const entry = event.currentTarget;
+                requestAnimationFrame(() => entry.querySelector<HTMLAnchorElement>(".nav-preview a")?.focus());
+              }
+            }}>
+            <SiteLink className="nav-destination" href={item.href} onClick={closeNavigation}
+              onFocus={() => reveal(item.id)} aria-expanded={active === item.id} aria-controls={`nav-${item.id}`}
+              aria-current={pathname?.startsWith(item.href.slice(0,-1)) ? "page" : undefined}>
+              {t(item.title)}<svg aria-hidden="true" width="10" height="6" viewBox="0 0 10 6"><path d="m1 1 4 4 4-4" fill="none" stroke="currentColor" /></svg>
+            </SiteLink>
+            {active === item.id && <div className="nav-preview" id={`nav-${item.id}`}>
+              <div className="nav-preview-inner">
+                <div><p className="nav-preview-title">{t(item.title)}</p><p className="nav-preview-description">{t(item.description)}</p>
+                  <SiteLink className="nav-preview-cta" href={item.href} onClick={closeNavigation}>{tr(language, "Explore", "进入")}{language === "zh" ? item.title[1] : ` ${item.title[0]}`} <span aria-hidden="true">↗</span></SiteLink>
+                </div>
+                <div className={`nav-preview-topics${item.id === "products" ? " nav-product-grid" : ""}`}>{item.id === "products" ? productNavigation.map(product => <SiteLink key={product.id} href={`/products/#product-${product.id}`} onClick={closeNavigation}>{t(product.title)}<span aria-hidden="true">↗</span></SiteLink>) : item.topics.map((topic, index) => <SiteLink key={topic[0]} href={item.href + (["enterprise","careers","about"].includes(item.id) ? `#detail-${index}` : "")} onClick={closeNavigation}>{t(topic)}<span aria-hidden="true">↗</span></SiteLink>)}</div>
+              </div>
+            </div>}
+          </div>)}
         </div>
 
         <div className="flex items-center justify-self-end gap-2 sm:gap-3">
@@ -158,7 +175,7 @@ export function Nav() {
 
           <button
             type="button"
-            onClick={enterAccount}
+            onClick={() => { setActive(null); enterAccount(); }}
             className="hidden whitespace-nowrap rounded-full border border-line-strong bg-white/[0.03] px-4 py-2 text-[15.5px] font-medium text-white transition-colors hover:border-accent/40 hover:bg-accent-soft sm:flex"
           >
             {account ? tr(language, "Dashboard", "控制台") : tr(language, "Sign in", "登录")}
@@ -166,17 +183,20 @@ export function Nav() {
         </div>
       </nav>
 
-      {/* mobile menu */}
+      {/* Touch users receive the same destinations with visible descriptions. */}
       <div
-        className={`overflow-hidden border-b border-line bg-bg-0/95 backdrop-blur-xl transition-[max-height,opacity] duration-500 xl:hidden ${
+        hidden={!open}
+        className={`overflow-hidden border-b border-line bg-bg-0/95 transition-[max-height,opacity] duration-200 xl:hidden ${
           open
             ? "max-h-[calc(100dvh-72px)] overflow-y-auto opacity-100"
             : "max-h-0 opacity-0"
         }`}
       >
         <div className="space-y-1 px-6 py-6">
-          <button data-showcase={ENTERPRISE_NAV.key} onClick={() => setOpen(false)} className="block w-full rounded-lg px-3 py-3 text-left text-lg font-medium text-text-secondary hover:text-white">{tr(language, ENTERPRISE_NAV.label.en, ENTERPRISE_NAV.label.zh)}</button>
-          {[...NAV_LINKS, ...AUX_NAV_LINKS].map((l) => <a key={l.href} href={"externalPath" in l && l.externalPath ? assetUrl(l.href) : l.href} onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 text-lg font-medium text-text-secondary hover:text-white">{tr(language, l.label.en, l.label.zh)}</a>)}
+          {navigation.map(item => <div key={item.id}><SiteLink href={item.href} onClick={closeNavigation} className="nav-mobile-link">
+            <span>{t(item.title)} <span aria-hidden="true">↗</span></span>
+            <small>{t(item.description)}</small>
+          </SiteLink>{item.id === "products" && <div className="nav-mobile-products">{productNavigation.map(product => <SiteLink key={product.id} href={`/products/#product-${product.id}`} onClick={closeNavigation}>{t(product.title)} <span aria-hidden="true">↗</span></SiteLink>)}</div>}</div>)}
           <button
             type="button"
             onClick={() => { setOpen(false); enterAccount(); }}

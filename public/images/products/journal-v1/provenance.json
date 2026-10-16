@@ -1,0 +1,140 @@
+{
+  "generator": "Built-in image_gen",
+  "date": "2026-10-13",
+  "purpose": "Original conceptual scientific editorial artwork for the products page. Not measured simulation results. Homepage video unchanged.",
+  "assets": [
+    {
+      "id": "platform",
+      "title": "尺度之间",
+      "prompt": "Use case: stylized-concept. Create original scientific editorial cover artwork for AetherMind's professional research software product website. The visual sophistication, conceptual clarity and exquisite materials of a major scientific journal cover, but NO magazine masthead, NO text, NO labels, NO UI, NO logos, NO watermark. Not a literal instrument photo or a generic sci-fi wallpaper. A single memorable scientific idea, masterfully controlled illumination, optically credible translucent materials, immaculate micro-detail, strong depth, restrained palette and dramatic but quiet composition. Landscape 3:2, high resolution. Keep main form fully inside central 80% so it survives a 16:10 website crop. This is conceptual art, not a measured simulation or a claim of physical validation. A suspended, sculptural wave of atomically thin crystalline layers folds once into a generous open arch, bridging a finely resolved hexagonal atomic edge on the left to a smooth continuous translucent surface on the right. The idea is discrete matter becoming a continuous field. Cold platinum and deep petrol blue with one subtle warm champagne edge, on a luminous midnight-blue atmospheric ground. Asymmetric sweeping composition, one main curved structure, raking studio light and transparent interference at the edges, near-black corners. No outer-space stars, no laser beams, no busy particle cloud. Subject biased slightly right, leftmost 25% calm shadow. Beautiful tangible and mysterious, art directed not a technical stock render.",
+      "deliverables": [
+        {
+          "file": "platform-640.webp",
+          "bytes": 38552
+        },
+        {
+          "file": "platform-1280.webp",
+          "bytes": 114760
+        },
+        {
+          "file": "platform-1536.webp",
+          "bytes": 150858
+        }
+      ]
+    },
+    {
+      "id": "simulation",
+      "title": "分子之间的波",
+      "prompt": "Use case: stylized-concept. Create original scientific editorial cover artwork for AetherMind's professional research software product website. The visual sophistication, conceptual clarity and exquisite materials of a major scientific journal cover, but NO magazine masthead, NO text, NO labels, NO UI, NO logos, NO watermark. Not a literal instrument photo or a generic sci-fi wallpaper. A single memorable scientific idea, masterfully controlled illumination, optically credible translucent materials, immaculate micro-detail, strong depth, restrained palette and dramatic but quiet composition. Landscape 3:2, high resolution. Keep main form fully inside central 80% so it survives a 16:10 website crop. This is conceptual art, not a measured simulation or a claim of physical validation. An elegant translucent molecular fluid droplet suspended in a dark teal void, one sharply legible ripple traverses the spherical surface. Within the droplet, a sparse and carefully arranged molecular network becomes visible through refraction, a few copper and silver atom clusters. Macro fluid photography meets sophisticated scientific illustration. Lit from the upper left by a broad soft silver source, a fine amber caustic through the lower edge. Deep ink teal, muted copper, smoky crystal. Bold asymmetric close-up, droplet not perfectly centered, calm dark backdrop with tonal detail. No text or charts, no stereotypical DNA, no exploding debris.",
+      "deliverables": [
+        {
+          "file": "simulation-640.webp",
+          "bytes": 48096
+        },
+        {
+          "file": "simulation-1280.webp",
+          "bytes": 129250
+        },
+        {
+          "file": "simulation-1536.webp",
+          "bytes": 164060
+        }
+      ]
+    },
+    {
+      "id": "intelligence",
+      "title": "可计算的路径",
+      "prompt": "Use case: stylized-concept. Create original scientific editorial cover artwork for AetherMind's professional research software product website. The visual sophistication, conceptual clarity and exquisite materials of a major scientific journal cover, but NO magazine masthead, NO text, NO labels, NO UI, NO logos, NO watermark. Not a literal instrument photo or a generic sci-fi wallpaper. A single memorable scientific idea, masterfully controlled illumination, optically credible translucent materials, immaculate micro-detail, strong depth, restrained palette and dramatic but quiet composition. Landscape 3:2, high resolution. Keep main form fully inside central 80% so it survives a 16:10 website crop. This is conceptual art, not a measured simulation or a claim of physical validation. An abstract continuous potential-energy landscape made of hundreds of impossibly fine silver contour filaments suspended in three-dimensional space. The filaments dip into three graceful valleys, and a SINGLE warm ivory-gold path traces across the saddles from near foreground into depth. A few cyan nodal points along the path, very restrained. No solid tray, no desk, no physical map base, no silicon chip. A beautiful transparent topological sculpture, volumetric fine-line craft, midnight indigo backdrop with subtle fog solely in deep distance, cool pale blue filaments with muted warm gold. Three-quarter perspective, balanced cinematic composition, clean sharp lines.",
+      "deliverables": [
+        {
+          "file": "intelligence-640.webp",
+          "bytes": 44948
+        },
+        {
+          "file": "intelligence-1280.webp",
+          "bytes": 146440
+        },
+        {
+          "file": "intelligence-1536.webp",
+          "bytes": 194658
+        }
+      ]
+    },
+    {
+      "id": "learning",
+      "title": "知识的生长",
+      "prompt": "Use case: stylized-concept. Create original scientific editorial cover artwork for AetherMind's professional research software product website. The visual sophistication, conceptual clarity and exquisite materials of a major scientific journal cover, but NO magazine masthead, NO text, NO labels, NO UI, NO logos, NO watermark. Not a literal instrument photo or a generic sci-fi wallpaper. A single memorable scientific idea, masterfully controlled illumination, optically credible translucent materials, immaculate micro-detail, strong depth, restrained palette and dramatic but quiet composition. Landscape 3:2, high resolution. Keep main form fully inside central 80% so it survives a 16:10 website crop. This is conceptual art, not a measured simulation or a claim of physical validation. A sculptural branching structure of delicate frosted glass ribbons, a single calm central stem divides into elegant translucent fan-shaped lamellae resembling ginkgo venation and an unfolding scientific knowledge tree. No literal tree trunk, books or brain. Pearl white, soft sage glass and subtle pale amber internal light on a deep forest-black field. Exquisite close-up, veins resolve into tiny branching filaments. A macro photograph of an impossible but tangible research specimen. One organic coherent form, generous dark breathing space. Directional luminous rim light, slow contemplative mood, composition neither symmetrical nor cluttered.",
+      "deliverables": [
+        {
+          "file": "learning-640.webp",
+          "bytes": 57018
+        },
+        {
+          "file": "learning-1280.webp",
+          "bytes": 167966
+        },
+        {
+          "file": "learning-1536.webp",
+          "bytes": 223536
+        }
+      ]
+    },
+    {
+      "id": "materials",
+      "title": "界面的秩序",
+      "prompt": "Use case: stylized-concept. Create original scientific editorial cover artwork for AetherMind's professional research software product website. The visual sophistication, conceptual clarity and exquisite materials of a major scientific journal cover, but NO magazine masthead, NO text, NO labels, NO UI, NO logos, NO watermark. Not a literal instrument photo or a generic sci-fi wallpaper. A single memorable scientific idea, masterfully controlled illumination, optically credible translucent materials, immaculate micro-detail, strong depth, restrained palette and dramatic but quiet composition. Landscape 3:2, high resolution. Keep main form fully inside central 80% so it survives a 16:10 website crop. This is conceptual art, not a measured simulation or a claim of physical validation. Extreme macro of a single polycrystalline metallic membrane gently curling, its surface showing exquisite interlocking anisotropic grains. A narrow warm gold grain boundary passes diagonally through dark graphite, pale silver and subtle blue iridescent facets. Beneath a peeled edge, a precise sparse atomic lattice is just visible, showing the bridge from microstructure to atomic structure. Premium scientific journal cover art, highly tactile, optical micrograph-inspired surface married with macro photography. Sculptural folded composition occupying the right and center, ink navy void in upper left. No floating orb, no labeled lattice, no mountains or rocks.",
+      "deliverables": [
+        {
+          "file": "materials-640.webp",
+          "bytes": 70496
+        },
+        {
+          "file": "materials-1280.webp",
+          "bytes": 211500
+        },
+        {
+          "file": "materials-1536.webp",
+          "bytes": 280838
+        }
+      ]
+    },
+    {
+      "id": "chemistry",
+      "title": "反应的瞬间",
+      "prompt": "Use case: stylized-concept. Create original scientific editorial cover artwork for AetherMind's professional research software product website. The visual sophistication, conceptual clarity and exquisite materials of a major scientific journal cover, but NO magazine masthead, NO text, NO labels, NO UI, NO logos, NO watermark. Not a literal instrument photo or a generic sci-fi wallpaper. A single memorable scientific idea, masterfully controlled illumination, optically credible translucent materials, immaculate micro-detail, strong depth, restrained palette and dramatic but quiet composition. Landscape 3:2, high resolution. Keep main form fully inside central 80% so it survives a 16:10 website crop. This is conceptual art, not a measured simulation or a claim of physical validation. Two translucent molecular orbital lobes approach and overlap in a single luminous saddle, illustrating the emergence of a chemical bond conceptually. Like delicate blown-glass clouds with finely textured electron-density surface contours, one lobe warm amber, the other cold smoky blue, overlap pale ivory. A few precisely rendered small platinum nuclei suspended inside, not generic ball-and-stick clusters everywhere. Extreme macro scientific still life in a deep aubergine-black void, soft luxurious volumetric lighting with exquisite caustics and sharply resolved surface ridges. One beautiful central interaction, controlled contrast, no explosion, no flames, no cosmic scene.",
+      "deliverables": [
+        {
+          "file": "chemistry-640.webp",
+          "bytes": 56202
+        },
+        {
+          "file": "chemistry-1280.webp",
+          "bytes": 184570
+        },
+        {
+          "file": "chemistry-1536.webp",
+          "bytes": 254000
+        }
+      ]
+    },
+    {
+      "id": "biology",
+      "title": "折叠的生命",
+      "prompt": "Use case: stylized-concept. Create original scientific editorial cover artwork for AetherMind's professional research software product website. The visual sophistication, conceptual clarity and exquisite materials of a major scientific journal cover, but NO magazine masthead, NO text, NO labels, NO UI, NO logos, NO watermark. Not a literal instrument photo or a generic sci-fi wallpaper. A single memorable scientific idea, masterfully controlled illumination, optically credible translucent materials, immaculate micro-detail, strong depth, restrained palette and dramatic but quiet composition. Landscape 3:2, high resolution. Keep main form fully inside central 80% so it survives a 16:10 website crop. This is conceptual art, not a measured simulation or a claim of physical validation. An elegant single folded protein ribbon complex, conceptual rather than a specific known protein, with believable alpha-helical ribbons and folded sheets intertwined in a coherent globular structure. Fine translucent sea-glass material with opalescent mint, silver-blue and quiet warm coral in one small region. Floating against a very dark marine green ground, macro cinematography, broad soft rim light reveals delicate pleats and hydration droplets. Selective depth of field but the main fold stays crisp, sophisticated scientific publication cover quality. Not a DNA double helix, no cell cartoon, no tentacle monster, no neon. Sculptural biological topology with lots of negative space.",
+      "deliverables": [
+        {
+          "file": "biology-640.webp",
+          "bytes": 39630
+        },
+        {
+          "file": "biology-1280.webp",
+          "bytes": 108738
+        },
+        {
+          "file": "biology-1536.webp",
+          "bytes": 141882
+        }
+      ]
+    }
+  ]
+}

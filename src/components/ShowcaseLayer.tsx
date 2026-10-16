@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "./LanguageProvider";
 import "./showcase.css";
+import { suspendBackgroundActivity } from "@/lib/background-activity";
 
 const CONTENT = {
   enterprise: { zh: ["企业服务", "为高校、研究机构和企业提供可控、可追溯的科学计算部署方案。", ["私有化部署", "HPC 集群接入", "团队权限与审计"]], en: ["Enterprise services", "Controlled and traceable scientific computing for universities, research teams and companies.", ["Private deployment", "HPC integration", "Team access and audit"]] },
@@ -33,6 +34,8 @@ export function ShowcaseLayer() {
       if (!trigger) return;
       const href = trigger.getAttribute("href") || "";
       const key = (trigger.getAttribute("data-showcase") || href.slice(1) || "home") as ShowcaseKey;
+      // A real page section is a navigation target, not a feature preview.
+      if (!trigger.hasAttribute("data-showcase") && document.getElementById(key)) return;
       if (!(key in CONTENT)) return;
       event.preventDefault(); event.stopPropagation(); setNotice(""); setActive(key);
     };
@@ -41,9 +44,11 @@ export function ShowcaseLayer() {
   }, []);
   useEffect(() => {
     if (!active) return;
+    const resume = suspendBackgroundActivity();
+    const previousOverflow = document.body.style.overflow;
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setActive(null); };
     document.body.style.overflow = "hidden"; window.addEventListener("keydown", onKey);
-    return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", onKey); };
+    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener("keydown", onKey); resume(); };
   }, [active]);
   const labels = useMemo(() => language === "zh" ? { close: "关闭", preview: "功能预览", ready: "样板已准备", open: "打开样板", done: "已记录到示例工作区" } : { close: "Close", preview: "Feature preview", ready: "Preview ready", open: "Open sample", done: "Added to the sample workspace" }, [language]);
   if (!active || !content) return null;

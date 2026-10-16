@@ -1,0 +1,64 @@
+/* Service navigation is a choice of needs; the detail rows explain the next action. */
+:root[data-theme] .enterprise-page { --service-panel:#12232e; --service-highlight:#65d7ef; }
+:root[data-theme="light"] .enterprise-page { --service-panel:#e7eff3; --service-highlight:#096f98; }
+:root[data-theme] .enterprise-page .enterprise-routing { display:grid;grid-template-columns:.7fr 2.3fr;gap:48px;padding-block:38px 56px;align-items:center;border-bottom:1px solid var(--ent-line); }
+html.type-system[data-language] .enterprise-routing h2 { font-size:clamp(24px,2.2vw,32px);line-height:1.4;font-weight:600;letter-spacing:-.035em;margin:0; }
+:root[data-theme] .enterprise-page .enterprise-wayfinding { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;background:transparent;border:0; }
+:root[data-theme] .enterprise-page .enterprise-wayfinding a { position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:10px;min-height:164px;padding:4px 28px 16px;border:0;border-left:1px solid var(--ent-line);transition:background .2s; }
+:root[data-theme] .enterprise-page .enterprise-wayfinding a:hover { background:var(--service-panel); }
+:root[data-theme] .enterprise-page .enterprise-route-number { color:var(--ent-soft);font:12px var(--font-geist-mono),monospace; }
+.enterprise-wayfinding strong { font-size:22px;font-weight:600;letter-spacing:-.03em; }
+.enterprise-wayfinding p { font-size:14px;line-height:1.7;color:var(--ent-muted);padding-right:12px;max-width:230px; }
+:root[data-theme] .enterprise-page .enterprise-route-arrow { position:absolute;top:8px;right:16px;margin:0;color:var(--service-highlight);font-size:23px;transition:transform .2s; }
+.enterprise-wayfinding a:hover .enterprise-route-arrow { transform:translate(3px,3px); }
+:root[data-theme] .enterprise-page .enterprise-services { padding-block:88px 96px; }
+:root[data-theme] .enterprise-page .enterprise-section-intro { gap:64px;margin-bottom:48px; }
+html.type-system[data-language] .enterprise-page .enterprise-section-intro h2 { font-size:clamp(34px,3.4vw,50px);font-weight:550;line-height:1.3;letter-spacing:-.04em; }
+.enterprise-section-intro h2 span { color:var(--ent-soft); }
+:root[data-theme] .enterprise-page .enterprise-service-grid { display:grid;grid-template-columns:1fr;gap:0;border-top:1px solid var(--ent-line); }
+:root[data-theme] .enterprise-page .enterprise-service-grid article,
+:root[data-theme] .enterprise-page .enterprise-service-grid article:first-child,
+:root[data-theme] .enterprise-page .enterprise-service-grid article:last-child { display:grid;grid-template-columns:1fr 1fr;gap:80px;padding:52px 36px;border:0;border-bottom:1px solid var(--ent-line);border-radius:0;background:transparent;box-shadow:none; }
+:root[data-theme] .enterprise-page .enterprise-service-grid article:nth-child(2) { background:var(--service-panel); }
+.enterprise-service-heading { position:relative;padding-left:78px; }
+.enterprise-service-number { position:absolute;left:0;top:-6px;font:400 40px/1.3 var(--font-inter-tight),sans-serif;letter-spacing:-.06em;color:var(--ent-soft); }
+.enterprise-service-label { color:var(--service-highlight);font-size:15px;font-weight:600;margin-bottom:20px; }
+html.type-system[data-language] .enterprise-page .enterprise-service-grid h3 { font-family:var(--font-heading);font-size:clamp(28px,2.65vw,40px);font-weight:550;line-height:1.4;letter-spacing:-.035em;white-space:pre-line; }
+:root[data-theme] .enterprise-page .enterprise-service-body { font-size:17px;line-height:1.85;margin:0;min-height:0;max-width:540px; }
+:root[data-theme] .enterprise-page .enterprise-service-grid ul { border:0;padding:0;margin:24px 0 30px;gap:10px; }
+:root[data-theme] .enterprise-page .enterprise-service-grid li { font-size:15px;color:var(--ent-ink);gap:12px; }
+:root[data-theme] .enterprise-page .enterprise-service-grid li::before { content:"↗";width:auto;height:auto;flex:none;margin:0;color:var(--service-highlight);background:none;font-size:15px; }
+.enterprise-service-action { display:inline-flex;align-items:center;justify-content:space-between;gap:38px;min-height:50px;padding:13px 22px;font-weight:550;font-size:16px;border-radius:5px; }
+:root[data-theme] .enterprise-page .enterprise-contact-context { border-left:2px solid var(--service-highlight);padding:4px 0 4px 20px;margin-top:28px;color:var(--ent-ink); }
+.enterprise-contact-context strong { font-size:19px;font-weight:600; }
+.enterprise-contact-context p { font-size:16px;line-height:1.8;margin-top:6px;color:var(--ent-muted); }
+:root[data-theme] .enterprise-page .enterprise-contact-method { background:var(--service-panel);padding:36px;border:1px solid var(--ent-line);border-radius:6px; }
+:root[data-theme] .enterprise-page .enterprise-process li { position:relative;border-top:2px solid var(--ent-line); }
+:root[data-theme] .enterprise-page .enterprise-step-number { display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--ent-line);border-radius:50%;color:var(--service-highlight);font-size:13px; }
+@media(max-width:1100px){
+ :root[data-theme] .enterprise-page .enterprise-routing{grid-template-columns:1fr;gap:28px}
+ html.type-system[data-language] .enterprise-routing h2 br{display:none}
+ :root[data-theme] .enterprise-page .enterprise-service-grid article,
+ :root[data-theme] .enterprise-page .enterprise-service-grid article:first-child,
+ :root[data-theme] .enterprise-page .enterprise-service-grid article:last-child{gap:36px;padding:40px 24px}
+ .enterprise-service-heading{padding-left:56px}.enterprise-service-number{font-size:32px}
+}
+@media(max-width:767px){
+ :root[data-theme] .enterprise-page .enterprise-routing{padding-block:20px 32px;gap:24px}
+ :root[data-theme] .enterprise-page .enterprise-wayfinding{grid-template-columns:1fr}
+ :root[data-theme] .enterprise-page .enterprise-wayfinding a{min-height:0;padding:20px 38px 20px 42px;border-left:0;border-top:1px solid var(--ent-line);gap:6px}
+ :root[data-theme] .enterprise-page .enterprise-route-number{position:absolute;left:0;top:26px}
+ :root[data-theme] .enterprise-page .enterprise-route-arrow{top:22px;right:4px}
+ .enterprise-wayfinding strong{font-size:21px}.enterprise-wayfinding p{max-width:none;font-size:14px}
+ :root[data-theme] .enterprise-page .enterprise-services{padding-block:48px 56px}
+ :root[data-theme] .enterprise-page .enterprise-section-intro{gap:20px;margin-bottom:32px}
+ html.type-system[data-language] .enterprise-page .enterprise-section-intro h2{font-size:32px;line-height:1.4}
+ :root[data-theme] .enterprise-page .enterprise-service-grid article,
+ :root[data-theme] .enterprise-page .enterprise-service-grid article:first-child,
+ :root[data-theme] .enterprise-page .enterprise-service-grid article:last-child{grid-template-columns:1fr;gap:24px;padding:32px 18px}
+ html.type-system[data-language] .enterprise-page .enterprise-service-grid h3{font-size:28px}
+ .enterprise-service-heading{padding-left:44px}.enterprise-service-number{font-size:28px;top:0}.enterprise-service-label{font-size:14px;margin-bottom:12px}
+ .enterprise-service-action{width:100%;font-size:16px;gap:18px}
+ :root[data-theme] .enterprise-page .enterprise-contact-method{padding:24px}
+}
+@media(prefers-reduced-motion:reduce){.enterprise-wayfinding a,.enterprise-route-arrow{transition:none!important;transform:none!important}}

@@ -2,8 +2,9 @@
 const restored = "/images/products/original-restyled-v1";
 const journal = "/images/products/journal-v1";
 export const productAssets = {
-  hero: `${journal}/platform`,
-  platform: `${restored}/platform`,
+  enterpriseHero: "/images/enterprise/datacenter-v2",
+  productsHero: "/images/official/products-v3",
+  platform: "/images/official/platform-v4",
   mdExp: `${restored}/md-exp`,
   lammps: `${journal}/simulation`,
   aiAgent: `${journal}/intelligence`,

@@ -3,10 +3,14 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { assetUrl } from "@/lib/asset-url";
 import { useLanguage } from "@/components/LanguageProvider";
-import { tr } from "@/lib/i18n";
+import { Nav } from "./Nav";
+import { EditorialFooter } from "./EditorialFooter";
+import { SiteLink } from "./primitives/SiteLink";
 import Image from "next/image";
+import { OfficialHero } from "./OfficialHero";
 import { LoginPage } from "@/components/LoginPage";
 import "./community.css";
+import "./community-editorial.css";
 import {
   accountApi,
   accountUrl,
@@ -196,7 +200,7 @@ function avatarSrc(path?: string | null) {
 }
 
 export function CommunityPage() {
-  const { language, setLanguage } = useLanguage();
+  const { language } = useLanguage();
   const zh = language === "zh";
   const labels = zh ? copy.zh : copy.en;
   const [posts, setPosts] = useState<Post[]>([]);
@@ -231,6 +235,7 @@ export function CommunityPage() {
   const [moderation, setModeration] = useState<Queue | null>(null);
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
+  const [feedError, setFeedError] = useState(false);
 
   const api: Api = useCallback(
     <T,>(path: string, init: RequestInit = {}, allowRetry = true): Promise<T> =>
@@ -258,14 +263,15 @@ export function CommunityPage() {
 
   const loadPosts = useCallback(async () => {
     setLoading(true);
+    setFeedError(false);
     try {
       const data = await api<{ items: Post[]; nextOffset: number | null }>(
         `/api/v1/community/posts?order=${order}&status=${status}&q=${encodeURIComponent(query)}${category === "all" ? "" : `&category=${encodeURIComponent(category)}`}`,
       );
       setPosts(data.items);
       setNextCursor(data.nextOffset == null ? null : String(data.nextOffset));
-    } catch (error) {
-      setNotice(error instanceof Error ? error.message : labels.accountError);
+    } catch {
+      setFeedError(true);
     } finally {
       setLoading(false);
     }
@@ -411,93 +417,28 @@ export function CommunityPage() {
   };
 
   return (
-    <main className="community-page min-h-screen bg-bg-0 text-text-primary">
+    <main className="community-page community-editorial min-h-screen bg-bg-0 text-text-primary" lang={zh ? "zh-CN" : "en"}>
       <style>{`.community-page{--text-faint:#929aa4;--text-tertiary:#a1a9b2}.community-dialog{--text-faint:#929aa4;--text-tertiary:#a1a9b2}.community-page button:disabled,.community-dialog button:disabled{opacity:.5;cursor:wait}.community-page h1{text-wrap:balance}.community-dialog p,.community-page h2{overflow-wrap:anywhere}.community-page :focus-visible,.community-dialog :focus-visible{outline:2px solid var(--accent);outline-offset:3px}`}</style>
-      <header className="sticky top-0 z-40 border-b border-line bg-bg-0/90 backdrop-blur-xl">
-        <div className="forum-container forum-header">
-          <a
-            href={assetUrl("/")}
-            className="font-display text-sm font-semibold tracking-[0.18em] text-white"
-          >
-            {tr(language, "AethericAI", "以太智元")}
-          </a>
-          <nav
-            className="forum-sections"
-            aria-label={zh ? "社区板块" : "Community sections"}
-          >
-            {[
-              ["all", zh ? "社区" : "Community"],
-              ["methods", zh ? "经验" : "Methods"],
-              ["materials", zh ? "材料" : "Materials"],
-              ["simulation", zh ? "模拟" : "Simulation"],
-              ["discussion", zh ? "交流" : "Discussion"],
-            ].map(([value, label]) => (
-              <button
-                key={value}
-                aria-current={category === value ? "page" : undefined}
-                onClick={() => {
-                  setCategory(value);
-                  closeTopic();
-                }}
-              >
-                {label}
-              </button>
-            ))}
-          </nav>
-          <label className="forum-search">
-            <span className="sr-only">{labels.search}</span>
-            <input
-              aria-label={labels.search}
-              placeholder={labels.search}
-              value={search}
-              onChange={(event) => {
-                setSearch(event.target.value);
-                if (selected) closeTopic();
-              }}
-              maxLength={100}
-            />
-          </label>
-          <div className="forum-account flex items-center gap-2">
-            <button
-              aria-label={zh ? "Switch to English" : "切换中文"}
-              onClick={() => setLanguage(zh ? "en" : "zh")}
-              className="rounded-full border border-line-strong px-3 py-2 text-xs"
-            >
-              {zh ? "EN" : "中文"}
-            </button>
-            <a
-              href={assetUrl("/")}
-              className="hidden rounded-full px-3 py-2 text-xs text-text-tertiary hover:text-white sm:block"
-            >
-              {labels.home}
-            </a>
-            {profile ? (
-              <>
-                <button
-                  onClick={() => setProfileOpen(true)}
-                  className="max-w-32 truncate rounded-full border border-line-strong px-3 py-2 text-xs text-white"
-                >
-                  {profile.displayName}
-                </button>
-                <button
-                  onClick={signOut}
-                  className="rounded-full px-2 py-2 text-xs text-text-tertiary hover:text-white"
-                  aria-label={labels.signOut}
-                >
-                  {labels.signOut}
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => goLogin()}
-                className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-bg-0"
-              >
-                {labels.signIn}
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
+      <Nav />
+      {!selected && (
+        <OfficialHero id="community-title" image="/images/community/conversation-v2" imagePosition="65% 25%"
+          imageAlt={zh ? "研究者围桌交谈、分享笔记并倾听彼此的想法" : "Researchers sharing ideas around a table"}
+          eyebrow={zh ? "研究者社区" : "RESEARCH COMMUNITY"}
+          title={zh ? <>好的想法，<br /><span>始于一次交谈。</span></> : <>Good ideas begin<br /><span>with a conversation.</span></>}
+          description={zh ? "分享研究中的疑问、方法与发现。在坦诚的交流中，让彼此的探索更进一步。" : "Share questions, methods and discoveries. Find fresh perspectives in thoughtful conversations with fellow researchers."}
+          actions={<><button onClick={() => profile ? setComposeOpen(true) : goLogin(true)}>{labels.write}<span aria-hidden="true">↗</span></button><a href="#community-discussions">{zh ? "看看大家在聊什么" : "Explore conversations"}<span aria-hidden="true">↓</span></a></>}
+        />
+      )}
+      <section className="forum-container community-discovery" aria-label={zh ? "探索社区板块" : "Explore community categories"}>
+        <div className="community-section-heading"><div><h2>{zh ? "从共同关心的问题开始。" : "Start with a shared interest."}</h2></div></div>
+        <div className="community-category-grid">{[
+          ["simulation", "01", "分子模拟", "Molecular simulation", "LAMMPS · 力场 · 轨迹分析", "LAMMPS · Force fields · Trajectories"],
+          ["materials", "02", "材料研究", "Materials research", "结构 · 性能 · 计算方法", "Structures · Properties · Computation"],
+          ["methods", "03", "方法与实践", "Methods & practice", "科研工作流 · 经验复现", "Workflows · Reproducible methods"],
+          ["discussion", "04", "开放交流", "Open discussion", "想法 · 提问 · 跨领域探索", "Ideas · Questions · New perspectives"],
+        ].map(([value, number, cn, en, desc, descEn]) => <button key={value} className="community-category" aria-pressed={category === value} onClick={() => { setCategory(category === value ? "all" : value); closeTopic(); }}><span className="community-category-top">{number}<span aria-hidden="true">↗</span></span><strong>{zh ? cn : en}</strong><small>{zh ? desc : descEn}</small></button>)}</div>
+      </section>
+      <div id="community-discussions" className="forum-container community-feed-heading"><div><p className="community-eyebrow">{zh ? "社区讨论" : "THE CONVERSATION"}</p><h2>{zh ? "值得展开的每一场对话。" : "Conversations worth having."}</h2></div><label className="forum-search"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="10" cy="10" r="6" /><path d="m15 15 5 5" /></svg><span className="sr-only">{labels.search}</span><input placeholder={zh ? "搜索话题、方法或关键词…" : "Search topics, methods or keywords…"} aria-label={labels.search} value={search} maxLength={100} onChange={event => { setSearch(event.target.value); if (selected) closeTopic(); }} />{search && <button aria-label={zh ? "清除搜索" : "Clear search"} onClick={() => setSearch("")}>×</button>}</label></div>
       <nav
         className="forum-filter-bar"
         aria-label={zh ? "话题排序" : "Topic order"}
@@ -505,7 +446,7 @@ export function CommunityPage() {
         <div className="forum-container forum-filter-inner">
           {(
             [
-              ["default", zh ? "默认" : "Overview"],
+              ["default", zh ? "全部动态" : "Overview"],
               ["new", zh ? "新帖" : "New"],
               ["pinned", zh ? "置顶" : "Pinned"],
               ["popular", zh ? "热门讨论" : "Popular"],
@@ -760,7 +701,7 @@ export function CommunityPage() {
           ) : (
             <div className="forum-panel">
               <div className="forum-list-heading">
-                <h1>{zh ? "社区话题" : "Community discussions"}</h1>
+                <h2>{category === "all" ? (zh ? "全部讨论" : "All discussions") : labels[category as keyof typeof labels]}</h2>
                 <span>
                   {category === "all"
                     ? zh
@@ -769,14 +710,17 @@ export function CommunityPage() {
                     : labels[category as keyof typeof labels]}
                 </span>
               </div>
+              {category !== "all" && <div className="community-active-filter"><span>{zh ? "当前板块" : "Category"} · {labels[category as keyof typeof labels]}</span><button onClick={() => setCategory("all")}>{zh ? "查看全部" : "View all"} ×</button></div>}
               {loading ? (
                 <div className="forum-empty" role="status">
                   {zh ? "正在加载话题" : "Loading discussions"}
                 </div>
+              ) : feedError ? (
+                <div className="forum-empty" role="status"><span className="forum-empty-symbol" aria-hidden="true">↻</span><h2>{zh ? "讨论暂时未能加载" : "Discussions are temporarily unavailable"}</h2><p>{zh ? "连接社区服务后，即可查看最新讨论。你可以稍后重试，或先浏览上方研究板块。" : "We could not reach the community service. Retry shortly or explore the research categories above."}</p><button className="forum-primary" onClick={() => void loadPosts()}>{zh ? "重新加载" : "Try again"}<span aria-hidden="true">↗</span></button></div>
               ) : posts.length === 0 ? (
                 <div className="forum-empty">
                   <span className="forum-empty-symbol" aria-hidden>
-                    ＋
+                    ◇
                   </span>
                   <h2>
                     {query
@@ -844,6 +788,7 @@ export function CommunityPage() {
                           </span>
                         )}
                       </div>
+                      <p className="community-post-excerpt">{post.body}</p>
                       <div className="forum-row-meta">
                         <button onClick={() => void showProfile(post.author)}>
                           {post.author.displayName}
@@ -895,13 +840,16 @@ export function CommunityPage() {
             </div>
           )}
           <div className="forum-panel forum-compose-card">
+            <h2>{zh ? "你的经验，值得被看见。" : "Your experience matters."}</h2>
+            <p>{zh ? "一个具体的问题，一次实践的记录，都可以成为下一场讨论的起点。" : "A specific question or a record of an experiment can start a useful conversation."}</p>
             <button
               className="forum-primary"
               onClick={() => (profile ? setComposeOpen(true) : goLogin(true))}
             >
-              {zh ? "发布新话题" : "New discussion"}
+              {zh ? "发布新话题" : "New discussion"}<span aria-hidden="true">＋</span>
             </button>
           </div>
+          {profile && <div className="forum-panel community-member-account"><button onClick={() => setProfileOpen(true)}>{profile.displayName} ↗</button><button onClick={signOut}>{labels.signOut}</button></div>}
           <div className="forum-panel forum-tip">
             <h2>{zh ? "小贴士" : "A useful starting point"}</h2>
             <p>
@@ -932,8 +880,8 @@ export function CommunityPage() {
                     ? "参与讨论，认识一起做研究的人。"
                     : "Join a discussion and meet fellow researchers."
                   : zh
-                    ? "正在加载"
-                    : "Loading"}
+                    ? "成员信息暂未加载。"
+                    : "Member information is unavailable."}
               </p>
             )}
           </div>
@@ -947,7 +895,7 @@ export function CommunityPage() {
               ].map(([name, value]) => (
                 <div key={name}>
                   <dt>{name}</dt>
-                  <dd>{value ?? "…"}</dd>
+                  <dd>{value ?? "—"}</dd>
                 </div>
               ))}
             </dl>
@@ -969,6 +917,8 @@ export function CommunityPage() {
           </div>
         </aside>
       </div>
+      <div className="forum-container community-resource"><div><h2>{zh ? "把讨论中的好奇，变成学习的起点。" : "Turn curiosity into your next learning path."}</h2></div><SiteLink href="/products/learn-everything/">{zh ? "探索 Learn Everything" : "Explore Learn Everything"} ↗</SiteLink></div>
+      <EditorialFooter />
       {composeOpen && (
         <Dialog onClose={() => setComposeOpen(false)}>
           <PostForm

@@ -431,7 +431,6 @@ export function AdminPanel({
     <section className="dash-admin">
       <div className="dash-admin-heading">
         <div>
-          <p className="dash-eyebrow">ADMINISTRATION</p>
           <h2>
             {owner
               ? t("总管理员中心", "Owner administration")

@@ -1,4 +1,5 @@
 "use client";
+import { ThemeSwitch } from "./ThemeSwitch";
 
 import { useEffect, useState } from "react";
 import { LoginPage } from "./LoginPage";
@@ -9,6 +10,9 @@ import { useAccount } from "@/lib/use-account";
 import { assetUrl } from "@/lib/asset-url";
 import { BRAND } from "@/lib/site";
 import "./console.css";
+import "./console-workspace.css";
+import { ThemedProductArt } from "./ThemedProductArt";
+import { productAssets } from "@/data/productAssets";
 
 type Section = "agents" | "compute" | "jobs";
 type MdAgentState = {
@@ -124,8 +128,9 @@ export function ConsolePage() {
             <span className="console-mark" aria-hidden="true"><Mark /></span>
             {zh ? BRAND.zh : BRAND.en}
           </a>
+          <span className="console-workspace-label">{zh ? "研究工作台" : "Research workspace"}</span>
         </div>
-        <div className="console-top-actions">
+        <div className="console-top-actions"><ThemeSwitch />
           {account ? (
             <div className="console-account-wrap">
             <button className="console-account console-account-compact" onClick={() => setAccountMenuOpen((open) => !open)} aria-expanded={accountMenuOpen}
@@ -150,31 +155,34 @@ export function ConsolePage() {
 
       <div className="console-layout">
         <aside className="console-sidebar" aria-label={zh ? "控制台导航" : "Console navigation"}>
+          <p className="console-nav-label">{zh ? "工作空间" : "WORKSPACE"}</p>
           {sidebar.map(([id, label]) => (
-            <button key={id} className={section === id ? "active" : ""} onClick={() => setSection(id)}>
-              <span aria-hidden="true">{id === "agents" ? "▦" : id === "compute" ? "▤" : id === "jobs" ? "▣" : "⚙"}</span>
+            <button key={id} className={section === id ? "active" : ""} onClick={() => setSection(id)} aria-current={section === id ? "page" : undefined}>
+              <WorkspaceGlyph kind={id} />
               {label}
             </button>
           ))}
+          <div className="console-sidebar-help"><p>{zh ? "让工具适合你的研究。" : "Tools for the way you research."}</p><a href={assetUrl("/enterprise/#contact")}>{zh ? "联系团队" : "Contact our team"}<span aria-hidden="true">↗</span></a><a href={assetUrl("/products/")}>{zh ? "浏览产品" : "Explore products"}<span aria-hidden="true">↗</span></a></div>
         </aside>
 
         <section className="console-content">
-          {notice && <div className="console-notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
+          <div className="console-page-heading"><div><p className="console-breadcrumb">{zh ? "控制台" : "Console"}<span aria-hidden="true"> / </span>{sidebar.find(([id]) => id === section)?.[1]}</p><h1>{section === "agents" ? (zh ? "从一个研究问题开始。" : "Start with a research question.") : section === "compute" ? (zh ? "连接你的计算环境。" : "Connect your compute.") : (zh ? "研究任务，集中管理。" : "Your research, in one place.")}</h1><p>{section === "agents" ? (zh ? "选择适合的智能体，开展建模、计算与结果分析。" : "Choose an agent for modeling, computation and analysis.") : section === "compute" ? (zh ? "查看平台资源，或了解如何接入团队已有的算力。" : "Review platform resources or explore connecting your infrastructure.") : (zh ? "计算任务功能开放后，可在这里查看运行进展与结果。" : "Once available, track your jobs and results here.")}</p></div><a className="console-back-home" href={assetUrl("/")}>{zh ? "返回官网" : "Back to website"}<span aria-hidden="true">↗</span></a></div>
+          {notice && <div className="console-notice" role="status">{notice}<button aria-label={zh ? "关闭提示" : "Dismiss notification"} onClick={() => setNotice("")}>×</button></div>}
 
           {section === "agents" && <>
             <div className="agent-list">
               {agents.map((agent) => (
                 <article key={agent.id} className={`agent-card ${agent.status === "available" ? "available" : ""}`}>
-                  <img src={assetUrl(agent.image)} alt="" />
-                  <div className="agent-copy"><h2>{agent.title}</h2><p className="agent-description">{agent.description}</p><div className="agent-tags">{agent.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
-                  <button className="agent-action" disabled={agent.status !== "available" || enteringMdExp} onClick={() => void enterMdExp()}>{agent.status === "available" ? (enteringMdExp ? (zh ? "正在打开…" : "Opening…") : (zh ? "进入智能体  →" : "Open agent  →")) : (zh ? "敬请期待" : "Stay tuned")}</button>
+                  <div className="agent-art"><ThemedProductArt base={agent.id === "md-exp" ? productAssets.mdExp : agent.id === "gromacs" ? productAssets.biology : agent.id === "dft" ? productAssets.materials : productAssets.platform} sizes="(max-width:620px) 90vw, 210px" /></div>
+                  <div className="agent-copy"><div className="agent-edition"><span>{agent.id === "md-exp" ? "MD EXP" : agent.id === "gromacs" ? "BIOMOLECULAR" : agent.id === "dft" ? "ELECTRONIC STRUCTURE" : "TRAJECTORY ANALYSIS"}</span><span className="agent-availability">{agent.status === "available" ? (zh ? "已开放" : "Available") : (zh ? "规划中" : "Planned")}</span></div><h2>{agent.title}</h2><p className="agent-description">{agent.description}</p><div className="agent-tags">{agent.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
+                  <div className="agent-action-area"><button className="agent-action" disabled={agent.status !== "available" || enteringMdExp} onClick={() => void enterMdExp()}>{agent.status === "available" ? (enteringMdExp ? (zh ? "正在打开…" : "Opening…") : (zh ? "进入智能体  →" : "Open agent  →")) : (zh ? "尚未开放" : "Not yet available")}</button>{agent.status === "available" && <p>{zh ? "使用前需登录并获得对应产品资格。" : "Sign-in and product access are required."}</p>}</div>
                 </article>
               ))}
             </div>
           </>}
 
           {section === "compute" && <ComputePanel zh={zh} />}
-          {section === "jobs" && <StatusPanel title={zh ? "计算任务" : "Compute jobs"} title2={zh ? "尚未开放" : "Not available yet"} body={zh ? "完成超算适配和作业状态契约后，这里会显示本人任务、日志、结果和取消状态。" : "Personal jobs, logs, artifacts and cancellation will appear after the HPC contract is integrated."} />}
+          {section === "jobs" && <StatusPanel title={zh ? "任务中心正在准备中" : "Your job center is on its way"} title2={zh ? "尚未开放" : "Not available yet"} body={zh ? "未来将在这里集中查看任务进度、运行日志与计算结果。当前可先从智能体目录开始研究。" : "Track progress, logs and computation results here when available. For now, start from the agent catalog."} />}
         </section>
       </div>
       {loginOpen && <LoginPage overlay onClose={() => setLoginOpen(false)} />}
@@ -191,14 +199,17 @@ function UserGlyph() {
   );
 }
 
+function WorkspaceGlyph({ kind }: { kind: Section }) {
+  return <svg className="workspace-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{kind === "agents" ? <><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></> : kind === "compute" ? <><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01M12 6.5h5M12 17.5h5"/></> : <><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></>}</svg>;
+}
+
 function StatusPanel({ title, title2, body }: { title: string; title2: string; body: string }) {
-  return <section className="console-status-panel"><p className="console-kicker">AETHERICAI / STATUS</p><h2>{title}</h2><span>{title2}</span><p>{body}</p></section>;
+  return <section className="console-status-panel console-empty-state"><WorkspaceGlyph kind="jobs"/><span>{title2}</span><h2>{title}</h2><p>{body}</p></section>;
 }
 
 function ComputePanel({ zh }: { zh: boolean }) {
   return (
     <section className="console-status-panel console-compute-panel">
-      <p className="console-kicker">AETHERICAI / COMPUTE</p>
       <h2>{zh ? "超算连接" : "Compute connection"}</h2>
       <div className="compute-options">
         <article className="compute-option compute-option-provided">
@@ -215,7 +226,7 @@ function ComputePanel({ zh }: { zh: boolean }) {
             <strong>{zh ? "联系客服" : "Contact support"}</strong>
           </div>
           <p>{zh ? "如需接入自有超算资源，请联系客服完成连接配置。" : "Contact support to configure access to your own compute resources."}</p>
-          <button className="compute-contact" type="button">{zh ? "联系客服" : "Contact support"} →</button>
+          <a className="compute-contact" href={assetUrl("/enterprise/#contact")}>{zh ? "咨询接入方案" : "Discuss integration"} <span aria-hidden="true">→</span></a>
         </article>
       </div>
     </section>

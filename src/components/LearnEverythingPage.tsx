@@ -2,6 +2,10 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Nav } from "./Nav";
+import { OfficialHero } from "./OfficialHero";
+import { LearningRouteDemo } from "./LearningRouteDemo";
+import { SiteLink } from "./primitives/SiteLink";
+import { EditorialFooter } from "./EditorialFooter";
 import { LoginPage } from "./LoginPage";
 import { useLanguage } from "./LanguageProvider";
 import {
@@ -153,80 +157,44 @@ export function LearnEverythingPage() {
     }
   }
 
+  const examples = [
+    { title: t("分子动力学入门", "Molecular dynamics"), question: t("我想从零开始，理解并运行一次分子动力学模拟。", "I want to understand and run my first molecular dynamics simulation."), nodes: [t("原子与分子模型", "Atoms & molecular models"), t("势函数与力场", "Potentials & force fields"), t("积分方法与系综", "Integration & ensembles"), t("运行 LAMMPS 模拟", "Run a LAMMPS simulation")] },
+    { title: t("机器学习基础", "Machine learning"), question: t("我有 Python 基础，想理解机器学习的核心方法。", "I know Python and want to understand the core methods of machine learning."), nodes: [t("数据与特征", "Data & features"), t("回归与分类", "Regression & classification"), t("模型训练与评估", "Training & evaluation"), t("完成一个预测项目", "Build a prediction project")] },
+    { title: t("材料科学探索", "Materials science"), question: t("我想理解材料的微观结构如何影响宏观性能。", "I want to understand how microstructure influences material properties."), nodes: [t("晶体结构", "Crystal structures"), t("缺陷与界面", "Defects & interfaces"), t("结构与性能关系", "Structure–property relations"), t("分析一个材料体系", "Analyze a material system")] },
+  ];
+  const accessLabel = opening ? t("正在打开…", "Opening…") : access === "checking" ? t("正在检查…", "Checking access…") : access === "active" ? t("打开学习工作台", "Open workspace") : t("开始学习", "Start learning");
+
   return (
-    <main className="learn-page">
+    <main className="learn-page" lang={zh ? "zh-CN" : "en"}>
       <Nav />
-      <section className="learn-hero">
-        <div className="learn-container">
-          <p className="learn-kicker">LEARN EVERYTHING / SCIENCE WORKSPACE</p>
-          <h1>{t("Learn Everything 学习 Agent", "Learn Everything Learning Agent")}</h1>
-          <p>
-            {t(
-              "把一个问题变成一条可执行、可复习、可验证的学习路线。",
-              "Turn one question into an executable, reviewable and verifiable learning route.",
-            )}
-          </p>
-          <div className="learn-hero-actions">
-            <button className="learn-primary" onClick={() => void open()} disabled={opening || access === "checking"}>
-              {opening
-                ? t("正在打开…", "Opening…")
-                : access === "active"
-                  ? t("打开学习工作台", "Open learning workspace")
-                  : access === "checking"
-                    ? t("正在检查资格…", "Checking access…")
-                    : hasAccountSession()
-                      ? t("使用激活码激活", "Activate with code")
-                      : t("登录后使用", "Sign in to use")}
-            </button>
-            <a className="learn-secondary" href="#manual">
-              {t("查看操作手册", "Read the manual")} ↓
-            </a>
-          </div>
-        </div>
+      <OfficialHero id="learn-title" image="/images/official/learning-v3" imagePosition="65% 22%"
+        eyebrow={<><SiteLink href="/products/">{t("产品", "Products")}</SiteLink><span>/</span>Learn Everything</>}
+        title={<>{t("让每一份好奇，", "Follow your curiosity.")}<br /><span>{t("生长为知识。", "Build your knowledge.")}</span></>}
+        description={t("从一个问题出发，建立属于你的学习路线。让 AI 陪你理解、复习与验证，把探索变成持续积累。", "Turn a question into your own learning path. Understand, review and test with AI, and turn exploration into lasting knowledge.")}
+        actions={<><button onClick={() => void open()} disabled={opening || access === "checking"}>{accessLabel}<span aria-hidden="true">↗</span></button><a href="#learning-preview">{t("探索学习方式", "Explore how it works")}<span aria-hidden="true">↓</span></a></>}
+        note={t("官网账号登录 · 产品激活码开通", "Website account · Activation code required")}
+      />
+      <nav className="learn-section-nav" aria-label={t("页面导航", "On this page")}><div className="learn-container"><span>Learn Everything</span><div><a href="#learning-preview">{t("学习体验", "Experience")}</a><a href="#capabilities">{t("核心能力", "Capabilities")}</a><a href="#manual">{t("使用指南", "Guide")}</a></div></div></nav>
+
+      <section id="learning-preview" className="learn-container learn-section">
+        <div className="learn-section-heading"><div><h2>{t("复杂知识，从有序开始。", "Complex knowledge. A clear path.")}</h2></div><p>{t("告诉它你想学什么、已经了解什么，以及你的目标。把庞大的主题拆成可以逐步掌握的知识点。", "Start with your topic, background and goal. Break a broad subject into connected, manageable steps.")}</p></div>
+        <LearningRouteDemo examples={examples} zh={zh} />
       </section>
 
-      <section className="learn-container learn-section">
-        <h2>{t("一个完整的学习闭环", "A complete learning loop")}</h2>
-        <div className="learn-feature-grid">
-          {[
-            ["01", "生成路线", "Build a route", "输入选题、背景和目标，生成带依赖关系的分阶段学习路线。", "Generate a staged route with dependencies from your topic, background and goal."],
-            ["02", "知识库问答", "Ask your library", "上传 PDF、Word、Markdown 等资料，用引用溯源的问答理解内容。", "Ask questions over PDFs, Word files and Markdown with source-grounded answers."],
-            ["03", "复习与测验", "Review and test", "FSRS 间隔复习、薄弱点测验和掌握度更新连在一起。", "FSRS review, weak-point quizzes and mastery updates work together."],
-            ["04", "看板与导出", "Track and export", "查看学习记录、日报和掌握度，并导出 Markdown、Anki 或打印报告。", "Track study records and mastery, then export Markdown, Anki or printable reports."],
-          ].map(([number, title, enTitle, body, enBody]) => (
-            <article key={number}>
-              <b>{number}</b>
-              <h3>{t(title, enTitle)}</h3>
-              <p>{t(body, enBody)}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+      <section id="capabilities" className="learn-capabilities"><div className="learn-container learn-section">
+        <div className="learn-section-heading"><div><h2>{t("学过之后，还能真正掌握。", "Go beyond the first read.")}</h2></div><p>{t("把阅读、思考和练习连接起来，在同一个工作台中完成学习与复盘。", "Bring reading, thinking and practice together. Study and reflect in one workspace.")}</p></div>
+        <div className="learn-feature-grid">{[
+          ["01", "有依据的知识问答", "Answers with sources", "围绕 PDF、Word、Markdown 和笔记提问，通过引用回到原始资料。", "Ask questions about PDFs, Word documents, Markdown and notes. Follow citations back to the source."],
+          ["02", "以讲解加深理解", "Learn by explaining", "在助教、费曼讲解和苏格拉底提问之间切换，逐个理解路线上的知识点。", "Work through each concept with tutor, Feynman explanation and Socratic questioning modes."],
+          ["03", "在合适的时间复习", "Review at the right time", "用 FSRS 间隔复习安排下一次回顾，通过薄弱点测验发现尚未掌握的内容。", "Schedule spaced review with FSRS and use focused quizzes to find gaps in understanding."],
+          ["04", "让积累看得见", "See your progress", "查看掌握度、学习热力图和日报，把成果导出为 Markdown、Anki 或打印报告。", "Explore mastery, study heatmaps and daily reports. Export to Markdown, Anki or print."],
+        ].map(([number, title, enTitle, body, enBody]) => <article key={number}><div className="learn-feature-top"><span>{number}</span><svg aria-hidden="true" viewBox="0 0 40 40"><path d={number === "01" ? "M10 6h15l6 6v22H10z M24 6v8h7 M15 20h11 M15 25h8" : number === "02" ? "M6 8h28v20H20l-8 7v-7H6z M12 15h16 M12 21h10" : number === "03" ? "M32 14A14 14 0 1 0 34 25 M32 5v10H22 M20 12v9l6 4" : "M7 32h28 M11 27V17h4v10 M21 27V9h4v18 M31 27V4h4v23"} /></svg></div><h3>{t(title, enTitle)}</h3><p>{t(body, enBody)}</p></article>)}</div>
+        <p className="learn-library-note">{t("资料库目前为共享空间，请仅上传可供其他使用者访问的资料。个人学习路线、笔记与进度按账号隔离。", "The library is currently shared. Upload only materials you can share with other users. Personal routes, notes and progress are isolated by account.")}</p>
+      </div></section>
 
-      <section id="manual" className="learn-container learn-section learn-manual">
-        <div>
-          <p className="learn-kicker">OPERATION MANUAL</p>
-          <h2>{t("操作说明", "How to use it")}</h2>
-          <p className="learn-manual-intro">
-            {t(
-              "以下内容根据 Learn Everything 使用指南整理，并适配官网账号、激活码与服务器版操作流程。",
-              "This manual adapts the Learn Everything guide to website accounts, activation codes and the server workflow.",
-            )}
-          </p>
-        </div>
-        <div className="learn-manual-groups">
-          {MANUAL.map((group) => (
-            <article className="learn-manual-group" key={group.title.en}>
-              <h3>{t(group.title.zh, group.title.en)}</h3>
-              <ol>
-                {group.items.map((item) => (
-                  <li key={item.en}>{t(item.zh, item.en)}</li>
-                ))}
-              </ol>
-            </article>
-          ))}
-        </div>
-      </section>
+      <section id="manual" className="learn-container learn-section learn-manual"><div><h2>{t("从这里，开始探索。", "Your starting point.")}</h2><p className="learn-manual-intro">{t("从激活账号到完成第一次学习，在这里找到操作步骤和常见问题。", "From activating access to your first study session. Find the steps and answers here.")}</p><SiteLink className="learn-text-link" href="/community/">{t("到社区交流", "Ask the community")} ↗</SiteLink></div><div className="learn-manual-groups">{MANUAL.map((group, index) => <details className="learn-manual-group" key={group.title.en} open={index === 0}><summary><span className="learn-manual-number">0{index + 1}</span><h3>{t(index === 0 ? "快速上手" : group.title.zh, index === 0 ? "Quick start" : group.title.en)}</h3><span className="learn-disclosure" aria-hidden="true">+</span></summary><ol>{group.items.map(item => <li key={item.en}>{t(item.zh, item.en)}</li>)}</ol></details>)}</div></section>
+      <section className="learn-cta"><div className="learn-container"><div><h2>{t("下一个想理解的问题，是什么？", "What will you understand next?")}</h2><p>{t("带着你的问题，开启一段新的学习。", "Bring a question. Begin a new learning journey.")}</p></div><button className="learn-primary" onClick={() => void open()} disabled={opening || access === "checking"}>{accessLabel}<span aria-hidden="true">↗</span></button></div></section>
+      <EditorialFooter />
 
       {error && !activationOpen && <p className="learn-container learn-error learn-page-error" role="alert">{error}</p>}
 
@@ -234,7 +202,7 @@ export function LearnEverythingPage() {
         <div className="learn-modal-backdrop">
           <section className="learn-modal" role="dialog" aria-modal="true" aria-labelledby="learn-activation-title">
             <button className="learn-modal-close" onClick={() => setActivationOpen(false)} aria-label={t("关闭", "Close")}>×</button>
-            <p className="learn-kicker">PRODUCT ACTIVATION</p>
+
             <h2 id="learn-activation-title">{t("激活 Learn Everything", "Activate Learn Everything")}</h2>
             <p>{t("输入总管理员发放的产品激活码。激活成功后即可打开学习工作台。", "Enter a product activation code issued by the owner to open the learning workspace.")}</p>
             <form onSubmit={(event) => void redeem(event)}>

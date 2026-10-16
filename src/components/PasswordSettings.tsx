@@ -68,7 +68,6 @@ export function PasswordSettings({ zh, phoneMasked, onClose }: { zh: boolean; ph
   return <div className="dash-modal-backdrop">
     <section className="dash-modal dash-password-modal" role="dialog" aria-modal="true" aria-labelledby="password-title">
       <button className="dash-modal-close" onClick={onClose} disabled={busy} aria-label={t("关闭", "Close")}>×</button>
-      <p className="dash-eyebrow">ACCOUNT SECURITY</p>
       <h2 id="password-title">{hasPassword ? t("修改登录密码", "Change password") : t("设置登录密码", "Set password")}</h2>
       <p>{t("绑定手机号", "Bound phone")}: {phoneMasked}<br />
         {t("每次设置或修改均需短信验证。保存后所有设备需重新登录。", "SMS verification is required each time. All devices will need to sign in again after saving.")}</p>

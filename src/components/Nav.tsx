@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ThemeSwitch } from "./ThemeSwitch";
 import { BRAND } from "@/lib/site";
 import { navigation, productNavigation } from "@/data/navigation";
 import { usePathname } from "next/navigation";
@@ -107,7 +108,7 @@ export function Nav() {
                 <div><p className="nav-preview-title">{t(item.title)}</p><p className="nav-preview-description">{t(item.description)}</p>
                   <SiteLink className="nav-preview-cta" href={item.href} onClick={closeNavigation}>{tr(language, "Explore", "进入")}{language === "zh" ? item.title[1] : ` ${item.title[0]}`} <span aria-hidden="true">↗</span></SiteLink>
                 </div>
-                <div className={`nav-preview-topics${item.id === "products" ? " nav-product-grid" : ""}`}>{item.id === "products" ? productNavigation.map(product => <SiteLink key={product.id} href={`/products/#product-${product.id}`} onClick={closeNavigation}>{t(product.title)}<span aria-hidden="true">↗</span></SiteLink>) : item.topics.map((topic, index) => <SiteLink key={topic[0]} href={item.href + (["enterprise","careers","about"].includes(item.id) ? `#detail-${index}` : "")} onClick={closeNavigation}>{t(topic)}<span aria-hidden="true">↗</span></SiteLink>)}</div>
+                <div className={`nav-preview-topics${item.id === "products" ? " nav-product-grid" : ""}`}>{item.id === "products" ? productNavigation.map(product => <SiteLink key={product.id} href={`/products/${product.id}/`} onClick={closeNavigation}>{t(product.title)}<span aria-hidden="true">↗</span></SiteLink>) : item.topics.map((topic, index) => <SiteLink key={topic[0]} href={item.href + (["enterprise","careers","about"].includes(item.id) ? `#detail-${index}` : "")} onClick={closeNavigation}>{t(topic)}<span aria-hidden="true">↗</span></SiteLink>)}</div>
               </div>
             </div>}
           </div>)}
@@ -147,6 +148,7 @@ export function Nav() {
             </button>
           </div>
 
+          <ThemeSwitch />
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -196,7 +198,7 @@ export function Nav() {
           {navigation.map(item => <div key={item.id}><SiteLink href={item.href} onClick={closeNavigation} className="nav-mobile-link">
             <span>{t(item.title)} <span aria-hidden="true">↗</span></span>
             <small>{t(item.description)}</small>
-          </SiteLink>{item.id === "products" && <div className="nav-mobile-products">{productNavigation.map(product => <SiteLink key={product.id} href={`/products/#product-${product.id}`} onClick={closeNavigation}>{t(product.title)} <span aria-hidden="true">↗</span></SiteLink>)}</div>}</div>)}
+          </SiteLink>{item.id === "products" && <div className="nav-mobile-products">{productNavigation.map(product => <SiteLink key={product.id} href={`/products/${product.id}/`} onClick={closeNavigation}>{t(product.title)} <span aria-hidden="true">↗</span></SiteLink>)}</div>}</div>)}
           <button
             type="button"
             onClick={() => { setOpen(false); enterAccount(); }}

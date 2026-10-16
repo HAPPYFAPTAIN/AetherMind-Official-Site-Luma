@@ -29,7 +29,7 @@ const RESEARCH: {
   {
     image: "g01-04-materials-science",
     name: ["Materials", "材料科学"],
-    href: "/products/#product-materials",
+    href: "/products/materials/",
     link: ["Explore materials computing", "了解材料计算"],
     title: ["A new perspective on matter.", "看见材料的另一种可能。"],
     copy: [
@@ -40,7 +40,7 @@ const RESEARCH: {
   {
     image: "g01-05-computational-chemistry",
     name: ["Chemistry", "计算化学"],
-    href: "/products/#product-chemistry",
+    href: "/products/chemistry/",
     link: ["Explore computational chemistry", "了解计算化学"],
     title: [
       "Follow the energy. Find the mechanism.",
@@ -54,7 +54,7 @@ const RESEARCH: {
   {
     image: "g01-02-molecular-dynamics",
     name: ["Molecular dynamics", "分子动力学"],
-    href: "/products/#product-md-exp",
+    href: "/products/md-exp/",
     link: ["Explore MD EXP", "了解 MD EXP"],
     title: ["Every motion tells a story.", "每一次运动，都有迹可循。"],
     copy: [
@@ -427,7 +427,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
           aria-label={t("Scroll to explore", "向下探索")}
         >
           <span />
-          {t("A closer look", "向未知，再近一步")}
+          {t("Explore the platform", "了解平台")}
         </a>
       </section>
       <section
@@ -480,12 +480,7 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
             <span aria-hidden="true">↗</span>
           </SiteLink>
         </div>
-        <div className="luma-chapter-foot">
-          <span>LAMMPS</span>
-          <span>
-            {t("Structure / Trajectory / Analysis", "结构 / 轨迹 / 分析")}
-          </span>
-        </div>
+        <div className="luma-chapter-foot"><span>LAMMPS</span></div>
       </section>
       <ComputeWorkflow />
       <section
@@ -519,10 +514,6 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
             <i />
             <span>{t("Prediction", "预测")}</span>
           </div>
-        </div>
-        <div className="luma-chapter-foot">
-          <span>{t("Physics meets intelligence", "物理与智能，在此相遇")}</span>
-          <span>{t("Learn / Predict / Validate", "学习 / 预测 / 验证")}</span>
         </div>
       </section>
       <section
@@ -694,9 +685,6 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
           </div>
         </div>
         <div className="luma-chapter-copy">
-          <span className="luma-section-name">
-            {t("Built around your research", "围绕你的研究而构建")}
-          </span>
           <h2 id="infrastructure-title">
             {t("Your science.", "你的研究。")}
             <br />
@@ -713,12 +701,6 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
             {t("Enterprise services", "了解企业服务")}
           </SiteLink>
         </div>
-        <div className="luma-chapter-foot">
-          <span>{t("Computing built for research teams", "面向科研团队的计算服务")}</span>
-          <span>
-            {t("Private / On-premise / Hybrid", "私有云 / 本地 / 混合")}
-          </span>
-        </div>
       </section>
       <DeploymentOptions />
       <section
@@ -727,9 +709,6 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
         aria-labelledby="finale-title"
       >
         <div className="luma-finale-copy">
-          <span className="luma-finale-kicker">
-            {t("The next question is yours.", "下一个问题，由你提出。")}
-          </span>
           <h2 id="finale-title">
             {t("Imagine what's next.", "想象，下一次发现。")}
           </h2>
@@ -753,16 +732,16 @@ function ImmersiveHomeContent({ restartAtTop }: { restartAtTop: boolean }) {
           </div>
           {[
             {title:["Platform & agents","平台与智能体"],links:[
-              ["AetherMind Platform","以太智元平台","/products/#product-platform"],
-              ["MD EXP","MD EXP","/products/#product-md-exp"],
-              ["Science Agents","科学智能体","/products/#product-agent"],
-              ["Learn Everything","学习 Agent","/products/#product-learn-everything"],
+              ["AetherMind Platform","以太智元平台","/products/platform/"],
+              ["MD EXP","MD EXP","/products/md-exp/"],
+              ["Science Agents","科学智能体","/products/agent/"],
+              ["Learn Everything","学习 Agent","/products/learn-everything/"],
             ]},
             {title:["Scientific computing","科学计算"],links:[
-              ["LAMMPS Engine","LAMMPS 计算引擎","/products/#product-lammps"],
-              ["Materials Computing","材料计算","/products/#product-materials"],
-              ["Chemistry & Molecules","化学与分子计算","/products/#product-chemistry"],
-              ["Biological Computing","生物计算","/products/#product-biology"],
+              ["LAMMPS Engine","LAMMPS 计算引擎","/products/lammps/"],
+              ["Materials Computing","材料计算","/products/materials/"],
+              ["Chemistry & Molecules","化学与分子计算","/products/chemistry/"],
+              ["Biological Computing","生物计算","/products/biology/"],
             ]},
             {title:["Enterprise services","企业服务"],links:[
               ["Private deployment","私有化部署","/enterprise/#detail-0"],

@@ -1,0 +1,164 @@
+/* Shared reading system. The approved home hero remains a separate brand treatment. */
+:root {
+  --font-ui: var(--font-inter), var(--font-noto-sans), "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-heading: var(--font-inter-tight), var(--font-noto-sans), "PingFang SC", "Microsoft YaHei", sans-serif;
+  --type-ink: #e5eaee;
+  --type-copy: #b3bfc9;
+  --type-muted: #8b9eac;
+  --type-rule: #adcad826;
+}
+:root[data-theme="light"] {
+  --type-ink: #263238;
+  --type-copy: #52616a;
+  --type-muted: #657780;
+  --type-rule: #263f4e29;
+}
+html.type-system body,
+html.type-system[data-language="zh"] body {
+  font-family: var(--font-ui);
+  font-optical-sizing: auto;
+  font-kerning: normal;
+  line-height: 1.65;
+}
+html.type-system[data-language] body main :is(h1:not(.luma-hero-title), h2, h3),
+html.type-system[data-language] .font-display:not(.brand-name) {
+  font-family: var(--font-heading);
+  text-wrap: balance;
+}
+html.type-system[data-language] body main :where(h1:not(.luma-hero-title), h2, h3),
+html.type-system[data-language] .font-display:not(.brand-name) {
+  font-weight: 500;
+}
+html.type-system[data-language] body main :is(h2, h3) {
+  letter-spacing: -.025em;
+}
+html.type-system[data-language="zh"] body main :is(h2, h3) {
+  letter-spacing: -.015em;
+}
+html.type-system[data-language] body :is(.products-hero, .information-hero, .learn-hero, .community-hero, .detail-copy) h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(42px, 4.6vw, 72px);
+  font-weight: 450;
+  letter-spacing: -.045em;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+html.type-system[data-language="zh"] body :is(.products-hero, .information-hero, .learn-hero, .community-hero, .detail-copy) h1 {
+  font-size: clamp(36px, 3.8vw, 60px);
+  letter-spacing: -.025em;
+  line-height: 1.3;
+}
+html.type-system[data-language] :is(.products-hero-description, .information-lead, .learn-hero-description, .community-hero-description, .detail-description) {
+  font-size: clamp(16px, 1.3vw, 19px);
+  font-weight: 400;
+  line-height: 1.9;
+  letter-spacing: 0;
+  max-width: 32em;
+  color: var(--type-copy);
+  text-wrap: pretty;
+}
+html.type-system[data-language] :is(.products-eyebrow, .information-label, .community-eyebrow) {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.7;
+  letter-spacing: .09em;
+  color: var(--type-muted);
+}
+html.type-system[data-language] :is(.products-catalog-heading, .learn-section-heading, .community-section-heading, .research-process, .careers-role) h2 {
+  font-size: clamp(27px, 2.5vw, 38px);
+  font-weight: 450;
+  line-height: 1.4;
+  color: var(--type-ink);
+}
+html.type-system[data-language] :is(.information-details, .role-columns, .research-process, .careers-role, .contact-card, .legal-page) p,
+html.type-system[data-language] :is(.role-columns, .legal-page) li {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.9;
+  color: var(--type-copy);
+  text-wrap: pretty;
+}
+html.type-system[data-language] .information-details h2 {
+  font-size: 26px;
+  font-weight: 450;
+  line-height: 1.45;
+  color: var(--type-ink);
+}
+html.type-system[data-language] :is(.product-card h3, .community-category > strong) {
+  font-family: var(--font-heading);
+  font-size: clamp(21px, 1.8vw, 26px);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -.02em;
+}
+html.type-system[data-language] :is(.product-card-description, .product-description, .products-catalog-heading > p) {
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--type-copy);
+}
+html.type-system[data-language] .products-footer p:not(.products-eyebrow) {
+  font-family: var(--font-heading);
+  font-weight: 450;
+  letter-spacing: -.02em;
+}
+html.type-system[data-language] .site-navigation .nav-destination {
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0;
+}
+/* Below the home hero: generous line spacing with quieter section labels. */
+html.type-system[data-language] .luma-home h2 {
+  font-weight: 450;
+  line-height: 1.28;
+  letter-spacing: -.035em;
+}
+html.type-system[data-language="zh"] .luma-home h2 {
+  line-height: 1.35;
+  letter-spacing: -.025em;
+}
+html.type-system[data-language] .luma-home .luma-section-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #95a7b4;
+  letter-spacing: .08em;
+  margin-bottom: 28px;
+}
+html.type-system[data-language] .luma-home :is(.luma-chapter-copy p, .luma-statement-note, .luma-research-heading > p, .luma-research-caption p, .luma-workflow-heading p, .luma-step-copy) {
+  font-size: clamp(16px, 1.25vw, 19px);
+  font-weight: 400;
+  line-height: 1.85;
+  letter-spacing: 0;
+  color: #b7c3cc;
+}
+html.type-system[data-language] .luma-home .luma-text-link {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.6;
+  gap: 28px;
+  border-bottom-color: #c8d4dc50;
+}
+html.type-system[data-language] .luma-home .luma-workflow-steps strong {
+  font-weight: 500;
+}
+/* Keep the first screen's original Chinese UI and brand fonts untouched. */
+html.type-system[data-language="zh"] .luma-hero {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", var(--font-inter), sans-serif;
+}
+@media(max-width:767px) {
+  html.type-system[data-language] body :is(.products-hero, .information-hero, .learn-hero, .community-hero, .detail-copy) h1 {
+    font-size: clamp(32px, 8.5vw, 48px);
+    line-height: 1.25;
+    letter-spacing: -.03em;
+  }
+  html.type-system[data-language="zh"] body :is(.products-hero, .information-hero, .learn-hero, .community-hero, .detail-copy) h1 {
+    font-size: clamp(30px, 7.8vw, 42px);
+    line-height: 1.38;
+    letter-spacing: -.02em;
+  }
+  html.type-system[data-language] :is(.products-hero-description, .information-lead, .learn-hero-description, .community-hero-description, .detail-description) {
+    font-size: 16px;
+    line-height: 1.85;
+  }
+  html.type-system[data-language] .information-details h2 { font-size: 23px; }
+}

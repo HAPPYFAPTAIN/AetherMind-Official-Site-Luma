@@ -1,0 +1,43 @@
+/* A single primary-action palette across public interior pages. Literal white
+   avoids inheriting the light theme's remapped text-white utility. */
+:root { --action-fill:#096f98;--action-hover:#075676;--action-text:#fff;--action-ring:#27cce6; }
+html:root[data-theme="dark"] body .enterprise-page {--ent-ground:#0c151d;--ent-surface:#12212c;--ent-ink:#edf4f8;--ent-muted:#afc1cc;--ent-soft:#819daa;--ent-line:#a9ccdf26;--ent-accent:#65d7ef}
+html:root[data-theme="dark"] body .enterprise-backdrop::after {background:linear-gradient(0deg,var(--ent-ground),transparent 42%),linear-gradient(90deg,#0c151df5 0%,#0c151dcc 30%,#0c151d59 57%,#0c151d0a 85%)}
+html:root[data-theme="dark"] body .enterprise-page h1 span {color:#76d4ed}
+html:root[data-theme] body .community-page.community-editorial {--community-ground:#0d171f;--community-surface:#132530;--community-ink:#eaf2f7;--community-muted:#aabecb;--community-soft:#83a0b3;--community-rule:#bdd7e526;--community-button:var(--action-fill);--community-button-ink:#fff}
+html:root[data-theme="light"] body .community-page.community-editorial {--community-ground:#f1f5f7;--community-surface:#e5eff5;--community-ink:#203746;--community-muted:#4e6878;--community-soft:#617f90;--community-rule:#254a6226}
+html:root[data-theme] body .community-editorial .community-category[aria-pressed=true] {background:var(--community-surface);box-shadow:inset 0 -2px #27cce6}
+html:root[data-theme] body .community-editorial .forum-filter-inner button[aria-pressed=true]::after {background:#27cce6}
+html:root[data-theme] body .community-editorial .community-resource>a {color:var(--community-ink)}
+html:root[data-theme] body .community-editorial .forum-compose-card {background:var(--community-surface)}
+html:root[data-theme] body :is(.products-browse,.information-contact,.enterprise-primary,.enterprise-service-action,.learn-primary,.community-editorial .forum-primary) {
+ background:var(--action-fill);color:var(--action-text);border:1px solid var(--action-fill);border-radius:5px;
+ min-height:52px;padding:13px 23px;font-size:16px;font-weight:600;line-height:1.5;text-decoration:none;
+ box-shadow:inset 0 1px 0 #ffffff12;transition:background .2s,box-shadow .2s,transform .2s;
+}
+html:root[data-theme] body :is(.products-browse,.information-contact,.enterprise-primary,.enterprise-service-action,.learn-primary,.community-editorial .forum-primary):hover:not(:disabled) {
+ background:var(--action-hover);border-color:var(--action-hover);color:#fff;filter:none;transform:translateY(-1px);box-shadow:0 5px 16px #102b2420;
+}
+html:root[data-theme] body :is(.products-browse,.information-contact,.enterprise-primary,.enterprise-service-action,.learn-primary,.community-editorial .forum-primary):focus-visible { outline:2px solid var(--action-ring);outline-offset:4px; }
+html:root[data-theme] body :is(.learn-primary,.community-editorial .forum-primary):disabled { opacity:.5;cursor:not-allowed;transform:none; }
+html:root[data-theme] body .enterprise-hero h1 { color:var(--ent-ink); }
+html.type-system[data-language] body :is(.products-catalog-heading,.learn-section-heading,.community-section-heading,.research-process,.careers-role) h2 {font-size:clamp(30px,3vw,44px);font-weight:550;letter-spacing:-.035em;line-height:1.35}
+html.type-system[data-language] body .information-details h2 {font-size:clamp(28px,2.7vw,38px);font-weight:550;line-height:1.4}
+html.type-system[data-language] body .product-card h3 {font-size:clamp(23px,2vw,29px);font-weight:550;line-height:1.35}
+html:root[data-theme] body .products-page .product-detail {background:transparent;border:0;border-top:1px solid var(--line-strong);border-radius:0;padding:17px 0 6px;min-height:52px;color:var(--text-primary);font-weight:600}
+html:root[data-theme] body .products-page .product-detail:hover {color:var(--accent);border-color:var(--accent);background:transparent}
+.product-guidance {display:flex;align-items:center;justify-content:space-between;gap:48px;margin-block:40px 80px;padding:42px;border:1px solid var(--line-strong);border-left:3px solid var(--action-fill);background:var(--bg-2)}
+html.type-system[data-language] .product-guidance h2 {font-size:clamp(26px,2.7vw,38px);font-weight:550;line-height:1.4}
+.product-guidance p {font-size:17px;line-height:1.8;color:var(--text-secondary);margin-top:14px;max-width:650px}
+.product-guidance .products-browse {flex-shrink:0;margin-top:0;gap:32px}
+html:root[data-theme] .community-editorial .community-hero-actions>a {font-size:16px;min-height:48px;border-bottom:1px solid var(--community-rule)}
+html:root[data-theme] .community-editorial .community-category {transition:background .2s,border-color .2s}
+html:root[data-theme] .community-editorial .community-category:hover {background:var(--community-surface);border-color:var(--community-muted)}
+.information-page .information-details article {border-top:1px solid var(--line-strong)}
+@media(max-width:767px){
+ .product-guidance{flex-direction:column;align-items:stretch;gap:24px;padding:28px 24px;margin-block:24px 48px}
+ .product-guidance .products-browse{justify-content:space-between;align-self:flex-start}
+ html.type-system[data-language] body :is(.products-catalog-heading,.learn-section-heading,.community-section-heading,.research-process,.careers-role) h2{font-size:29px}
+ html:root[data-theme] body :is(.products-browse,.information-contact,.enterprise-primary,.enterprise-service-action,.learn-primary,.community-editorial .forum-primary){font-size:16px;padding:12px 18px;min-height:50px}
+}
+@media(prefers-reduced-motion:reduce){html:root[data-theme] body :is(.products-browse,.information-contact,.enterprise-primary,.enterprise-service-action,.learn-primary,.community-editorial .forum-primary){transition:none!important;transform:none!important}}

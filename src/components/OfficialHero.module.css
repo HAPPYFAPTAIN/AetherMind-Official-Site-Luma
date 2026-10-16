@@ -1,0 +1,36 @@
+.hero {--hero-ground:#0b1720;--hero-ink:#eff6fa;--hero-copy:#b9cbd6;--hero-accent:#6cdcf2;position:relative;isolation:isolate;overflow:hidden;background:var(--hero-ground);color:var(--hero-ink);border-bottom:1px solid #8baec022}
+:global(html[data-theme="light"]) .hero {--hero-ground:#e4ebf0;--hero-ink:#173447;--hero-copy:#3e586b;--hero-accent:#086e98}
+.art {position:absolute;inset:0;z-index:-1}
+.art img {object-fit:cover;object-position:var(--hero-position,65% 50%)}
+.art::after {content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--hero-ground) 0%,color-mix(in srgb,var(--hero-ground) 97%,transparent) 20%,color-mix(in srgb,var(--hero-ground) 78%,transparent) 36%,color-mix(in srgb,var(--hero-ground) 14%,transparent) 64%,transparent 100%),linear-gradient(0deg,var(--hero-ground),transparent 24%)}
+.inner {width:min(1320px,calc(100% - 112px));margin-inline:auto;min-height:640px;display:flex;align-items:flex-start;padding-block:112px 72px}
+.copy {position:relative;max-width:650px;width:53%}
+:global(html.type-system[data-language]) body main .hero .eyebrow {font:550 14px/1.6 var(--font-ui);letter-spacing:.08em;color:var(--hero-copy);margin:0 0 28px;display:flex;align-items:center;gap:12px}
+.eyebrow::before {content:"";width:22px;height:2px;background:#27cce6;flex-shrink:0}
+:global(html.type-system[data-language]) body main .hero .title {font-family:var(--font-heading);font-weight:550;font-size:clamp(44px,4.2vw,64px);line-height:1.14;letter-spacing:-.045em;color:var(--hero-ink);margin:0;text-wrap:balance}
+:global(html.type-system[data-language="zh"]) body main .hero .title {font-size:clamp(40px,3.65vw,56px);line-height:1.32;letter-spacing:-.035em}
+:global(html.type-system[data-language]) body main .hero .title span {color:var(--hero-accent)}
+:global(html.type-system[data-language]) body main .hero .description {font:400 18px/1.85 var(--font-ui);color:var(--hero-copy);max-width:510px;min-height:67px;margin:26px 0 0;text-wrap:pretty}
+.actions {display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-top:32px}
+:global(html:root[data-theme]) body main .hero .actions>:is(a,button) {display:inline-flex;align-items:center;justify-content:space-between;gap:28px;min-height:52px;padding:13px 22px;border:1px solid #7496aa55;border-radius:4px;margin:0;font:550 16px/1.5 var(--font-ui);text-decoration:none;background:color-mix(in srgb,var(--hero-ground) 66%,transparent);color:var(--hero-ink);box-shadow:none;transition:background .2s,border-color .2s,transform .2s}
+:global(html:root[data-theme]) body main .hero .actions>:first-child {background:#096f98;border-color:#096f98;color:#fff}
+:global(html:root[data-theme]) body main .hero .actions>:hover {transform:translateY(-2px);border-color:var(--hero-accent)}
+:global(html:root[data-theme]) body main .hero .actions>:first-child:hover {background:#075676;color:#fff;border-color:#075676}
+.actions :is(a,button):focus-visible {outline:2px solid #27cce6;outline-offset:4px}
+.actions button:disabled {opacity:.5;cursor:wait}
+.actions svg {width:20px;height:20px}
+.note {font-size:13px;line-height:1.6;color:var(--hero-copy);margin-top:18px}
+@media(max-width:1100px){.inner{width:calc(100% - 64px)}.copy{width:61%}}
+@media(max-width:767px){
+ .inner{width:calc(100% - 40px);min-height:720px;padding-block:300px 48px;align-items:flex-end}
+ .copy{width:100%;max-width:none}.art{bottom:auto;height:420px}.art img{object-position:70% 40%}
+ .art::after{background:linear-gradient(180deg,transparent 10%,color-mix(in srgb,var(--hero-ground) 12%,transparent) 35%,var(--hero-ground) 100%)}
+ :global(html.type-system[data-language]) body main .hero .eyebrow{font-size:13px;margin-bottom:20px}
+ :global(html.type-system[data-language]) body main .hero .title{font-size:clamp(33px,8.8vw,44px);line-height:1.18}
+ :global(html.type-system[data-language="zh"]) body main .hero .title{font-size:clamp(31px,8.4vw,40px);line-height:1.35}
+ :global(html.type-system[data-language]) body main .hero .description{font-size:16px;line-height:1.8;margin-top:22px;min-height:0}
+ .actions{gap:12px;margin-top:26px}
+ :global(html:root[data-theme]) body main .hero .actions>:is(a,button){min-height:50px;font-size:15px;padding:12px 17px;gap:20px}
+ .note{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){.hero .actions>:is(a,button){transition:none!important;transform:none!important}}

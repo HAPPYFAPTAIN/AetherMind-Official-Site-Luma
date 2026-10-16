@@ -1,4 +1,5 @@
 "use client";
+import { ThemeSwitch } from "./ThemeSwitch";
 
 import { FormEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
@@ -192,6 +193,7 @@ export function LoginPage({ overlay = false, onClose, returnTo: returnToProp }: 
               ×
             </a>
           )}
+          {!overlay && <ThemeSwitch />}
           {!overlay && (
             <button
               onClick={() => setLanguage(zh ? "en" : "zh")}

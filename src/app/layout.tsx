@@ -1,9 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Inter_Tight, Geist_Mono, Cormorant_Garamond, Noto_Serif_SC } from "next/font/google";
+import localFont from "next/font/local";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { BRAND } from "@/lib/site";
 import { ShowcaseLayer } from "@/components/ShowcaseLayer";
 import "./globals.css";
+import "./light-surfaces.css";
+import "./typography.css";
+import "./theme.css";
+import "./interior-layout.css";
+import "./action-design.css";
+import "./official-sections.css";
+import { ThemeProvider, themeBootScript } from "@/components/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,6 +44,15 @@ const chineseDisplay = Noto_Serif_SC({
   subsets: ["latin"],
   preload: false,
   display: "swap",
+});
+
+const chineseSans = localFont({
+  src: "./fonts/noto-sans-sc-site.woff2",
+  variable: "--font-noto-sans",
+  weight: "100 900",
+  display: "swap",
+  preload: false,
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {
@@ -71,12 +88,15 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${interTight.variable} ${geistMono.variable} ${brandDisplay.variable} ${chineseDisplay.variable}`}
+      className={`type-system ${inter.variable} ${interTight.variable} ${geistMono.variable} ${brandDisplay.variable} ${chineseDisplay.variable} ${chineseSans.variable}`}
     >
+      <head><script dangerouslySetInnerHTML={{ __html: themeBootScript }} /></head>
       <body>
         <LanguageProvider>
+          <ThemeProvider>
           {children}
           <ShowcaseLayer />
+          </ThemeProvider>
         </LanguageProvider>
       </body>
     </html>

@@ -1,4 +1,5 @@
 "use client";
+import { ThemeSwitch } from "./ThemeSwitch";
 import { useLanguage } from "./LanguageProvider";
 import { assetUrl } from "@/lib/asset-url";
 import { COMMUNITY_TERMS_VERSION } from "@/lib/community-login";
@@ -63,7 +64,7 @@ export function LegalPage() {
         <a href={assetUrl("/login/")}>
           ← {zh ? "返回登录" : "Back to sign in"}
         </a>
-        <button onClick={() => setLanguage(zh ? "en" : "zh")}>
+        <ThemeSwitch /><button onClick={() => setLanguage(zh ? "en" : "zh")}>
           {zh ? "EN" : "中文"}
         </button>
       </nav>

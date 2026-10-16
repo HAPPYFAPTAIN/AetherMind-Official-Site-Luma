@@ -1,0 +1,97 @@
+/* Public pages share a grid and rhythm. Each section keeps its own hierarchy. */
+html:root[data-theme] body :is(.enterprise-container,.information-container,.products-container,.community-editorial .forum-container,.learn-container){width:min(1320px,calc(100% - 112px));margin-inline:auto}
+html:root[data-theme] body :is(.information-page,.products-page,.learn-page,.community-editorial,.enterprise-page){--section-ground:#0b1720;--section-panel:#142733;--section-ink:#eaf3f8;--section-muted:#adc1ce;--section-line:#a1c6da26;--section-accent:#6cdcf2;background:var(--section-ground);color:var(--section-ink);padding-top:84px}
+html:root[data-theme="light"] body :is(.information-page,.products-page,.learn-page,.community-editorial,.enterprise-page){--section-ground:#dfe7ec;--section-panel:#f2f6f9;--section-ink:#142f42;--section-muted:#3e586b;--section-line:#aec0cd;--section-accent:#086b95}
+.about-overview{display:grid;grid-template-columns:1fr 1fr;gap:64px;padding-block:88px;scroll-margin-top:110px}
+.about-mission{padding:44px;background:#112c3d;color:#eff7fb;display:flex;flex-direction:column;align-items:flex-start;border-top:3px solid #27cce6}
+.about-mission .section-label{font-size:14px;color:#8fc5de;margin-bottom:32px;letter-spacing:.06em}
+html.type-system[data-language] .about-mission h2{font-size:clamp(32px,3vw,44px);font-weight:550;line-height:1.4;letter-spacing:-.035em;max-width:11em;color:#eff7fb}
+.about-mission>p:not(.section-label){font-size:18px;line-height:1.9;color:#c4d6e1;margin-top:28px}
+.about-mission>a{margin-top:36px;display:flex;justify-content:space-between;align-items:center;gap:48px;min-height:48px;padding-block:12px;border-bottom:1px solid #85b2ca80;color:#eff7fb;font-size:16px}
+.about-principles{display:grid;gap:32px}
+.about-principles article{position:relative;border-top:1px solid var(--section-line);padding-top:28px;padding-left:50px}
+.principle-number{position:absolute;top:34px;left:0;font:13px var(--font-geist-mono);color:var(--section-accent)}
+html.type-system[data-language] .about-principles h2{font-size:28px;font-weight:550;line-height:1.4;color:var(--section-ink)}
+.about-principles p{margin-top:20px;font-size:17px;line-height:1.85;color:var(--section-muted)}
+html:root[data-theme] .information-page .research-process{padding-block:72px 88px;border-top:1px solid var(--section-line)}
+html:root[data-theme] .information-page .research-process ol{gap:0;border:1px solid var(--section-line);margin-top:40px}
+.information-page .research-process li{padding:32px;border-right:1px solid var(--section-line);border-bottom:1px solid var(--section-line);background:var(--section-panel)}
+.information-page .research-process li:nth-child(3n){border-right:0}.information-page .research-process li:nth-last-child(-n+3){border-bottom:0}
+html:root[data-theme] .information-page .process-number{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;font-size:12px;letter-spacing:0;border:1px solid var(--section-line);border-radius:50%;color:var(--section-accent)}
+html.type-system[data-language] .information-page .research-process h3{font-size:23px;font-weight:550;color:var(--section-ink);margin-top:22px}
+html.type-system[data-language] .information-page .research-process li p{font-size:16px;line-height:1.7;color:var(--section-muted)}
+.careers-intro{display:grid;grid-template-columns:1fr 1fr;gap:80px;padding-block:72px;scroll-margin-top:110px}
+html.type-system[data-language] .careers-intro h2{font-size:clamp(32px,3vw,44px);max-width:10em;line-height:1.4;font-weight:550}
+.careers-intro p{font-size:18px;line-height:1.85;color:var(--section-muted)}
+.careers-intro p+p{margin-top:20px}
+html:root[data-theme] .information-page .careers-role{border:1px solid var(--section-line);border-top:3px solid #27cce6;background:var(--section-panel);padding:44px;margin-bottom:80px}
+.role-heading{display:flex;justify-content:space-between;gap:32px;align-items:center;border-bottom:1px solid var(--section-line);padding-bottom:36px}
+.role-heading .information-label{font-size:14px;margin-bottom:12px;color:var(--section-accent)}
+html:root[data-theme] .role-heading .information-contact{flex-shrink:0;margin:0}
+html:root[data-theme] .information-page .role-meta span{font-size:14px;line-height:1.5;border:0;padding:0;border-radius:0;color:var(--section-muted)}
+.role-meta span+span::before{content:"/";margin-right:12px;color:var(--section-accent)}
+html.type-system[data-language] .information-page .role-columns h3{font-size:25px;font-weight:550;color:var(--section-ink)}
+html.type-system[data-language] .information-page .role-columns li{font-size:17px;line-height:1.85;color:var(--section-muted)}
+html:root[data-theme] .information-page .role-preferred{padding:18px 22px;border-left:2px solid #27cce6;background:var(--section-ground);font-size:16px;color:var(--section-muted)}
+html:root[data-theme] .information-page .information-footer{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;align-items:center;padding-block:64px 80px;border-top:1px solid var(--section-line)}
+html.type-system[data-language] .information-page .information-footer>h2{font-size:clamp(34px,3.2vw,46px);font-weight:550;line-height:1.4;max-width:10em}
+html:root[data-theme] .information-page .contact-card{padding:28px;margin:0;border:1px solid var(--section-line);background:var(--section-panel);border-radius:4px;gap:24px}
+html.type-system[data-language] .information-page .contact-card p{font-size:15px;line-height:1.8;color:var(--section-muted)}
+html.type-system[data-language] .information-page .contact-card h3{font-size:22px;font-weight:550}
+html:root[data-theme] .products-page .products-catalog{padding-block:72px}
+html:root[data-theme] .community-editorial .community-discovery{padding-top:60px}
+html:root[data-theme] .community-editorial .community-section-heading{padding-top:0;border-top:0}
+html:root[data-theme] .community-editorial .community-category{border-top:1px solid var(--section-line);padding-top:24px}
+/* Separate light content surfaces from the page and pale product artwork. */
+html:root[data-theme="light"] body .products-page{--products-paper:#f2f6f9;--products-ink:var(--section-ink);--products-muted:var(--section-muted);--products-line:var(--section-line);--products-accent:var(--section-accent)}
+html:root[data-theme="light"] body .products-page .products-discovery{padding:16px;background:#edf3f7;border:1px solid #b6c6d1;border-radius:8px;gap:16px 24px}
+html:root[data-theme="light"] body .products-page .products-category-tabs button{color:#3e586b}
+html:root[data-theme="light"] body .products-page .products-category-tabs button:hover{background:#d9e7f0;color:#124363}
+html:root[data-theme="light"] body .products-page .products-category-tabs button[aria-pressed="true"]{background:#173e56;color:#fff;box-shadow:0 2px 5px #16384f18}
+html:root[data-theme="light"] body .products-page .products-search{padding-inline:12px;background:#f7fafc;border:1px solid #aebfcb;border-radius:4px}
+html:root[data-theme="light"] body .products-page .products-search input::placeholder{color:#50697b}
+html:root[data-theme="light"] body .products-page .products-sort select{background:#f7fafc;border:1px solid #aebfcb;border-radius:4px;padding-inline:10px}
+/* Both themes share card geometry; only the palette changes. */
+.products-page{--product-card-bg:#12232e;--product-card-line:#304957;--product-card-hover:#668fa5;--product-card-shadow:#00000014;--product-card-shadow-hover:#00000029;--product-card-muted:#afc3ce;--product-card-accent:#a2cedd;--product-button-bg:#1c3949;--product-button-line:#3d6074;--product-button-ink:#d0e9f2;--product-button-hover:#b4d8e7;--product-button-hover-ink:#102d3d}
+html:root[data-theme="light"] body .products-page{--product-card-bg:#f5f8fa;--product-card-line:#b5c5d0;--product-card-hover:#5087a7;--product-card-shadow:#173e560b;--product-card-shadow-hover:#173e561a;--product-card-muted:#496173;--product-card-accent:#08658c;--product-button-bg:#e0ebf2;--product-button-line:#b2c9d7;--product-button-ink:#174865;--product-button-hover:#173e56;--product-button-hover-ink:#fff}
+html:root[data-theme] body .products-page .product-card{border:1px solid var(--product-card-line);border-radius:8px;background:var(--product-card-bg);box-shadow:0 3px 10px var(--product-card-shadow);transition:border-color .2s,box-shadow .2s}
+html:root[data-theme] body .products-page .product-card:is(:hover,:focus-within){border-color:var(--product-card-hover);box-shadow:0 8px 24px var(--product-card-shadow-hover)}
+html:root[data-theme] body .products-page .product-image{border-radius:7px 7px 0 0;border-bottom:1px solid var(--product-card-line)}
+html:root[data-theme] body .products-page .product-card-body{padding:24px}
+html:root[data-theme] body .products-page :is(.product-state,.product-tags){color:var(--product-card-muted)}
+html:root[data-theme] body .products-page .product-meta>span:first-child{color:var(--product-card-accent);font-weight:600}
+html:root[data-theme] body .products-page .product-detail{margin-top:22px;padding:13px 16px;min-height:50px;border:1px solid var(--product-button-line);border-radius:4px;background:var(--product-button-bg);color:var(--product-button-ink)}
+html:root[data-theme] body .products-page .product-detail:hover{background:var(--product-button-hover);color:var(--product-button-hover-ink);border-color:var(--product-button-hover)}
+html:root[data-theme="light"] body .enterprise-page{--ent-ground:var(--section-ground);--ent-surface:var(--section-panel);--ent-ink:var(--section-ink);--ent-muted:var(--section-muted);--ent-line:var(--section-line);--service-panel:var(--section-panel)}
+html:root[data-theme="light"] body .community-page.community-editorial{--community-ground:var(--section-ground);--community-surface:var(--section-panel);--community-ink:var(--section-ink);--community-muted:var(--section-muted);--community-soft:#506d80;--community-rule:var(--section-line)}
+html:root[data-theme="light"] body .community-editorial :is(.community-category,.forum-main>.forum-panel){background:var(--section-panel)}
+html:root[data-theme="light"] body .community-editorial .community-category[aria-pressed="true"]{background:#cee2ee;box-shadow:inset 0 -3px #096f98}
+html:root[data-theme="light"] body .learn-page{--learn-bg:var(--section-ground);--learn-surface:var(--section-panel);--learn-line:var(--section-line);--learn-muted:var(--section-muted)}
+@media(max-width:1100px){
+ html:root[data-theme] body :is(.enterprise-container,.information-container,.products-container,.community-editorial .forum-container,.learn-container){width:calc(100% - 64px)}
+ .about-overview,.careers-intro{gap:32px}.about-mission{padding:32px}.about-principles article{padding-left:36px}
+ .role-heading{align-items:flex-start;flex-direction:column}
+ html:root[data-theme] .information-page .information-footer{gap:32px;grid-template-columns:1fr 1.4fr}
+ html:root[data-theme] .information-page .contact-card{grid-template-columns:120px 1fr;padding:24px}
+ .information-page .contact-card>a,.information-page .contact-card img{width:120px;height:120px}
+}
+@media(max-width:767px){
+ html:root[data-theme] body :is(.information-page,.products-page,.learn-page,.community-editorial,.enterprise-page){padding-top:72px}
+ html:root[data-theme] body :is(.enterprise-container,.information-container,.products-container,.community-editorial .forum-container,.learn-container){width:calc(100% - 40px)}
+ .about-overview,.careers-intro{grid-template-columns:1fr;padding-block:48px;gap:32px}
+ .about-mission{padding:28px}.about-mission .section-label{margin-bottom:24px}.about-mission>p:not(.section-label){font-size:16px}
+ html.type-system[data-language] .about-mission h2{font-size:clamp(26px,7.5vw,32px)}
+ .about-principles p,.careers-intro p{font-size:16px}
+ html.type-system[data-language] .about-principles h2{font-size:25px}
+ html:root[data-theme] .information-page .research-process{padding-block:40px 56px}
+ .information-page .research-process li{padding:22px 16px;border-right:1px solid var(--section-line)!important;border-bottom:1px solid var(--section-line)!important}
+ .information-page .research-process li:nth-child(2n){border-right:0!important}.information-page .research-process li:nth-last-child(-n+2){border-bottom:0!important}
+ html.type-system[data-language] .information-page .research-process h3{font-size:19px}
+ html.type-system[data-language] .information-page .research-process li p{font-size:14px}
+ html:root[data-theme] .information-page .careers-role{padding:26px 22px;margin-bottom:48px}
+ html.type-system[data-language] .information-page .role-columns li{font-size:16px}
+ html:root[data-theme] .information-page .information-footer{grid-template-columns:1fr;padding-block:40px 56px}
+ html:root[data-theme] .information-page .contact-card{grid-template-columns:1fr}
+ html:root[data-theme] .products-page .products-catalog{padding-block:48px}
+ html:root[data-theme] .community-editorial .community-discovery{padding-top:40px}
+}

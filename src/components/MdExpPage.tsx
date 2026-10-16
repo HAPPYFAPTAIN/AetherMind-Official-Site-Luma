@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
+import { ThemedProductArt } from "./ThemedProductArt";
 import { Nav } from "./Nav";
 import { ProductPurchase } from "./ProductPurchase";
 import { useLanguage } from "./LanguageProvider";
 import { SiteLink } from "./primitives/SiteLink";
-import { assetUrl } from "@/lib/asset-url";
 import { productAssets } from "@/data/productAssets";
 import "./products.css";
 
@@ -18,7 +17,7 @@ export function MdExpPage() {
       <Nav />
       <section className="products-hero">
         <div className="products-hero-art" aria-hidden="true">
-          <Image src={assetUrl(`${productAssets.mdExp}-1536.webp`)} alt="" fill sizes="75vw" priority />
+          <ThemedProductArt base={productAssets.mdExp} alt=""  sizes="75vw" priority />
         </div>
         <div className="products-container products-hero-inner">
           <div className="products-hero-copy">

@@ -1,0 +1,63 @@
+{
+  "method": "Per-channel monotonic tone curve; no synthesis, crop, or content replacement.",
+  "blackPoint": 0.07,
+  "exponent": 0.7,
+  "assets": [
+    {
+      "name": "platform",
+      "source": "public/images/official/platform-v4-1536.webp",
+      "sourceSha256": "8ade2ab2a8727574a4471f4f14547180f823cbe10c106d302942013ed1aa79f4",
+      "width": 1536,
+      "height": 864
+    },
+    {
+      "name": "lammps",
+      "source": "public/images/products/journal-v1/simulation-1536.webp",
+      "sourceSha256": "b34de59926eef7a20f9f4b4ec1d49bba8be06de92f95dada5fd5058039173882",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "name": "md-exp",
+      "source": "public/images/products/original-restyled-v1/md-exp-1536.webp",
+      "sourceSha256": "dc5439c978caad2149a7cc96767aa3d9e8b31354d120c06c08cf5a4edee0c20d",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "name": "agent",
+      "source": "public/images/products/journal-v1/intelligence-1536.webp",
+      "sourceSha256": "ad4d5069cdd7baed386de77e0385337405d885652593e2e453423ebe7bcf0472",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "name": "learning",
+      "source": "public/images/products/journal-v1/learning-1536.webp",
+      "sourceSha256": "b86f78a640ff7a668896fec472bc16479f90b929ac6ce83c76deece38ad40466",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "name": "materials",
+      "source": "public/images/products/original-restyled-v1/materials-1536.webp",
+      "sourceSha256": "1acdb158f5ec4b0af17ea784618305b2913ab8366a87435c769dcd73b3f678f9",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "name": "chemistry",
+      "source": "public/images/products/journal-v1/chemistry-1536.webp",
+      "sourceSha256": "d9a0e5b51aa3e3a668062d0255ab4c8a291a8c4539f6dfbc33d64800b80726a4",
+      "width": 1536,
+      "height": 1024
+    },
+    {
+      "name": "biology",
+      "source": "public/images/products/journal-v1/biology-1536.webp",
+      "sourceSha256": "d11445926e223d773c5f9609c5432eb6cf3c8302518b703be94acd805aa5e91c",
+      "width": 1536,
+      "height": 1024
+    }
+  ]
+}

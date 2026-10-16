@@ -1,36 +1,39 @@
-.science-evidence,.compute-workflow,.deployment-options{width:min(1440px,84vw);margin:auto;padding:110px 0;scroll-margin-top:100px}
-.science-evidence,.compute-workflow{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(40px,7vw,120px);align-items:center}
-.science-evidence h2,.compute-workflow h2,.deployment-options h2{font-size:clamp(32px,3.6vw,56px)}
-.evidence-intro>p,.compute-workflow>div>p,.deployment-heading>p{font-size:19px;line-height:1.9;color:#c3cdd4;max-width:500px;margin-top:28px}
-.evidence-intro .evidence-note{font-size:15px;color:#91a5b2;margin-top:24px}
-.evidence-plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.evidence-plots figure{padding:24px 20px;background:#0b1116;border:1px solid #253139;border-radius:12px}
-.evidence-plots figcaption{font-size:17px;display:flex;gap:16px;color:#dbe5eb}.evidence-plots figcaption span{color:#8196a3;font-size:14px}
-.evidence-plots svg{display:block;width:100%;margin-top:24px}.evidence-plots svg text{font-size:12px;fill:#9bafbb}
-.evidence-plots figure p{font-size:15px;line-height:1.7;color:#a7b8c4;border-top:1px solid #253139;padding-top:18px;margin-top:16px}
-.compute-flow-panel{border:1px solid #2a363f;border-radius:14px;background:linear-gradient(145deg,#111c24,#080d12);padding:32px}
-.compute-flow-label{display:flex;justify-content:space-between;gap:20px;font-size:15px;color:#a9c4d3;padding-bottom:24px;border-bottom:1px solid #2a363f}
-.compute-flow-panel li{display:flex;gap:24px;padding:26px 0;border-bottom:1px solid #26323a}.compute-flow-panel li:last-child{border:0;padding-bottom:0}.compute-flow-panel li>span{font-size:14px;color:#849aa8;padding-top:5px}.compute-flow-panel h3{font-size:23px;font-weight:500}.compute-flow-panel p{font-size:17px;line-height:1.8;color:#b2c0ca;margin-top:10px}
-.deployment-options{padding-top:88px}.deployment-heading{display:grid;grid-template-columns:1.3fr 1fr;gap:72px;align-items:end}.deployment-heading>p{margin-top:0}
-.deployment-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px;margin-top:60px}.deployment-grid article{border-top:1px solid #35434c;padding-top:22px}.deployment-number{font-size:14px;color:#8ea6b5}.deployment-grid h3{font-size:24px;font-weight:500;margin-top:18px}.deployment-grid p{font-size:17px;line-height:1.9;color:#b6c5cf;margin-top:16px}
-.luma-home:lang(zh-CN) .luma-scroll-cue{font-family:var(--font-brand-cn),"Songti SC","STSong","SimSun",serif;font-weight:500;letter-spacing:.05em}
-@media(max-width:1000px){.science-evidence,.compute-workflow{grid-template-columns:1fr;gap:48px}.deployment-heading{grid-template-columns:1fr;gap:24px}.deployment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.science-evidence,.compute-workflow,.deployment-options{width:calc(100% - 48px);padding:64px 0}.evidence-plots{grid-template-columns:1fr}.compute-flow-panel{padding:24px}.deployment-grid{gap:30px 20px;margin-top:36px}.deployment-grid h3{font-size:21px}.deployment-grid p,.evidence-intro>p,.compute-workflow>div>p,.deployment-heading>p{font-size:17px}.evidence-intro .evidence-note{font-size:14px}}
-/* Scientific workbench: one focal specimen and one large analysis view. */
-.compute-flow-panel{padding:0;overflow:hidden;background:#0b1218;border-color:#2c3942;border-radius:8px}
-.compute-flow-label{padding:22px 26px;margin:0;font-size:14px;letter-spacing:.06em}
-.compute-specimen{height:280px;position:relative;overflow:hidden;background:#070c11}
-.compute-specimen::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,#080e15dd,transparent 50%)}
-.specimen-caption{position:absolute;bottom:20px;left:26px;right:26px;z-index:1;display:flex;justify-content:space-between;gap:16px;color:#b9cad7;font-size:13px;letter-spacing:.04em}
-.specimen-cross{position:absolute;right:24px;top:18px;color:#8195a4;font-size:22px}
-.compute-flow-panel ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:26px;gap:20px;border-top:1px solid #28363f}
-.compute-flow-panel li{display:block;padding:0;border:0}.compute-flow-panel li:last-child{padding:0}.compute-flow-panel h3{font-size:19px;margin-top:12px}.compute-flow-panel p{font-size:14px;line-height:1.9;margin-top:10px}.compute-flow-panel li>span{font-size:12px;letter-spacing:.12em}
-.evidence-studio{min-width:0;background:radial-gradient(ellipse at 65% 35%,#14232d,#0a1117 75%);border:1px solid #293b48;border-radius:8px;padding:26px}
-.studio-heading,.studio-foot{display:flex;justify-content:space-between;gap:16px;color:#8fa8b8;font-size:12px;letter-spacing:.08em;line-height:1.7}
-.evidence-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:28px;border-bottom:1px solid #30404b}
-.evidence-tabs button{padding:12px 0 16px;font-size:15px;line-height:1.6;color:#93a8b6;border-bottom:1px solid transparent;cursor:pointer}
-.evidence-tabs button[aria-selected=true]{color:#e4edf3;border-color:#aecddd}.evidence-tabs button:hover{color:#fff}
-.evidence-studio .evidence-plots{display:block}.evidence-studio figure{border:0;padding:28px 0 22px;background:none;border-radius:0}.evidence-studio figure[hidden]{display:none}
-.evidence-studio figcaption{font-size:22px}.evidence-studio svg{margin-top:28px;min-height:240px}.evidence-studio svg text{font-size:10px}.evidence-studio figure p{margin-top:20px;font-size:16px;border:0;padding-top:0;min-height:28px}
-.studio-foot{padding-top:18px;border-top:1px solid #293c49;font-size:10px}
-@media(max-width:600px){.compute-flow-panel{padding:0}.compute-specimen{height:235px}.compute-flow-label{padding:20px}.compute-flow-panel ol{padding:20px;gap:16px;grid-template-columns:1fr}.compute-flow-panel li{display:flex;gap:18px}.compute-flow-panel h3{margin-top:0}.compute-flow-panel p{margin-top:6px}.evidence-studio{padding:20px 16px}.evidence-tabs{gap:6px}.evidence-tabs button{font-size:13px}.evidence-studio svg{min-height:190px}.studio-foot{flex-wrap:wrap}.specimen-caption{left:20px;right:20px}}
+/* Open scientific figures: typography, image and linework, without a dashboard shell. */
+.science-evidence,.compute-workflow,.deployment-options{width:min(1440px,84vw);margin:auto;padding:120px 0;scroll-margin-top:100px}
+.science-evidence,.compute-workflow{display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(48px,8vw,128px);align-items:center}
+.evidence-intro>p,.compute-workflow>div>p,.deployment-heading>p{font-size:18px;line-height:1.85;color:#aeb9c3;max-width:460px;margin-top:28px}
+.evidence-intro .evidence-note{font-size:13px;color:#81929f;margin-top:24px;line-height:1.8}
+.compute-flow-panel,.evidence-studio{min-width:0;background:none;border:0;border-radius:0;box-shadow:none;padding:0}
+.compute-flow-label,.studio-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border-top:1px solid #ffffff35;font-size:11px;font-weight:400;letter-spacing:.1em;color:#91a4b2}
+.compute-flow-label>span:last-child,.studio-heading>span:last-child{letter-spacing:.04em;color:#c5cfd6}
+.compute-specimen{height:clamp(280px,25vw,400px);position:relative;overflow:hidden;background:#000}
+.compute-specimen>div{mask-image:radial-gradient(ellipse 72% 75% at 50% 48%,#000 32%,transparent 87%)}
+.specimen-caption{display:flex;justify-content:space-between;gap:20px;position:static;padding:12px 0 24px;font-size:12px;color:#8b9ca8;line-height:1.6}
+.specimen-caption>span:first-child{color:#c5cfd6}
+.compute-flow-panel ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;padding-top:24px;border-top:1px solid #ffffff24}
+.compute-flow-panel li{min-width:0}
+.compute-step-number{display:block;font-family:var(--font-geist-mono),monospace;font-size:10px;color:#748a9a;margin-bottom:16px}
+.compute-flow-panel h3{font-size:16px;font-weight:450;color:#e2e7ea;line-height:1.5;letter-spacing:0}
+.compute-flow-panel p{font-size:12px;line-height:1.8;color:#8f9eaa;margin-top:8px}
+.evidence-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:24px;border-bottom:1px solid #ffffff20}
+.evidence-tabs button{padding:12px 0 18px;font-size:14px;line-height:1.5;font-weight:400;color:#899ba9;border-bottom:1px solid transparent;cursor:pointer;transition:color .2s,border-color .2s}
+.evidence-tabs button[aria-selected=true]{color:#edf1f3;border-color:#edf1f3}
+.evidence-tabs button:hover{color:#dce8ee}
+.evidence-plots figure{margin:0;padding:32px 0 0}
+.evidence-plots figure[hidden]{display:none}
+.evidence-plots svg{width:100%;display:block;color:#b7d6e1;overflow:visible}
+.evidence-plots svg text{font-family:var(--font-inter),sans-serif;font-size:9px;font-weight:400;fill:#9aaebc}
+.evidence-grid{stroke:#8499a8;stroke-opacity:.16;stroke-width:.45}
+.evidence-axis{stroke:#899da9;stroke-width:.6;stroke-opacity:.55}
+.evidence-plots figure p{display:flex;gap:14px;align-items:baseline;padding-top:22px;margin-top:20px;border-top:1px solid #ffffff24;font-size:13px;line-height:1.8;color:#9bafbc}
+.plot-legend{width:22px;height:1px;background:#b7d6e1;flex-shrink:0;transform:translateY(-4px)}
+.deployment-options{padding-top:88px}
+.deployment-heading{display:grid;grid-template-columns:1.3fr 1fr;gap:72px;align-items:end}
+.deployment-heading>p{margin-top:0}
+.deployment-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:32px;margin-top:60px}
+.deployment-grid article{border-top:1px solid #ffffff24;padding-top:22px}
+.deployment-number{font-size:11px;color:#8096a5;font-family:var(--font-geist-mono),monospace}
+.deployment-grid h3{font-size:22px;font-weight:450;margin-top:24px;line-height:1.4}
+.deployment-grid p{font-size:16px;line-height:1.85;color:#aab8c3;margin-top:18px}
+@media(max-width:1000px){.science-evidence,.compute-workflow{grid-template-columns:1fr;gap:64px}.deployment-heading{grid-template-columns:1fr;gap:24px}.deployment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.compute-specimen{height:380px}}
+@media(max-width:600px){.science-evidence,.compute-workflow,.deployment-options{width:calc(100% - 48px);padding:72px 0}.compute-specimen{height:260px}.compute-flow-panel ol{gap:18px;grid-template-columns:1fr}.compute-flow-panel li{display:grid;grid-template-columns:28px 1fr;gap:16px}.compute-step-number{margin-top:5px}.compute-flow-panel p{margin-top:5px}.evidence-tabs{gap:8px;margin-top:16px}.evidence-tabs button{font-size:12px}.evidence-plots figure{padding-top:28px}.deployment-grid{gap:32px 24px;margin-top:40px}.deployment-grid h3{font-size:20px}.deployment-grid p{font-size:15px}.evidence-intro>p,.compute-workflow>div>p,.deployment-heading>p{font-size:16px}}

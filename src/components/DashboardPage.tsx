@@ -875,7 +875,6 @@ export function DashboardPage() {
             >
               ×
             </button>
-            <p className="dash-eyebrow">ACTIVATE</p>
             <h2 id="redeem-title">{t("兑换激活码", "Redeem your code")}</h2>
             <p>
               {t(

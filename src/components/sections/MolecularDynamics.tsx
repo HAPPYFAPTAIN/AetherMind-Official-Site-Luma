@@ -2,11 +2,9 @@
 
 import { Section } from "@/components/primitives/Section";
 import { Reveal } from "@/components/primitives/Reveal";
-import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
 import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
-import { assetUrl } from "@/lib/asset-url";
 
 const PARAMS = [
   { label: { en: "Timestep", zh: "时间步长" }, value: { en: "2.0 fs", zh: "2.0 fs" } },
@@ -20,19 +18,6 @@ export function MolecularDynamics() {
 
   return (
     <Section id="simulation" className="py-32 md:py-44">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <EdgeFadeVisual variant="section" className="absolute inset-0">
-          <div className="absolute inset-[-6%] opacity-40">
-            <img
-              src={assetUrl("/images/g01/g01-03-lammps-millions-atoms.full.webp")}
-              alt=""
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        </EdgeFadeVisual>
-      </div>
-
       <div className="relative grid items-end gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-6">
           <Reveal>
@@ -68,7 +53,7 @@ export function MolecularDynamics() {
           </Reveal>
 
           <Reveal delay={0.2}>
-            <div className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line">
+            <div data-story-stagger className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line">
               {PARAMS.map(({ label, value }) => (
                 <div key={label.en} className="bg-bg-1/80 p-5 backdrop-blur">
                   <div className="mono-label mb-2 whitespace-nowrap text-text-faint">
@@ -85,7 +70,7 @@ export function MolecularDynamics() {
 
         <div className="lg:col-span-6">
           <Reveal delay={0.1} y={40}>
-            <div className="glass relative aspect-[16/10] overflow-hidden rounded-2xl">
+            <div data-story-panel className="glass relative aspect-[16/10] overflow-hidden rounded-2xl">
               <ScienceScene mode="simulation" className="absolute inset-0" />
               <div className="pointer-events-none absolute left-5 top-5 z-10 flex items-center gap-2">
                 <span className="mono-label whitespace-nowrap">

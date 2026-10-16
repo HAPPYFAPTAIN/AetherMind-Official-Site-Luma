@@ -10,7 +10,7 @@ import { assetUrl } from "@/lib/asset-url";
 import { BRAND } from "@/lib/site";
 import "./console.css";
 
-type Section = "agents" | "compute" | "jobs" | "model";
+type Section = "agents" | "compute" | "jobs";
 type MdAgentState = {
   accountBinding: "unbound" | "bound";
   qualifications: { product_id: string }[];
@@ -21,8 +21,7 @@ type MdAgentState = {
 const agents = [
   {
     id: "md-exp",
-    title: "MD EXP",
-    subtitle: "分子模拟智能体",
+    title: "分子模拟智能体",
     description: "模型对话、任务规划与分子动力学工作流。",
     tags: ["LAMMPS / ReaxFF", "建模 · 分析 · 科研对话"],
     image: "/assets/products/lammps.png",
@@ -30,8 +29,7 @@ const agents = [
   },
   {
     id: "gromacs",
-    title: "GROMACS",
-    subtitle: "分子模拟工作流",
+    title: "分子模拟智能体",
     description: "蛋白质与膜体系的后续智能体。",
     tags: ["蛋白质 · 膜体系"],
     image: "/assets/products/biology.png",
@@ -39,8 +37,7 @@ const agents = [
   },
   {
     id: "dft",
-    title: "DFT 智能体",
-    subtitle: "电子结构与材料计算",
+    title: "电子结构与材料计算智能体",
     description: "结构优化、电子性质与材料计算。",
     tags: ["结构优化 · 电子性质"],
     image: "/assets/products/materials.png",
@@ -48,8 +45,7 @@ const agents = [
   },
   {
     id: "materials",
-    title: "材料分析智能体",
-    subtitle: "轨迹与性质分析",
+    title: "轨迹与性质分析智能体",
     description: "从轨迹中提取结构、能量和科学图表。",
     tags: ["轨迹解析 · 科学图表"],
     image: "/assets/products/platform.png",
@@ -76,7 +72,7 @@ export function ConsolePage() {
   const enterMdExp = async () => {
     if (enteringMdExp) return;
     if (!account) {
-      window.location.assign(assetUrl("/login/?returnTo=/official/console/"));
+      window.location.assign(assetUrl("/login/?returnTo=/official/md-agent/"));
       return;
     }
     if (!mdState?.qualifications.some((item) => item.product_id === "md-exp")) {
@@ -118,7 +114,6 @@ export function ConsolePage() {
     ["agents", zh ? "智能体目录" : "Agent catalog"],
     ["compute", zh ? "超算连接" : "Compute connection"],
     ["jobs", zh ? "计算任务" : "Compute jobs"],
-    ["model", zh ? "模型配置" : "Model settings"],
   ] as const;
 
   return (
@@ -167,25 +162,19 @@ export function ConsolePage() {
           {notice && <div className="console-notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
 
           {section === "agents" && <>
-            <div className="console-toolbar">
-              <div className="console-filters"><button className="active">{zh ? "全部智能体" : "All agents"}</button><button>{zh ? "可用" : "Available"}</button><button>{zh ? "即将上架" : "Coming soon"}</button></div>
-              <label className="console-search"><span>⌕</span><input placeholder={zh ? "搜索智能体" : "Search agents"} /></label>
-            </div>
             <div className="agent-list">
               {agents.map((agent) => (
                 <article key={agent.id} className={`agent-card ${agent.status === "available" ? "available" : ""}`}>
                   <img src={assetUrl(agent.image)} alt="" />
-                  <div className="agent-copy"><h2>{agent.title}</h2><p className="agent-subtitle">{agent.subtitle}</p><p className="agent-description">{agent.description}</p><div className="agent-tags">{agent.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
-                  <div className="agent-status"><span className={agent.status}>{agent.status === "available" ? (zh ? "可用" : "Available") : (zh ? "下个月上架" : "Coming next month")}</span><small>{agent.status === "available" ? (mdState?.qualifications.some((item) => item.product_id === agent.id) ? (zh ? "已获得产品资格" : "Qualified") : (zh ? "需要绑定邀请码" : "Invite binding required")) : ""}</small></div>
+                  <div className="agent-copy"><h2>{agent.title}</h2><p className="agent-description">{agent.description}</p><div className="agent-tags">{agent.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
                   <button className="agent-action" disabled={agent.status !== "available" || enteringMdExp} onClick={() => void enterMdExp()}>{agent.status === "available" ? (enteringMdExp ? (zh ? "正在打开…" : "Opening…") : (zh ? "进入智能体  →" : "Open agent  →")) : (zh ? "敬请期待" : "Stay tuned")}</button>
                 </article>
               ))}
             </div>
           </>}
 
-          {section === "compute" && <StatusPanel title={zh ? "超算连接" : "Compute connection"} title2={zh ? "待接入" : "Integration pending"} body={zh ? "SSH 连接、工作区和队列适配正在联调。当前不会显示虚假的在线状态，也不会提交计算任务。" : "SSH, workspace and queue support are being integrated. No online state is claimed and no jobs can be submitted yet."} />}
+          {section === "compute" && <ComputePanel zh={zh} />}
           {section === "jobs" && <StatusPanel title={zh ? "计算任务" : "Compute jobs"} title2={zh ? "尚未开放" : "Not available yet"} body={zh ? "完成超算适配和作业状态契约后，这里会显示本人任务、日志、结果和取消状态。" : "Personal jobs, logs, artifacts and cancellation will appear after the HPC contract is integrated."} />}
-          {section === "model" && <ModelPanel zh={zh} />}
         </section>
       </div>
       {loginOpen && <LoginPage overlay onClose={() => setLoginOpen(false)} />}
@@ -202,17 +191,33 @@ function UserGlyph() {
   );
 }
 
-function ModelPanel({ zh }: { zh: boolean }) {
-  const models = [
-    ["Kimi", "kimi-k3", zh ? "旗舰，长上下文与视觉理解" : "Flagship, long context and vision", "pending"],
-    ["Kimi", "kimi-k2.7-code-highspeed", zh ? "高速代码与 Agent 工作流" : "High-speed coding and agent workflows", "verified"],
-    ["Kimi", "kimi-k2.6", zh ? "通用对话、视觉与 Agent" : "General, vision and agent tasks", "pending"],
-    ["DeepSeek", "deepseek-v4-pro", zh ? "旗舰推理与工具调用" : "Flagship reasoning and tools", "verified"],
-    ["DeepSeek", "deepseek-flash", zh ? "高吞吐、多模态 Flash" : "High-throughput multimodal Flash", "pending"],
-  ];
-  return <section className="console-status-panel console-model-panel"><p className="console-kicker">MODEL PROVIDERS</p><h2>{zh ? "模型配置" : "Model settings"}</h2><span>{zh ? "共享代理已接入" : "Shared proxy connected"}</span><p>{zh ? "Kimi 2.7 Highspeed 与 DeepSeek V4 Pro 已完成服务端短请求验证；用户级模型选择和对话状态仍由 dsh 会话读取。" : "Kimi 2.7 Highspeed and DeepSeek V4 Pro passed server-side smoke tests; per-user model selection and chat state are read by the dsh session."}</p><div className="console-model-list">{models.map(([provider,id,desc,status]) => <div key={id}><b>{provider}</b><code>{id}</code><small>{desc}</small><em className={status}>{status === "verified" ? (zh ? "已验证" : "Verified") : (zh ? "可选" : "Available")}</em></div>)}</div></section>;
-}
-
 function StatusPanel({ title, title2, body }: { title: string; title2: string; body: string }) {
   return <section className="console-status-panel"><p className="console-kicker">AETHERICAI / STATUS</p><h2>{title}</h2><span>{title2}</span><p>{body}</p></section>;
+}
+
+function ComputePanel({ zh }: { zh: boolean }) {
+  return (
+    <section className="console-status-panel console-compute-panel">
+      <p className="console-kicker">AETHERICAI / COMPUTE</p>
+      <h2>{zh ? "超算连接" : "Compute connection"}</h2>
+      <div className="compute-options">
+        <article className="compute-option compute-option-provided">
+          <div className="compute-option-heading">
+            <div><h3>{zh ? "以太智元超算" : "AethericAI compute"}</h3><span>{zh ? "平台提供的超算资源" : "Compute resources provided by the platform"}</span></div>
+            <strong>{zh ? "可用" : "Available"}</strong>
+          </div>
+          <p>{zh ? "选择规格后提交计算任务。当前默认使用自动调度。" : "Choose a resource profile before submitting a job. Auto scheduling is selected by default."}</p>
+          <label>{zh ? "规格" : "Profile"}<select defaultValue="auto" aria-label={zh ? "超算规格" : "Compute profile"}><option value="auto">auto</option></select></label>
+        </article>
+        <article className="compute-option compute-option-custom">
+          <div className="compute-option-heading">
+            <div><h3>{zh ? "用户自配超算" : "Your own compute"}</h3><span>{zh ? "接入自有 SSH、队列或集群" : "Connect your own SSH, queue or cluster"}</span></div>
+            <strong>{zh ? "联系客服" : "Contact support"}</strong>
+          </div>
+          <p>{zh ? "如需接入自有超算资源，请联系客服完成连接配置。" : "Contact support to configure access to your own compute resources."}</p>
+          <button className="compute-contact" type="button">{zh ? "联系客服" : "Contact support"} →</button>
+        </article>
+      </div>
+    </section>
+  );
 }

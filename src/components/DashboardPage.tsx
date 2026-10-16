@@ -588,37 +588,30 @@ export function DashboardPage() {
                         <h2>{t("产品权益", "Product access")}</h2>
                         <p>
                           {t(
-                            "已激活的产品与使用期限",
-                            "Active products and access duration",
+                            "已拥有的产品",
+                            "Products you own",
                           )}
                         </p>
                       </div>
-                      <strong>
-                        {data.entitlements.filter((e) => e.active).length}
-                        <small> / {data.products.length}</small>
-                      </strong>
-                      <div
-                        className="dash-access-progress"
-                        role="img"
-                        aria-label={`${data.entitlements.filter((e) => e.active).length}/${data.products.length}`}
-                      >
-                        {data.products.map((p) => (
-                          <i
-                            key={p.id}
-                            className={
-                              data.entitlements.some(
-                                (e) => e.product_id === p.id && e.active,
-                              )
-                                ? "active"
-                                : ""
-                            }
-                            title={zh ? p.name : p.name_en}
-                          />
-                        ))}
+                      <div className="dash-access-list">
+                        {data.entitlements.filter((p) => p.active).length ? (
+                          data.entitlements.filter((p) => p.active).map((p) => (
+                            <div key={p.product_id} className="dash-access-product">
+                              <div>
+                                <strong>{zh ? p.name : p.name_en}</strong>
+                                <span>{t("有效期至", "Access until")} {formatDate(p.expires_at_ms)}</span>
+                              </div>
+                              {p.entry_url && (
+                                <a className="dash-primary" href={p.entry_url} target="_blank" rel="noopener noreferrer">
+                                  {t("进入产品", "Enter")} →
+                                </a>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <p className="dash-access-empty">{t("暂未激活产品", "No active products yet")}</p>
+                        )}
                       </div>
-                      <button onClick={() => setTab("products")}>
-                        {t("查看我的产品", "View my products")} →
-                      </button>
                     </div>
                   </div>
                 </section>
@@ -739,6 +732,7 @@ export function DashboardPage() {
                           <a
                             className="dash-primary"
                             href={p.entry_url}
+                            target="_blank"
                             rel="noopener noreferrer"
                           >
                             {t("进入产品", "Open product")} →

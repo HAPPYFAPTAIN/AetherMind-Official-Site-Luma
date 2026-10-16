@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Inter_Tight, Geist_Mono } from "next/font/google";
+import { Inter, Inter_Tight, Geist_Mono, Cormorant_Garamond, Noto_Serif_SC } from "next/font/google";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { BRAND } from "@/lib/site";
 import { ShowcaseLayer } from "@/components/ShowcaseLayer";
@@ -20,6 +20,21 @@ const interTight = Inter_Tight({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const brandDisplay = Cormorant_Garamond({
+  variable: "--font-brand-display",
+  subsets: ["latin"],
+  weight: "500",
+  display: "swap",
+});
+
+const chineseDisplay = Noto_Serif_SC({
+  variable: "--font-brand-cn",
+  weight: "500",
+  subsets: ["latin"],
+  preload: false,
   display: "swap",
 });
 
@@ -55,7 +70,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${interTight.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+      className={`${inter.variable} ${interTight.variable} ${geistMono.variable} ${brandDisplay.variable} ${chineseDisplay.variable}`}
     >
       <body>
         <LanguageProvider>

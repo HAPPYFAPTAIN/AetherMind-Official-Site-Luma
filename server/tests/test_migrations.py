@@ -22,10 +22,10 @@ def applied(tmp_path, name='auth.sqlite3'):
 
 def test_migrations_applied_once_on_fresh_db(tmp_path):
     build(tmp_path)
-    assert [row[0] for row in applied(tmp_path)] == [1, 2, 3, 4, 5]
+    assert [row[0] for row in applied(tmp_path)] == [1, 2, 3, 4, 5, 6]
     with sqlite3.connect(tmp_path / 'auth.sqlite3') as c:
         tables = {row[0] for row in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-        assert {'users', 'official_rates', 'official_llm_models', 'schema_migrations'} <= tables
+        assert {'users', 'official_rates', 'official_llm_models', 'official_llm_providers', 'official_user_llm_models', 'schema_migrations'} <= tables
         assert not any(t.startswith(('paid_', 'v4_')) for t in tables)
         columns = {row[1] for row in c.execute('PRAGMA table_info(official_usage)')}
         assert {'model', 'core_minutes', 'shortfall'} <= columns
@@ -36,7 +36,7 @@ def test_migrate_twice_is_idempotent(tmp_path):
     with sqlite3.connect(tmp_path / 'auth.sqlite3') as c:
         before = c.execute("SELECT type,name,sql FROM sqlite_master ORDER BY type,name").fetchall()
     app.state.database.initialize()
-    assert [row[0] for row in applied(tmp_path)] == [1, 2, 3, 4, 5]
+    assert [row[0] for row in applied(tmp_path)] == [1, 2, 3, 4, 5, 6]
     with sqlite3.connect(tmp_path / 'auth.sqlite3') as c:
         after = c.execute("SELECT type,name,sql FROM sqlite_master ORDER BY type,name").fetchall()
         assert before == after
@@ -62,7 +62,7 @@ def legacy_schema(tmp_path):
 def test_baseline_assimilation_on_legacy_db(tmp_path):
     legacy_schema(tmp_path)
     build(tmp_path, 'legacy.sqlite3')
-    assert [row[0] for row in applied(tmp_path, 'legacy.sqlite3')] == [1, 2, 3, 4, 5]
+    assert [row[0] for row in applied(tmp_path, 'legacy.sqlite3')] == [1, 2, 3, 4, 5, 6]
     with sqlite3.connect(tmp_path / 'legacy.sqlite3') as c:
         # 0001 仅登记不执行：缺失的表不应被补建；既有数据原样保留。
         assert not c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='official_password_attempts'").fetchone()
@@ -98,7 +98,7 @@ def test_concurrent_independent_connections_apply_each_version_once(tmp_path):
     with sqlite3.connect(path) as c:
         assert c.execute('PRAGMA user_version').fetchone()[0] == 3
         rows = c.execute('SELECT version,COUNT(*) FROM schema_migrations GROUP BY version ORDER BY version').fetchall()
-        assert rows == [(1, 1), (2, 1), (3, 1), (4, 1), (5, 1)]
+        assert rows == [(1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1)]
         assert c.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
 
 

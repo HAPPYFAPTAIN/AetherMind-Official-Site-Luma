@@ -10,6 +10,13 @@
 
 ## 模型目录
 
+总管理员模型控制现在分为两层：
+
+- 「全局供应商」可维护 provider 标识、OpenAI 兼容 Base URL、启用状态和密钥。密钥在官网数据库中加密保存，管理接口只返回是否已配置，不回显明文。
+- 「模型路由」可配置公开模型名、供应商、上游模型 ID，并决定是否全局开放。关闭全局开放后，可在用户列表的「模型权限」中只给指定客户授权；网关的 `/v1/models` 和实际调用都按同一有效模型集合校验。
+
+授权模型更新后，官网会请求受保护的 dsh 管理刷新接口，绑定租户的 `settings.yaml` 按官方授权表重新生成。没有授权的用户不会收到额外 provider/model 条目，即使手工提交模型名，官方网关也会拒绝。
+
 首期支持目录按两家官方文档确定，真实密钥和连接验证另行进行：
 
 | provider | model_id | 当前状态 |
@@ -47,6 +54,15 @@
 - 初始化路径拒绝符号链接和越出账号 `projects` 根目录的工作区；每个租户实例有独立初始化锁，实例替换或初始化失败不会复用旧状态。
 - 旧的 `data/memory` 共享链接已移除，改为账号私有目录；共享进化目录不再作为用户记忆或工作区来源。
 - 两个生产绑定账号分别只能看到自己的 `default` 工作区；跨账号读写测试均被 UID 权限拒绝。回滚材料：`/var/backups/aethericai-official/20261009-233037-private-workspace/`。
+
+## 2026-10-13 无节点执行与红色错误
+
+- 用户没有在线 mdshell 节点时，租户 overlay 写入合法的 YAML provider 补丁，不再伪造 `n_none` 的 remote-world 地址；它重新启用本机 `subprocess/sandbox/fs-sandbox`，禁用 remote providers，文件操作走本机 Landlock/bwrap 沙箱。只有用户节点在线时才注入 `remote-fs`、`remote-subprocess` 和 `remote-sandbox`。
+- 生产权限策略固定为 `workspace-write + approval=never`：每个租户进程仍以独立 UID、独立 `DSH_HOME` 和独立数据根运行；越界或需要升权的操作自动拒绝，不再显示权限选择器或向用户弹批准框。删除、清空、杀进程和终止作业由 `mdagent-safety` 工具 guard 固定拒绝。
+- 权限预设只保留 `Read Only` 与 `Work` 两项；`Workspace Write`、`Full access` 不再出现在菜单中，`Work` 对应当前用户的 workspace-write 沙箱并带文件夹图标，不触发审批。
+- `mdagent-safety` 在启动时为已恢复会话补写固定权限事实，新会话和旧会话都不会回到 `ask` 或 `danger-full-access`。
+- `workspace-write no sandbox backend` 的根因是远程 provider 被强制启用但 mdshell 没有连接；`mdshell websocket 403` 是同一条 remote-world 链路的节点/短票问题，不是 HPC 未连接。`INSUFFICIENT_CREDITS 402` 是官方 LLM 网关余额预检，和超算提交无关。
+- 当前没有把 `danger-full-access` 作为修复手段；它会跳过文件限制和确认策略。科研命令仍受当前用户沙箱、独立 UID 和 `mdagent-safety` guard 约束。
 
 ## 2026-10-10 模型目录修复
 

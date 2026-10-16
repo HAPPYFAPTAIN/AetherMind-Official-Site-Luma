@@ -2,12 +2,10 @@
 
 import { Section } from "@/components/primitives/Section";
 import { Reveal } from "@/components/primitives/Reveal";
-import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
 import { ScienceScene } from "@/components/primitives/ScienceScene";
 import { useLanguage } from "@/components/LanguageProvider";
 import { BRAND } from "@/lib/site";
 import { tr } from "@/lib/i18n";
-import { assetUrl } from "@/lib/asset-url";
 import { ConsoleEntryButton } from "@/components/ConsoleEntryButton";
 
 export function FinalCTA() {
@@ -16,16 +14,6 @@ export function FinalCTA() {
   return (
     <Section id="console" className="science-finale flex items-center py-32" background={
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <EdgeFadeVisual variant="cta" className="absolute inset-0">
-          <div className="absolute inset-[-6%] opacity-[0.16]">
-            <img
-              src={assetUrl("/images/g01/g01-10-discovery-final.md.webp")}
-              alt=""
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
-          </div>
-        </EdgeFadeVisual>
         <ScienceScene mode="discovery" className="science-finale__object absolute inset-0" />
       </div>
     }>
@@ -64,7 +52,7 @@ export function FinalCTA() {
             <ConsoleEntryButton
               className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-[15px] font-semibold text-bg-0 transition-colors hover:bg-accent"
             >
-              {tr(language, "Open Console", "打开控制台")}
+              {tr(language, "Enter agent", "进入智能体")}
               <span className="transition-transform group-hover:translate-x-0.5">→</span>
             </ConsoleEntryButton>
             <a

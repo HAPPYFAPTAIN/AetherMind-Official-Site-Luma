@@ -1,0 +1,68 @@
+{
+  "generator": "Built-in image_gen",
+  "date": "2026-10-13",
+  "purpose": "Reference-guided edits preserving the original product subjects, restyled for the dark scientific editorial catalog. Conceptual artwork, not experimental results.",
+  "styleReference": "public/images/products/journal-v1/simulation-1536.webp",
+  "assets": [
+    {
+      "id": "platform",
+      "source": "public/assets/products/platform.png",
+      "prompt": "Use case: style-transfer image edit. Image 1 is the edit target: retain its specific subject identity and geometry, recognizable as the SAME original artwork. Image 2 is ONLY a lighting/material/style reference, do not copy its spherical capsule or introduce new subjects. Adapt the target for a premium scientific journal-cover visual used on a dark AetherMind product card: charcoal and deep petrol-blue environment, controlled silver-blue specular light, very subtle champagne highlights, realistic refined optical material, sharp principal geometry with quiet depth of field. Remove the bright stock-render studio atmosphere. No text, logo, labels, UI, stars or added particles. Landscape 3:2 high resolution; extend/crop the background so the principal subject fits the central 80% for a 16:10 card. Conceptual scientific art, not an experimental result. Preserve the transparent ice-blue crystalline cube with rounded square cell faces and its internal repeated voids; retain the cube perspective and the original surrounding connected spheres. Keep the complete cube prominent and fully visible. Re-light it against a subdued dark blue background, retaining transparent blue glass and detailed refractions; preserve the original cube, do not replace it with an arch or liquid bubble.",
+      "sourceSha256": "69191c5915d00991f31e6d5ac656e2a44c54d8e2b3d0befc16a048814b9a9536",
+      "deliverables": [
+        {
+          "file": "platform-640.webp",
+          "bytes": 63672
+        },
+        {
+          "file": "platform-1280.webp",
+          "bytes": 171748
+        },
+        {
+          "file": "platform-1536.webp",
+          "bytes": 218894
+        }
+      ]
+    },
+    {
+      "id": "md-exp",
+      "source": "public/assets/products/lammps.png",
+      "prompt": "Use case: style-transfer image edit. Image 1 is the edit target: retain its specific subject identity and geometry, recognizable as the SAME original artwork. Image 2 is ONLY a lighting/material/style reference, do not copy its spherical capsule or introduce new subjects. Adapt the target for a premium scientific journal-cover visual used on a dark AetherMind product card: charcoal and deep petrol-blue environment, controlled silver-blue specular light, very subtle champagne highlights, realistic refined optical material, sharp principal geometry with quiet depth of field. Remove the bright stock-render studio atmosphere. No text, logo, labels, UI, stars or added particles. Landscape 3:2 high resolution; extend/crop the background so the principal subject fits the central 80% for a 16:10 card. Conceptual scientific art, not an experimental result. Preserve the distinctive diagonal chain of large translucent blue glass spheres with dark reflective inner cores, from upper left to lower right, and the original lens depth. Keep the chain as the main subject, do not turn it into a double helix or molecule inside a capsule. The largest three foreground spheres should remain intact, centered, sophisticated glass with controlled silver light and faint warm rim.",
+      "sourceSha256": "5bf55c07ea33dd05c4e2a3a65cda49bc23459f2152a1da8c19fa7915f724f45a",
+      "deliverables": [
+        {
+          "file": "md-exp-640.webp",
+          "bytes": 28500
+        },
+        {
+          "file": "md-exp-1280.webp",
+          "bytes": 68088
+        },
+        {
+          "file": "md-exp-1536.webp",
+          "bytes": 82378
+        }
+      ]
+    },
+    {
+      "id": "materials",
+      "source": "public/assets/products/materials.png",
+      "prompt": "Use case: style-transfer image edit. Image 1 is the edit target: retain its specific subject identity and geometry, recognizable as the SAME original artwork. Image 2 is ONLY a lighting/material/style reference, do not copy its spherical capsule or introduce new subjects. Adapt the target for a premium scientific journal-cover visual used on a dark AetherMind product card: charcoal and deep petrol-blue environment, controlled silver-blue specular light, very subtle champagne highlights, realistic refined optical material, sharp principal geometry with quiet depth of field. Remove the bright stock-render studio atmosphere. No text, logo, labels, UI, stars or added particles. Landscape 3:2 high resolution; extend/crop the background so the principal subject fits the central 80% for a 16:10 card. Conceptual scientific art, not an experimental result. Preserve the original ball-and-stick material lattice: interconnected glossy silver and blue spheres, straight metallic bonds, central polygonal lattice structure in sharp focus, same geometry and viewpoint. Do not replace this subject with a rock, a cube, a membrane or a liquid sphere. Refine the original into a quieter low-key scientific editorial render, dark petrol depth, silver edges, sparse faint warm highlights.",
+      "sourceSha256": "08c364b4c13dd3ae0946dbe44a0708d5778827240b8dc545669c1f92274fbdba",
+      "deliverables": [
+        {
+          "file": "materials-640.webp",
+          "bytes": 39560
+        },
+        {
+          "file": "materials-1280.webp",
+          "bytes": 93814
+        },
+        {
+          "file": "materials-1536.webp",
+          "bytes": 115814
+        }
+      ]
+    }
+  ]
+}

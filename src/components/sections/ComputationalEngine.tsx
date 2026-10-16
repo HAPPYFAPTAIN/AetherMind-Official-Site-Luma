@@ -2,11 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Section } from "@/components/primitives/Section";
-import { Reveal, prefersReducedMotion } from "@/components/primitives/Reveal";
-import { EdgeFadeVisual } from "@/components/primitives/EdgeFadeVisual";
+import { Reveal } from "@/components/primitives/Reveal";
 import { useLanguage } from "@/components/LanguageProvider";
 import { tr } from "@/lib/i18n";
-import { assetUrl } from "@/lib/asset-url";
 
 const METRICS = [
   { value: "128", label: { en: "GPUs orchestrated per job", zh: "单个任务可调度的 GPU" } },
@@ -18,31 +16,15 @@ function fmt(n: number) {
   return Math.round(n).toLocaleString("en-US");
 }
 
+// A stable illustrative curve is also visible without animation or JavaScript.
+const SPARKLINE_PATH = `M ${Array.from({length: 48}, (_, i) =>
+  `${i / 47 * 100},${30 + Math.sin(i / 3.2) * 12 + Math.sin(i * 2.17) * 4}`,
+).join(" L ")}`;
+
 function Sparkline() {
-  const ref = useRef<SVGSVGElement>(null);
-  useEffect(() => {
-    const svg = ref.current;
-    if (!svg || prefersReducedMotion()) return;
-    const path = svg.querySelector("path");
-    const points = Array.from({ length: 48 }, (_, i) => {
-      const x = (i / 47) * 100;
-      const y = 30 + Math.sin(i / 3.2) * 12 + Math.random() * 10;
-      return `${x},${y}`;
-    });
-    const d = `M ${points.join(" L ")}`;
-    if (path) path.setAttribute("d", d);
-    const len = path?.getTotalLength() ?? 0;
-    if (path) {
-      path.style.strokeDasharray = `${len}`;
-      path.style.strokeDashoffset = `${len}`;
-      path.getBoundingClientRect();
-      path.style.transition = "stroke-dashoffset 2.4s ease-out";
-      path.style.strokeDashoffset = "0";
-    }
-  }, []);
   return (
-    <svg ref={ref} viewBox="0 0 100 60" preserveAspectRatio="none" className="h-16 w-full">
-      <path fill="none" stroke="var(--accent)" strokeWidth="1" strokeLinejoin="round" />
+    <svg viewBox="0 0 100 60" preserveAspectRatio="none" className="h-16 w-full" aria-hidden="true">
+      <path data-story-draw pathLength={1} d={SPARKLINE_PATH} fill="none" stroke="var(--accent)" strokeWidth="1" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -100,19 +82,6 @@ export function ComputationalEngine() {
 
   return (
     <Section id="engine" className="py-32 md:py-44">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <EdgeFadeVisual variant="section" className="absolute inset-0">
-          <div className="absolute inset-[-6%] opacity-[0.35]">
-            <img
-              src={assetUrl("/images/g01/g01-08-computational-engine.md.webp")}
-              alt=""
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        </EdgeFadeVisual>
-      </div>
-
       <div ref={contentRef} className="relative grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
         <div>
           <Reveal>
@@ -147,7 +116,7 @@ export function ComputationalEngine() {
             </p>
           </Reveal>
           <Reveal delay={0.2}>
-            <ul className="mt-10 space-y-4">
+            <ul data-story-stagger className="mt-10 space-y-4">
               {METRICS.map(({ value, label }) => (
                 <li key={value} className="flex items-baseline gap-4 border-b border-line pb-4">
                   <span className="font-display w-20 text-2xl font-semibold text-white">{value}</span>
@@ -162,7 +131,7 @@ export function ComputationalEngine() {
 
         {/* instrument panel */}
         <Reveal delay={0.1} y={40}>
-          <div className="glass relative rounded-2xl p-6 sm:p-8">
+          <div data-story-panel className="glass relative rounded-2xl p-6 sm:p-8">
             <div className="flex items-center justify-between border-b border-line pb-5">
               <div className="flex items-center gap-3">
                 <span className="inline-block h-2 w-2 rounded-full bg-accent-green shadow-[0_0_10px_var(--accent-green)]" />
@@ -175,7 +144,7 @@ export function ComputationalEngine() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-x-8 gap-y-7 py-7">
+            <div data-story-stagger className="grid grid-cols-2 gap-x-8 gap-y-7 py-7">
               <div>
                 <div className="mono-label mb-2">{tr(language, "Atoms", "原子数")}</div>
                 <div className="font-mono text-2xl font-medium text-white sm:text-3xl">

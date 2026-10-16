@@ -14,9 +14,9 @@ export function ProfilePage() {
   const zh = language === "zh";
   const { account } = useAccount();
   const [passwordOpen, setPasswordOpen] = useState(false);
-  if (!account) return <main className="profile-page"><a className="profile-back" href={assetUrl("/console/")}>← {zh ? "返回控制台" : "Back to console"}</a><section className="profile-auth"><h1>{zh ? "请先登录" : "Sign in first"}</h1><a href={assetUrl("/login/?returnTo=/official/profile/")}>{zh ? "登录" : "Sign in"}</a></section></main>;
+  if (!account) return <main className="profile-page"><a className="profile-back" href={assetUrl("/md-agent/")}>← {zh ? "返回智能体" : "Back to agent"}</a><section className="profile-auth"><h1>{zh ? "请先登录" : "Sign in first"}</h1><a href={assetUrl("/login/?returnTo=/official/profile/")}>{zh ? "登录" : "Sign in"}</a></section></main>;
   return <main className="profile-page">
-    <header className="profile-topbar"><a className="profile-brand" href={assetUrl("/")}><Mark />{zh ? BRAND.zh : BRAND.en}<span />{zh ? "个人中心" : "Personal center"}</a><a className="profile-back" href={assetUrl("/console/")}>← {zh ? "返回控制台" : "Back to console"}</a></header>
+    <header className="profile-topbar"><a className="profile-brand" href={assetUrl("/")}><Mark />{zh ? BRAND.zh : BRAND.en}<span />{zh ? "个人中心" : "Personal center"}</a><a className="profile-back" href={assetUrl("/md-agent/")}>← {zh ? "返回智能体" : "Back to agent"}</a></header>
     <div className="profile-content">
       <p className="profile-kicker">AETHERICAI / ACCOUNT</p>
       <h1>{zh ? "个人中心" : "Personal center"}</h1>

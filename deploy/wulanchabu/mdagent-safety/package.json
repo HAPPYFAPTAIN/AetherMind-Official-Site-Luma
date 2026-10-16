@@ -1,0 +1,17 @@
+{
+  "name": "mdagent-safety",
+  "version": "0.1.0",
+  "description": "Fixed MD-Agent workspace safety guard",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "license": "UNLICENSED"
+}

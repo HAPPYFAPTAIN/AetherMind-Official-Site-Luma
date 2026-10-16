@@ -72,7 +72,7 @@ export function ConsolePage() {
   const enterMdExp = async () => {
     if (enteringMdExp) return;
     if (!account) {
-      window.location.assign(assetUrl("/login/?returnTo=/official/console/"));
+      window.location.assign(assetUrl("/login/?returnTo=/official/md-agent/"));
       return;
     }
     if (!mdState?.qualifications.some((item) => item.product_id === "md-exp")) {
